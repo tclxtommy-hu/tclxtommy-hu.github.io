@@ -1,11 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>http200.cn</title>
+    <title>http200.cn | 0 error, 0 warning</title>
+    <meta name="description" content="http200.cn | 0 error, 0 warning">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            min-height:100vh;
+            background:#050508;
+            color:#fff;
+            font-family:"Segoe UI",Roboto,微软雅黑,sans-serif;
+            overflow:hidden;
+            position:relative;
+        }
+        /* 粒子流光背景 */
+        #bg-canvas{
+            position:fixed;
+            top:0;left:0;
+            width:100vw;height:100vh;
+            z-index:1;
+            opacity:0.6;
+        }
+        /* 主体容器 */
+        .wrap{
+            position:relative;
+            z-index:2;
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:20px;
+        }
+        /* 域名大Logo */
+        .domain{
+            font-size:clamp(2.5rem,8vw,6rem);
+            font-weight:900;
+            background:linear-gradient(90deg,#00f0ff,#7b2fff,#ff2fc8);
+            -webkit-background-clip:text;
+            background-clip:text;
+            color:transparent;
+            text-shadow:0 0 30px rgba(0,240,255,0.5);
+            margin-bottom:20px;
+            animation:glow 3s ease-in-out infinite alternate;
+        }
+        @keyframes glow{
+            from{filter:brightness(1);}
+            to{filter:brightness(1.3);}
+        }
+        .tip{
+            font-size:1rem;
+            color:#8892b0;
+            margin-bottom:40px;
+            letter-spacing:2px;
+        }
+        /* 按钮组 */
+        .btn-group{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+        .btn{
+            padding:12px 32px;
+            border:1px solid #00f0ff;
+            border-radius:50px;
+            color:#00f0ff;
+            text-decoration:none;
+            transition:all 0.3s ease;
+            background:rgba(0,240,255,0.05);
+        }
+        .btn:hover{
+            background:#00f0ff;
+            color:#000;
+            box-shadow:0 0 20px #00f0ff;
+        }
+        .btn.alt{border-color:#7b2fff;color:#7b2fff;}
+        .btn.alt:hover{background:#7b2fff;color:#fff;box-shadow:0 0 20px #7b2fff;}
+        /* 底部版权 */
+        .footer{
+            position:absolute;
+            bottom:30px;
+            color:#555;
+            font-size:0.8rem;
+            letter-spacing:1px;
+        }
+    </style>
 </head>
 <body>
-    http200.cn
+<!-- 动态粒子背景 -->
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+    <div class="domain">http200.cn</div>
+    <div class="tip">200 OK · 极简静态 · 极速直达</div>
+    <div class="footer">© http200.cn | Powered by TommyHu</div>
+</div>
+
+<!-- 轻量粒子JS（内嵌无外链） -->
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let w,h,points=[];
+function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+// 生成光点
+for(let i=0;i<80;i++){
+    points.push({
+        x:Math.random()*w,
+        y:Math.random()*h,
+        r:Math.random()*1.5+0.5,
+        speedX:(Math.random()-0.5)*0.6,
+        speedY:(Math.random()-0.5)*0.6,
+        color:['#00f0ff','#7b2fff','#ff2fc8'][Math.floor(Math.random()*3)]
+    });
+}
+
+// 动画
+function animate(){
+    ctx.clearRect(0,0,w,h);
+    points.forEach(p=>{
+        p.x += p.speedX; p.y += p.speedY;
+        if(p.x<0||p.x>w)p.speedX*=-1;
+        if(p.y<0||p.y>h)p.speedY*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.color;ctx.fill();
+    });
+    // 连线
+    for(let a=0;a<points.length;a++){
+        for(let b=a+1;b<points.length;b++){
+            let dx=points[a].x-points[b].x;
+            let dy=points[a].y-points[b].y;
+            let d=Math.sqrt(dx*dx+dy*dy);
+            if(d<120){
+                ctx.beginPath();
+                ctx.moveTo(points[a].x,points[a].y);
+                ctx.lineTo(points[b].x,points[b].y);
+                ctx.strokeStyle=`rgba(0,240,255,${(120-d)/300})`;
+                ctx.lineWidth=0.3;ctx.stroke();
+            }
+        }
+    }
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
 </body>
 </html>
