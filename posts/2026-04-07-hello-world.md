@@ -18,6 +18,20 @@ tags: [日志, 博客]
 2. 推送到 GitHub
 3. GitHub Actions 自动编译并部署
 4. 通过 http200.cn 即可访问
+5. 其他
+
+```shell
+# ssh
+ssh-keygen -t ed25519 -C "你的GitHub邮箱@example.com"
+
+# 测试
+ssh -T git@github.com
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+
+# git代理
+http.proxy → http://127.0.0.1:7897
+https.proxy → http://127.0.0.1:7897
+```
 
 ### Markdown 支持
 
