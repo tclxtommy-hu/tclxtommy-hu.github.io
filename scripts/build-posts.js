@@ -51,13 +51,37 @@ const posts = mdFiles.map(file => {
 // Sort by date descending
 posts.sort((a, b) => (b.date > a.date ? 1 : -1));
 
+// ====== Generate search index ======
+const searchIndex = posts.map(p => ({
+  slug: p.slug,
+  title: p.title,
+  date: p.date,
+  tags: p.tags,
+  // Strip HTML tags for plain-text search content
+  content: p.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+}));
+fs.writeFileSync(
+  path.join(ROOT, 'public', 'search-index.json'),
+  JSON.stringify(searchIndex),
+  'utf-8'
+);
+
 // ====== Shared HTML fragments ======
+const criticalCss = `
+  <style>
+    body { background: #0a0a0f; color: #e0e0e6; margin: 0; }
+    .page-wrap { opacity: 0; animation: fadeIn .3s ease .05s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+  </style>`;
+
 const headExtra = `
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="/icons/icon-192.svg">`;
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">${criticalCss}`;
 
 // ====== Generate post pages ======
 for (const post of posts) {
@@ -75,6 +99,7 @@ for (const post of posts) {
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
+  <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav><a href="/">首页</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
@@ -90,6 +115,7 @@ for (const post of posts) {
     <a href="/" class="back-link">← 返回首页</a>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>`;
@@ -118,15 +144,23 @@ const indexHtml = `<!DOCTYPE html>
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
+  <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav><a href="/">首页</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
   </header>
   <main class="container">
     <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">最新文章</h2>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+    </div>
+    <div id="search-results" style="display:none;"></div>
+    <div id="post-list-wrap">
     ${listHtml}
+    </div>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>`;

@@ -12,15 +12,26 @@
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <style>
+    body { background: #0a0a0f; color: #e0e0e6; margin: 0; }
+    .page-wrap { opacity: 0; animation: fadeIn .3s ease .05s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+  </style>
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
+  <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav><a href="/">首页</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
   </header>
   <main class="container">
     <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">最新文章</h2>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+    </div>
+    <div id="search-results" style="display:none;"></div>
+    <div id="post-list-wrap">
     <ul class="post-list">
     <li class="post-item">
       <div class="post-title"><a href="/posts-html/2026-04-07-hello-world.html">Hello World - 博客启动</a></div>
@@ -38,8 +49,10 @@
 3. GitHub Ac</div>
     </li>
   </ul>
+    </div>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -36,9 +36,12 @@ body {
 }
 
 /* All content above canvas */
-.site-header, .container, .site-footer {
+.page-wrap {
   position: relative;
   z-index: 1;
+}
+.site-header, .container, .site-footer {
+  position: relative;
 }
 
 a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
@@ -197,6 +200,37 @@ a:hover { color: var(--accent3); }
   margin-top: 32px;
   color: var(--accent);
   font-size: 0.9rem;
+}
+
+/* ====== Search ====== */
+.search-box {
+  margin-bottom: 24px;
+}
+.search-box input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-box input::placeholder {
+  color: var(--text-muted);
+}
+.search-box input:focus {
+  border-color: var(--accent);
+}
+#search-results .search-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 0;
+}
+#search-results .search-highlight {
+  color: var(--accent3);
+  font-weight: 700;
 }
 .back-link:hover { color: var(--accent3); }
 

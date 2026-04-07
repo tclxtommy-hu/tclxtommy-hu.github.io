@@ -64,5 +64,83 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
+// ====== Search ======
+function initSearch() {
+  const input = document.getElementById('search-input');
+  if (!input) return;
+
+  const resultsEl = document.getElementById('search-results');
+  const listWrap = document.getElementById('post-list-wrap');
+  let index = null;
+
+  async function loadIndex() {
+    if (index) return index;
+    const res = await fetch('/search-index.json');
+    index = await res.json();
+    return index;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlight(text, query) {
+    if (!query) return escapeHtml(text);
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escapeHtml(text).replace(
+      new RegExp(escaped, 'gi'),
+      match => `<span class="search-highlight">${match}</span>`
+    );
+  }
+
+  let debounceTimer;
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => doSearch(input.value.trim()), 200);
+  });
+
+  async function doSearch(query) {
+    if (!query) {
+      resultsEl.style.display = 'none';
+      listWrap.style.display = '';
+      return;
+    }
+
+    const data = await loadIndex();
+    const lower = query.toLowerCase();
+    const matches = data.filter(p =>
+      p.title.toLowerCase().includes(lower) ||
+      p.content.toLowerCase().includes(lower) ||
+      p.tags.some(t => t.toLowerCase().includes(lower))
+    );
+
+    listWrap.style.display = 'none';
+    resultsEl.style.display = '';
+
+    if (matches.length === 0) {
+      resultsEl.innerHTML = '<p class="search-empty">没有找到匹配的文章</p>';
+      return;
+    }
+
+    resultsEl.innerHTML = `<ul class="post-list">${matches.map(p => {
+      // Find a snippet around the match in content
+      let snippet = '';
+      const idx = p.content.toLowerCase().indexOf(lower);
+      if (idx !== -1) {
+        const start = Math.max(0, idx - 40);
+        const end = Math.min(p.content.length, idx + query.length + 80);
+        snippet = (start > 0 ? '…' : '') + p.content.slice(start, end) + (end < p.content.length ? '…' : '');
+      }
+
+      return `<li class="post-item">
+        <div class="post-title"><a href="/posts-html/${p.slug}.html">${highlight(p.title, query)}</a></div>
+        <div class="post-meta">${p.date}${p.tags.length ? ' · ' + p.tags.join(', ') : ''}</div>
+        ${snippet ? `<div class="post-summary">${highlight(snippet, query)}</div>` : ''}
+      </li>`;
+    }).join('')}</ul>`;
+  }
+}
+
 // Init
 initParticles();
+initSearch();
