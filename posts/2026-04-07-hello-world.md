@@ -1,0 +1,36 @@
+---
+title: Hello World - 博客启动
+date: 2026-04-07
+tags: [日志, 博客]
+---
+
+# Hello World
+
+这是 **http200.cn** 的第一篇文章。
+
+## 关于本站
+
+本站使用 Vite 构建，通过 GitHub Actions 自动部署到 GitHub Pages。
+
+### 工作流程
+
+1. 在 `posts/` 目录下新建 `.md` 文件
+2. 推送到 GitHub
+3. GitHub Actions 自动编译并部署
+4. 通过 http200.cn 即可访问
+
+### Markdown 支持
+
+支持完整的 Markdown 语法：
+
+- **粗体** 和 *斜体*
+- `行内代码` 和代码块
+- 列表、引用、表格等
+
+> 0 error, 0 warning — 这就是 http200 的含义。
+
+```javascript
+console.log('Hello from http200.cn!');
+```
+
+欢迎访问！

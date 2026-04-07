@@ -1,0 +1,6 @@
+# Generated
+posts-html/
+dist/
+node_modules/
+*.local
+.DS_Store
