@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node scripts/build-posts.js && vite",
     "build": "node scripts/build-posts.js && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "new": "node scripts/new-post.js"
   },
   "repository": {
     "type": "git",

@@ -32,7 +32,8 @@ const posts = mdFiles.map(file => {
   const raw = fs.readFileSync(path.join(POSTS_DIR, file), 'utf-8');
   const { data, content } = matter(raw);
   const slug = file.replace(/\.md$/, '');
-  const html = marked(content);
+  // Rewrite image paths: ../public/images/xxx -> /images/xxx (for production)
+  const html = marked(content).replace(/(<img\s[^>]*src=")\.\.\/public\//g, '$1/');
 
   // Extract first paragraph as summary
   const summaryMatch = content.replace(/^#.+\n*/m, '').trim().split('\n\n')[0];
