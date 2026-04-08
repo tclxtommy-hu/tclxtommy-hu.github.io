@@ -113,6 +113,17 @@ for (const post of posts) {
       </div>
       <div class="post-content">${post.html}</div>
     </article>
+    <section class="comments-section">
+      <h2 class="comments-title">评论</h2>
+      <script src="https://utteranc.es/client.js"
+        repo="tclxtommy-hu/tclxtommy-hu.github.io"
+        issue-term="pathname"
+        label="💬 comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+      <\/script>
+    </section>
     <a href="/" class="back-link">← 返回首页</a>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
