@@ -115,13 +115,49 @@ for (const post of posts) {
     </article>
     <section class="comments-section">
       <h2 class="comments-title">评论</h2>
-      <script src="https://utteranc.es/client.js"
-        repo="tclxtommy-hu/tclxtommy-hu.github.io"
-        issue-term="pathname"
-        label="💬 comment"
-        theme="github-dark"
-        crossorigin="anonymous"
-        async>
+      <div id="comments-widget"><p class="comments-loading">评论加载中…</p></div>
+      <script>
+      (async function(){
+        var repo='tclxtommy-hu/tclxtommy-hu.github.io';
+        var postPath='/posts-html/${post.slug}.html';
+        var el=document.getElementById('comments-widget');
+        var API='https://api.github.com/repos/'+repo;
+        var HDR={Accept:'application/vnd.github.full+json'};
+        function gh(u){
+          return fetch(u,{headers:HDR}).then(function(r){
+            if(r.status===403||r.status===429){throw new Error('ratelimit');}
+            if(!r.ok){throw new Error(r.status);}
+            return r.json();
+          });
+        }
+        var newUrl='https://github.com/'+repo+'/issues/new?title='+encodeURIComponent(postPath)+'&labels='+encodeURIComponent('\ud83d\udcac comment');
+        try{
+          var issues=await gh(API+'/issues?state=open&per_page=100');
+          var issue=Array.isArray(issues)&&issues.find(function(i){return i.title===postPath;});
+          var btn='<a href="'+(issue?issue.html_url:newUrl)+'" target="_blank" rel="noopener" class="comment-btn">\ud83d\udcac '+(issue?'\u53bb GitHub \u8bc4\u8bba':'\u6210\u4e3a\u7b2c\u4e00\u4e2a\u8bc4\u8bba\u8005')+'</a>';
+          if(!issue||issue.comments===0){el.innerHTML='<p class="comments-empty">\u6682\u65e0\u8bc4\u8bba</p>'+btn;return;}
+          var comments=await gh(issue.comments_url+'?per_page=100');
+          var html=comments.map(function(c){
+            var d=new Date(c.created_at).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+            return '<div class="comment-item">'
+              +'<div class="comment-meta">'
+              +'<img src="'+c.user.avatar_url+'" class="comment-avatar" alt="" loading="lazy">'
+              +'<a href="https://github.com/'+c.user.login+'" target="_blank" rel="noopener" class="comment-user">'+c.user.login+'</a>'
+              +'<time class="comment-time">'+d+'</time>'
+              +'</div>'
+              +'<div class="comment-body">'+(c.body_html||c.body||'')+'</div>'
+              +'</div>';
+          }).join('');
+          el.innerHTML='<div class="comments-list">'+html+'</div>'+btn;
+        }catch(e){
+          if(e.message==='ratelimit'){
+            el.innerHTML='<p class="comments-error">GitHub \u8bc4\u8bba\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41\uff0c\u8bf7\u7a0d\u540e\u5237\u65b0\u3002'
+              +'<a href="'+newUrl+'" target="_blank" rel="noopener" class="comment-btn" style="margin-left:12px">\ud83d\udcac \u53bb GitHub \u8bc4\u8bba</a></p>';
+          }else{
+            el.innerHTML='<p class="comments-error">\u8bc4\u8bba\u52a0\u8f7d\u5931\u8d25\uff0c<a href="https://github.com/'+repo+'/issues" target="_blank" rel="noopener">\u524d\u5f80 GitHub \u67e5\u770b</a></p>';
+          }
+        }
+      })();
       <\/script>
     </section>
     <a href="/" class="back-link">← 返回首页</a>
