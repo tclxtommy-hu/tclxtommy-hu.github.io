@@ -141,6 +141,105 @@ function initSearch() {
   }
 }
 
+function initPostToc() {
+  const toc = document.querySelector('[data-post-toc]');
+  if (!toc) return;
+
+  const toggle = toc.querySelector('[data-toc-toggle]');
+  const toggleText = toggle?.querySelector('.post-toc-toggle-text');
+  const mobileMedia = window.matchMedia('(max-width: 768px)');
+
+  const items = [...toc.querySelectorAll('.post-toc-link')]
+    .map(link => {
+      const id = decodeURIComponent(link.getAttribute('href').slice(1));
+      const heading = document.getElementById(id);
+      return heading ? { link, heading } : null;
+    })
+    .filter(Boolean);
+
+  if (items.length === 0) {
+    toc.remove();
+    return;
+  }
+
+  function setCollapsed(collapsed) {
+    if (!toggle) return;
+    toc.classList.toggle('is-collapsed', collapsed);
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    if (toggleText) {
+      toggleText.textContent = collapsed ? '展开' : '收起';
+    }
+  }
+
+  function syncTocMode() {
+    if (!toggle) return;
+    if (mobileMedia.matches) {
+      setCollapsed(!toc.classList.contains('is-open-mobile'));
+    } else {
+      toc.classList.remove('is-collapsed', 'is-open-mobile');
+      toggle.setAttribute('aria-expanded', 'true');
+      if (toggleText) {
+        toggleText.textContent = '';
+      }
+    }
+  }
+
+  function updateActiveLink() {
+    const offset = 140;
+    let activeItem = items[0];
+
+    for (const item of items) {
+      if (item.heading.getBoundingClientRect().top <= offset) {
+        activeItem = item;
+      } else {
+        break;
+      }
+    }
+
+    for (const item of items) {
+      item.link.classList.toggle('is-active', item === activeItem);
+    }
+  }
+
+  let ticking = false;
+  function requestUpdate() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      updateActiveLink();
+      ticking = false;
+    });
+  }
+
+  for (const item of items) {
+    item.link.addEventListener('click', () => {
+      for (const entry of items) {
+        entry.link.classList.toggle('is-active', entry === item);
+      }
+
+      if (mobileMedia.matches) {
+        toc.classList.remove('is-open-mobile');
+        setCollapsed(true);
+      }
+    });
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const willOpen = toc.classList.contains('is-collapsed');
+      toc.classList.toggle('is-open-mobile', willOpen);
+      setCollapsed(!willOpen);
+    });
+  }
+
+  document.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate);
+  mobileMedia.addEventListener('change', syncTocMode);
+  syncTocMode();
+  requestUpdate();
+}
+
 // Init
 initParticles();
 initSearch();
+initPostToc();

@@ -20,6 +20,58 @@ const POSTS_HTML_DIR = path.join(ROOT, 'posts-html');
 if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
 if (!fs.existsSync(POSTS_HTML_DIR)) fs.mkdirSync(POSTS_HTML_DIR, { recursive: true });
 
+function slugifyHeading(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[\s\u3000]+/g, '-')
+    .replace(/[^\w\u4e00-\u9fa5-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '') || 'section';
+}
+
+function createHeadingId(text, slugCounts) {
+  const base = slugifyHeading(text);
+  const count = slugCounts.get(base) || 0;
+  slugCounts.set(base, count + 1);
+  return count === 0 ? base : `${base}-${count + 1}`;
+}
+
+function collectHeadings(tokens, slugCounts, headings = []) {
+  for (const token of tokens) {
+    if (token.type === 'heading') {
+      const text = (token.text || '').trim();
+      token._headingId = createHeadingId(text, slugCounts);
+      headings.push({
+        id: token._headingId,
+        text,
+        depth: token.depth,
+      });
+    }
+
+    if (Array.isArray(token.tokens)) {
+      collectHeadings(token.tokens, slugCounts, headings);
+    }
+
+    if (Array.isArray(token.items)) {
+      for (const item of token.items) {
+        if (Array.isArray(item.tokens)) {
+          collectHeadings(item.tokens, slugCounts, headings);
+        }
+      }
+    }
+  }
+
+  return headings;
+}
+
+const renderer = new marked.Renderer();
+renderer.heading = function heading({ tokens, depth, _headingId }) {
+  const text = this.parser.parseInline(tokens);
+  return `<h${depth} id="${_headingId}">${text}</h${depth}>`;
+};
+
 // Clean old generated HTML
 for (const f of fs.readdirSync(POSTS_HTML_DIR)) {
   fs.unlinkSync(path.join(POSTS_HTML_DIR, f));
@@ -32,12 +84,21 @@ const posts = mdFiles.map(file => {
   const raw = fs.readFileSync(path.join(POSTS_DIR, file), 'utf-8');
   const { data, content } = matter(raw);
   const slug = file.replace(/\.md$/, '');
+  const tokens = marked.lexer(content);
+  const headings = collectHeadings(tokens, new Map());
   // Rewrite image paths: ../public/images/xxx -> /images/xxx (for production)
-  const html = marked(content).replace(/(<img\s[^>]*src=")\.\.\/public\//g, '$1/');
+  const html = marked.parser(tokens, { renderer }).replace(/(<img\s[^>]*src=")\.\.\/public\//g, '$1/');
 
   // Extract first paragraph as summary
   const summaryMatch = content.replace(/^#.+\n*/m, '').trim().split('\n\n')[0];
   const summary = summaryMatch ? summaryMatch.replace(/[#*`\[\]]/g, '').slice(0, 150) : '';
+
+  const normalizedTitle = (data.title || slug).trim().toLowerCase();
+  const tocHeadings = headings.filter(heading => {
+    if (!heading.text) return false;
+    if (heading.depth > 4) return false;
+    return !(heading.depth === 1 && heading.text.trim().toLowerCase() === normalizedTitle);
+  });
 
   return {
     slug,
@@ -46,6 +107,7 @@ const posts = mdFiles.map(file => {
     tags: data.tags || [],
     summary,
     html,
+    tocHeadings,
   };
 });
 
@@ -89,6 +151,21 @@ for (const post of posts) {
   const tagsHtml = post.tags.length
     ? `<span class="post-tags"> · ${post.tags.join(', ')}</span>`
     : '';
+  const tocHtml = post.tocHeadings.length
+    ? `<aside class="post-toc" data-post-toc>
+      <button type="button" class="post-toc-toggle" data-toc-toggle aria-expanded="false" aria-controls="post-toc-nav-${post.slug}">
+        <span class="post-toc-title">目录</span>
+        <span class="post-toc-toggle-text">展开</span>
+      </button>
+      <nav id="post-toc-nav-${post.slug}" class="post-toc-nav" aria-label="文章目录">
+        <ol class="post-toc-list">${post.tocHeadings.map(heading => `
+          <li class="post-toc-item depth-${heading.depth}">
+            <a href="#${heading.id}" class="post-toc-link" data-toc-id="${heading.id}">${heading.text}</a>
+          </li>`).join('')}
+        </ol>
+      </nav>
+    </aside>`
+    : '';
 
   const postHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -105,61 +182,66 @@ for (const post of posts) {
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav><a href="/">首页</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
   </header>
-  <main class="container">
-    <article>
-      <div class="post-header">
-        <h1>${post.title}</h1>
-        <div class="post-meta">${post.date}${tagsHtml}</div>
+  <main class="container container-post">
+    <div class="post-layout${post.tocHeadings.length ? '' : ' no-toc'}">
+      <div class="post-main">
+        <article>
+          <div class="post-header">
+            <h1>${post.title}</h1>
+            <div class="post-meta">${post.date}${tagsHtml}</div>
+          </div>
+          <div class="post-content">${post.html}</div>
+        </article>
+        <section class="comments-section">
+          <h2 class="comments-title">评论</h2>
+          <div id="comments-widget"><p class="comments-loading">评论加载中…</p></div>
+          <script>
+          (async function(){
+            var repo='tclxtommy-hu/tclxtommy-hu.github.io';
+            var postPath='/posts-html/${post.slug}.html';
+            var el=document.getElementById('comments-widget');
+            var API='https://api.github.com/repos/'+repo;
+            var HDR={Accept:'application/vnd.github.full+json'};
+            function gh(u){
+              return fetch(u,{headers:HDR}).then(function(r){
+                if(r.status===403||r.status===429){throw new Error('ratelimit');}
+                if(!r.ok){throw new Error(r.status);}
+                return r.json();
+              });
+            }
+            var newUrl='https://github.com/'+repo+'/issues/new?title='+encodeURIComponent(postPath)+'&labels='+encodeURIComponent('\ud83d\udcac comment');
+            try{
+              var issues=await gh(API+'/issues?state=open&per_page=100');
+              var issue=Array.isArray(issues)&&issues.find(function(i){return i.title===postPath;});
+              var btn='<a href="'+(issue?issue.html_url:newUrl)+'" target="_blank" rel="noopener" class="comment-btn">\ud83d\udcac '+(issue?'\u53bb GitHub \u8bc4\u8bba':'\u6210\u4e3a\u7b2c\u4e00\u4e2a\u8bc4\u8bba\u8005')+'</a>';
+              if(!issue||issue.comments===0){el.innerHTML='<p class="comments-empty">\u6682\u65e0\u8bc4\u8bba</p>'+btn;return;}
+              var comments=await gh(issue.comments_url+'?per_page=100');
+              var html=comments.map(function(c){
+                var d=new Date(c.created_at).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+                return '<div class="comment-item">'
+                  +'<div class="comment-meta">'
+                  +'<img src="'+c.user.avatar_url+'" class="comment-avatar" alt="" loading="lazy">'
+                  +'<a href="https://github.com/'+c.user.login+'" target="_blank" rel="noopener" class="comment-user">'+c.user.login+'</a>'
+                  +'<time class="comment-time">'+d+'</time>'
+                  +'</div>'
+                  +'<div class="comment-body">'+(c.body_html||c.body||'')+'</div>'
+                  +'</div>';
+              }).join('');
+              el.innerHTML='<div class="comments-list">'+html+'</div>'+btn;
+            }catch(e){
+              if(e.message==='ratelimit'){
+                el.innerHTML='<p class="comments-error">GitHub \u8bc4\u8bba\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41\uff0c\u8bf7\u7a0d\u540e\u5237\u65b0\u3002'
+                  +'<a href="'+newUrl+'" target="_blank" rel="noopener" class="comment-btn" style="margin-left:12px">\ud83d\udcac \u53bb GitHub \u8bc4\u8bba</a></p>';
+              }else{
+                el.innerHTML='<p class="comments-error">\u8bc4\u8bba\u52a0\u8f7d\u5931\u8d25\uff0c<a href="https://github.com/'+repo+'/issues" target="_blank" rel="noopener">\u524d\u5f80 GitHub \u67e5\u770b</a></p>';
+              }
+            }
+          })();
+          <\/script>
+        </section>
       </div>
-      <div class="post-content">${post.html}</div>
-    </article>
-    <section class="comments-section">
-      <h2 class="comments-title">评论</h2>
-      <div id="comments-widget"><p class="comments-loading">评论加载中…</p></div>
-      <script>
-      (async function(){
-        var repo='tclxtommy-hu/tclxtommy-hu.github.io';
-        var postPath='/posts-html/${post.slug}.html';
-        var el=document.getElementById('comments-widget');
-        var API='https://api.github.com/repos/'+repo;
-        var HDR={Accept:'application/vnd.github.full+json'};
-        function gh(u){
-          return fetch(u,{headers:HDR}).then(function(r){
-            if(r.status===403||r.status===429){throw new Error('ratelimit');}
-            if(!r.ok){throw new Error(r.status);}
-            return r.json();
-          });
-        }
-        var newUrl='https://github.com/'+repo+'/issues/new?title='+encodeURIComponent(postPath)+'&labels='+encodeURIComponent('\ud83d\udcac comment');
-        try{
-          var issues=await gh(API+'/issues?state=open&per_page=100');
-          var issue=Array.isArray(issues)&&issues.find(function(i){return i.title===postPath;});
-          var btn='<a href="'+(issue?issue.html_url:newUrl)+'" target="_blank" rel="noopener" class="comment-btn">\ud83d\udcac '+(issue?'\u53bb GitHub \u8bc4\u8bba':'\u6210\u4e3a\u7b2c\u4e00\u4e2a\u8bc4\u8bba\u8005')+'</a>';
-          if(!issue||issue.comments===0){el.innerHTML='<p class="comments-empty">\u6682\u65e0\u8bc4\u8bba</p>'+btn;return;}
-          var comments=await gh(issue.comments_url+'?per_page=100');
-          var html=comments.map(function(c){
-            var d=new Date(c.created_at).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
-            return '<div class="comment-item">'
-              +'<div class="comment-meta">'
-              +'<img src="'+c.user.avatar_url+'" class="comment-avatar" alt="" loading="lazy">'
-              +'<a href="https://github.com/'+c.user.login+'" target="_blank" rel="noopener" class="comment-user">'+c.user.login+'</a>'
-              +'<time class="comment-time">'+d+'</time>'
-              +'</div>'
-              +'<div class="comment-body">'+(c.body_html||c.body||'')+'</div>'
-              +'</div>';
-          }).join('');
-          el.innerHTML='<div class="comments-list">'+html+'</div>'+btn;
-        }catch(e){
-          if(e.message==='ratelimit'){
-            el.innerHTML='<p class="comments-error">GitHub \u8bc4\u8bba\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41\uff0c\u8bf7\u7a0d\u540e\u5237\u65b0\u3002'
-              +'<a href="'+newUrl+'" target="_blank" rel="noopener" class="comment-btn" style="margin-left:12px">\ud83d\udcac \u53bb GitHub \u8bc4\u8bba</a></p>';
-          }else{
-            el.innerHTML='<p class="comments-error">\u8bc4\u8bba\u52a0\u8f7d\u5931\u8d25\uff0c<a href="https://github.com/'+repo+'/issues" target="_blank" rel="noopener">\u524d\u5f80 GitHub \u67e5\u770b</a></p>';
-          }
-        }
-      })();
-      <\/script>
-    </section>
+      ${tocHtml}
+    </div>
     <a href="/" class="back-link">← 返回首页</a>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>

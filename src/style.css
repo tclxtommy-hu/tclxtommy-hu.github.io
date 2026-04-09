@@ -23,6 +23,10 @@ body {
   position: relative;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ====== Particle Background ====== */
 #bg-canvas {
   position: fixed;
@@ -126,6 +130,23 @@ a:hover { color: var(--accent3); }
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
+.container-post {
+  max-width: 1240px;
+}
+.post-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-areas: "toc main";
+  gap: 36px;
+  align-items: start;
+}
+.post-layout.no-toc {
+  grid-template-columns: minmax(0, 1fr);
+}
+.post-main {
+  min-width: 0;
+  grid-area: main;
+}
 .post-header h1 {
   font-size: 2rem;
   font-weight: 800;
@@ -143,6 +164,7 @@ a:hover { color: var(--accent3); }
   margin-bottom: 0.6em;
   font-weight: 700;
   color: #fff;
+  scroll-margin-top: 120px;
 }
 .post-content h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
 .post-content h3 { font-size: 1.25rem; }
@@ -193,6 +215,93 @@ a:hover { color: var(--accent3); }
 }
 .post-content th { background: #1a1a2e; font-weight: 600; }
 .post-content hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+.post-toc {
+  grid-area: toc;
+  position: sticky;
+  top: 88px;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(18, 18, 26, 0.88);
+  backdrop-filter: blur(10px);
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+.post-toc::-webkit-scrollbar {
+  width: 10px;
+}
+.post-toc::-webkit-scrollbar-track {
+  background: transparent;
+}
+.post-toc::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.35), rgba(123, 47, 255, 0.45));
+  border: 2px solid rgba(18, 18, 26, 0.88);
+  border-radius: 999px;
+}
+.post-toc {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.45) transparent;
+}
+.post-toc-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.post-toc-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+.post-toc-toggle-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.post-toc-nav {
+  margin-top: 12px;
+}
+.post-toc-list {
+  list-style: none;
+}
+.post-toc-item + .post-toc-item {
+  margin-top: 6px;
+}
+.post-toc-item.depth-2 {
+  padding-left: 14px;
+}
+.post-toc-item.depth-3 {
+  padding-left: 28px;
+}
+.post-toc-item.depth-4 {
+  padding-left: 42px;
+}
+.post-toc-link {
+  display: block;
+  padding: 6px 10px;
+  border-left: 2px solid transparent;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.post-toc-link:hover {
+  color: var(--text);
+  background: rgba(123, 47, 255, 0.08);
+}
+.post-toc-link.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(0, 240, 255, 0.08);
+}
 
 /* Back link */
 .back-link {
@@ -318,6 +427,65 @@ a:hover { color: var(--accent3); }
   font-weight: 700;
 }
 .back-link:hover { color: var(--accent3); }
+
+@media (max-width: 1100px) {
+  .post-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .post-toc {
+    position: static;
+    top: auto;
+    max-height: none;
+    margin-bottom: 20px;
+  }
+
+  .post-toc-toggle-text {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 28px 16px;
+  }
+
+  .post-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .post-toc {
+    order: -1;
+    padding: 14px;
+    max-height: min(48vh, 360px);
+    overflow: hidden;
+  }
+
+  .post-toc.is-collapsed {
+    max-height: none;
+  }
+
+  .post-toc.is-collapsed .post-toc-nav {
+    display: none;
+  }
+
+  .post-toc.is-open-mobile {
+    overflow: auto;
+  }
+
+  .post-toc-toggle {
+    padding-bottom: 0;
+  }
+
+  .post-toc-toggle-text {
+    display: inline;
+  }
+
+  .post-content h2 { font-size: 1.35rem; }
+  .post-content h3 { font-size: 1.15rem; }
+}
 
 /* ====== Responsive ====== */
 @media (max-width: 600px) {
