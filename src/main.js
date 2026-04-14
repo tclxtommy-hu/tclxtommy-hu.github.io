@@ -239,7 +239,77 @@ function initPostToc() {
   requestUpdate();
 }
 
+// ====== WeChat Share ======
+function initWeChatShare() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (!ua.includes('micromessenger')) return;
+
+  // Extract share info from meta tags
+  const getMeta = (prop) => {
+    const el = document.querySelector(`meta[property="${prop}"]`) ||
+               document.querySelector(`meta[name="${prop}"]`);
+    return el ? el.getAttribute('content') : '';
+  };
+
+  const shareData = {
+    title: getMeta('og:title') || document.title,
+    desc: getMeta('og:description') || getMeta('description') || '',
+    link: getMeta('og:url') || window.location.href,
+    imgUrl: getMeta('og:image') || 'https://http200.cn/icons/icon-512.png',
+  };
+
+  // Try WeChat JS-SDK if available
+  function configWxSdk() {
+    if (typeof wx === 'undefined') return;
+
+    wx.ready(function () {
+      wx.updateAppMessageShareData({
+        title: shareData.title,
+        desc: shareData.desc,
+        link: shareData.link,
+        imgUrl: shareData.imgUrl,
+        success: function () {},
+      });
+      wx.updateTimelineShareData({
+        title: shareData.title,
+        link: shareData.link,
+        imgUrl: shareData.imgUrl,
+        success: function () {},
+      });
+    });
+  }
+
+  // Try to fetch wx-config from API, fallback to meta tags only
+  fetch('/api/wx-config?url=' + encodeURIComponent(window.location.href.split('#')[0]))
+    .then(function (res) { return res.json(); })
+    .then(function (cfg) {
+      if (cfg.appId && cfg.timestamp && cfg.nonceStr && cfg.signature) {
+        var script = document.createElement('script');
+        script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
+        script.onload = function () {
+          wx.config({
+            debug: false,
+            appId: cfg.appId,
+            timestamp: cfg.timestamp,
+            nonceStr: cfg.nonceStr,
+            signature: cfg.signature,
+            jsApiList: [
+              'updateAppMessageShareData',
+              'updateTimelineShareData',
+            ],
+          });
+          configWxSdk();
+        };
+        document.head.appendChild(script);
+      }
+    })
+    .catch(function () {
+      // No server-side config available, rely on OG meta tags
+    });
+}
+
 // Init
 initParticles();
 initSearch();
 initPostToc();
+initWeChatShare();

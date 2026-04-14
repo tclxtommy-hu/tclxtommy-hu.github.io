@@ -91,7 +91,7 @@ const posts = mdFiles.map(file => {
 
   // Extract first paragraph as summary
   const summaryMatch = content.replace(/^#.+\n*/m, '').trim().split('\n\n')[0];
-  const summary = summaryMatch ? summaryMatch.replace(/[#*`\[\]]/g, '').slice(0, 150) : '';
+  const summary = summaryMatch ? summaryMatch.replace(/[#*`\[\]]/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').slice(0, 150).trim() : '';
 
   const normalizedTitle = (data.title || slug).trim().toLowerCase();
   const tocHeadings = headings.filter(heading => {
@@ -138,6 +138,7 @@ const posts = mdFiles.map(file => {
     sortDate,
     tags: data.tags || [],
     summary,
+    image: data.image || '',
     html,
     tocHeadings,
   };
@@ -183,18 +184,19 @@ const headExtra = `
 
 function buildOgMeta({ title, description, url, type = 'website', image = '/icons/icon-512.png' }) {
   const fullImage = image.startsWith('http') ? image : `https://http200.cn${image}`;
+  const cleanDesc = description.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
   return `
   <link rel="canonical" href="https://http200.cn${url}">
   <meta property="og:type" content="${type}">
   <meta property="og:title" content="${title}">
-  <meta property="og:description" content="${description}">
+  <meta property="og:description" content="${cleanDesc}">
   <meta property="og:url" content="https://http200.cn${url}">
   <meta property="og:image" content="${fullImage}">
   <meta property="og:site_name" content="http200.cn">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
-  <meta name="twitter:description" content="${description}">
+  <meta name="twitter:description" content="${cleanDesc}">
   <meta name="twitter:image" content="${fullImage}">`;
 }
 
@@ -245,6 +247,7 @@ for (const post of posts) {
     description: post.summary,
     url: `/posts-html/${post.slug}.html`,
     type: 'article',
+    image: post.image || undefined,
   });
   const jsonLd = buildJsonLd({
     type: 'Article',
@@ -262,6 +265,8 @@ for (const post of posts) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${post.title} - http200.cn</title>
   <meta name="description" content="${post.summary}">
+  <meta property="article:published_time" content="${post.sortDate ? post.sortDate.toISOString() : ''}">
+  ${post.tags.length ? `<meta property="article:tag" content="${post.tags.join(',')}">` : ''}
   ${keywordsMeta}${ogMeta}${jsonLd}${headExtra}
 </head>
 <body>
