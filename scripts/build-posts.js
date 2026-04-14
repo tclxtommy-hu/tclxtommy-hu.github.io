@@ -100,10 +100,42 @@ const posts = mdFiles.map(file => {
     return !(heading.depth === 1 && heading.text.trim().toLowerCase() === normalizedTitle);
   });
 
+  // Format date nicely
+  // Priority: frontmatter date > date from slug > file mtime > file birthtime
+  const formatDate = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  let dateStr;
+  let sortDate; // for sorting
+
+  if (data.date) {
+    const d = data.date instanceof Date ? data.date : new Date(data.date);
+    if (d instanceof Date && !isNaN(d)) {
+      dateStr = formatDate(d);
+      sortDate = d;
+    } else {
+      dateStr = String(data.date);
+      sortDate = new Date(data.date);
+    }
+  } else {
+    // Try to extract date from slug (e.g. 2026-04-07-xxx or xxx-2026-04-09)
+    const m = slug.match(/(\d{4}-\d{2}-\d{2})/);
+    if (m) {
+      const d = new Date(m[1]);
+      dateStr = formatDate(d);
+      sortDate = d;
+    } else {
+      // Fall back to file mtime then birthtime
+      const filePath = path.join(POSTS_DIR, file);
+      const stat = fs.statSync(filePath);
+      sortDate = stat.mtime || stat.birthtime || new Date(0);
+      dateStr = formatDate(sortDate);
+    }
+  }
+
   return {
     slug,
     title: data.title || slug,
-    date: data.date || slug.slice(0, 10) || 'unknown',
+    date: dateStr,
+    sortDate,
     tags: data.tags || [],
     summary,
     html,
@@ -112,7 +144,7 @@ const posts = mdFiles.map(file => {
 });
 
 // Sort by date descending
-posts.sort((a, b) => (b.date > a.date ? 1 : -1));
+posts.sort((a, b) => (b.sortDate > a.sortDate ? 1 : -1));
 
 // ====== Generate search index ======
 const searchIndex = posts.map(p => ({
@@ -137,6 +169,9 @@ const criticalCss = `
     @keyframes fadeIn { to { opacity: 1; } }
   </style>`;
 
+const keywordsMeta = '<meta name="keywords" content="HTTP200,AI技术,大模型,人工智能,AI应用,网络技术,IT运维,软件开发,编程教程,AI工具,大语言模型">';
+const siteDesc = 'HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。';
+
 const headExtra = `
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0f">
@@ -145,6 +180,44 @@ const headExtra = `
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">${criticalCss}`;
+
+function buildOgMeta({ title, description, url, type = 'website', image = '/icons/icon-512.png' }) {
+  const fullImage = image.startsWith('http') ? image : `https://http200.cn${image}`;
+  return `
+  <link rel="canonical" href="https://http200.cn${url}">
+  <meta property="og:type" content="${type}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:url" content="https://http200.cn${url}">
+  <meta property="og:image" content="${fullImage}">
+  <meta property="og:site_name" content="http200.cn">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${description}">
+  <meta name="twitter:image" content="${fullImage}">`;
+}
+
+function buildJsonLd({ type, title, description, url, datePublished = '', dateModified = '' }) {
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': type,
+    name: title,
+    description,
+    url: `https://http200.cn${url}`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'http200.cn',
+      logo: { '@type': 'ImageObject', url: 'https://http200.cn/icons/icon-512.png' },
+    },
+  };
+  if (datePublished) ld.datePublished = datePublished;
+  if (dateModified) ld.dateModified = dateModified;
+  return `\n  <script type="application/ld+json">${JSON.stringify(ld)}</script>`;
+}
+
+// ====== Shared nav HTML ======
+const navHtml = '<a href="/">首页</a><a href="/archive.html">归档</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a>';
 
 // ====== Generate post pages ======
 for (const post of posts) {
@@ -167,20 +240,36 @@ for (const post of posts) {
     </aside>`
     : '';
 
+  const ogMeta = buildOgMeta({
+    title: `${post.title} - http200.cn`,
+    description: post.summary,
+    url: `/posts-html/${post.slug}.html`,
+    type: 'article',
+  });
+  const jsonLd = buildJsonLd({
+    type: 'Article',
+    title: post.title,
+    description: post.summary,
+    url: `/posts-html/${post.slug}.html`,
+    datePublished: post.sortDate ? post.sortDate.toISOString().split('T')[0] : '',
+    dateModified: post.sortDate ? post.sortDate.toISOString().split('T')[0] : '',
+  });
+
   const postHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${post.title} - http200.cn</title>
-  <meta name="description" content="${post.summary}">${headExtra}
+  <meta name="description" content="${post.summary}">
+  ${keywordsMeta}${ogMeta}${jsonLd}${headExtra}
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
-    <nav><a href="/">首页</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
+    <nav>${navHtml}</nav>
   </header>
   <main class="container container-post">
     <div class="post-layout${post.tocHeadings.length ? '' : ' no-toc'}">
@@ -253,10 +342,11 @@ for (const post of posts) {
   fs.writeFileSync(path.join(POSTS_HTML_DIR, `${post.slug}.html`), postHtml, 'utf-8');
 }
 
-// ====== Generate index.html ======
-const listHtml = posts.length === 0
+// ====== Generate index.html (only latest 3 posts) ======
+const latestPosts = posts.slice(0, 3);
+const listHtml = latestPosts.length === 0
   ? '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">还没有文章，在 <code>posts/</code> 目录下添加 Markdown 文件即可。</p>'
-  : `<ul class="post-list">${posts.map(p => `
+  : `<ul class="post-list">${latestPosts.map(p => `
     <li class="post-item">
       <div class="post-title"><a href="/posts-html/${p.slug}.html">${p.title}</a></div>
       <div class="post-meta">${p.date}${p.tags.length ? ` · ${p.tags.join(', ')}` : ''}</div>
@@ -269,15 +359,16 @@ const indexHtml = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>http200.cn | 0 error, 0 warning</title>
-  <meta name="description" content="http200.cn - TommyHu's blog">${headExtra}
+  <title>HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享</title>
+  <meta name="description" content="${siteDesc}">
+  ${keywordsMeta}${buildOgMeta({ title: 'HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享', description: siteDesc, url: '/' })}${buildJsonLd({ type: 'WebSite', title: 'HTTP200', description: siteDesc, url: '/' })}${headExtra}
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
-    <nav><a href="/">首页</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
+    <nav>${navHtml}</nav>
   </header>
   <main class="container">
     <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">最新文章</h2>
@@ -288,6 +379,7 @@ const indexHtml = `<!DOCTYPE html>
     <div id="post-list-wrap">
     ${listHtml}
     </div>
+    <div style="text-align:center;margin-top:24px;"><a href="/archive.html" style="color:var(--accent);font-size:0.95rem;">查看全部文章 →</a></div>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
   </div>
@@ -297,4 +389,114 @@ const indexHtml = `<!DOCTYPE html>
 
 fs.writeFileSync(path.join(ROOT, 'index.html'), indexHtml, 'utf-8');
 
-console.log(`✅ Built ${posts.length} post(s), index.html updated.`);
+// ====== Generate archive.html ======
+const archiveListHtml = posts.length === 0
+  ? '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">还没有文章。</p>'
+  : `<ul class="archive-list">${posts.map(p => `
+    <li class="archive-item">
+      ${p.date ? `<span class="archive-date">${p.date}</span>` : ''}
+      <a class="archive-title" href="/posts-html/${p.slug}.html">${p.title}</a>
+    </li>`).join('')}
+  </ul>`;
+
+const archiveHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>归档 - HTTP200</title>
+  <meta name="description" content="${siteDesc}">
+  ${keywordsMeta}${buildOgMeta({ title: '归档 - HTTP200', description: siteDesc, url: '/archive.html' })}${buildJsonLd({ type: 'CollectionPage', title: '归档 - HTTP200', description: siteDesc, url: '/archive.html' })}${headExtra}
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="page-wrap">
+  <header class="site-header">
+    <div class="logo"><a href="/">http200.cn</a></div>
+    <nav>${navHtml}</nav>
+  </header>
+  <main class="container">
+    <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">文章归档</h2>
+    ${archiveListHtml}
+  </main>
+  <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>`;
+
+fs.writeFileSync(path.join(ROOT, 'archive.html'), archiveHtml, 'utf-8');
+
+// ====== Generate sitemap.xml ======
+const SITE_URL = 'https://http200.cn';
+const today = new Date().toISOString().split('T')[0];
+
+const sitemapEntries = [];
+
+// Static pages
+sitemapEntries.push({ loc: '/', changefreq: 'daily', priority: '1.0', lastmod: today });
+sitemapEntries.push({ loc: '/archive.html', changefreq: 'weekly', priority: '0.8', lastmod: today });
+
+// Post pages
+for (const post of posts) {
+  sitemapEntries.push({
+    loc: `/posts-html/${post.slug}.html`,
+    changefreq: 'weekly',
+    priority: '0.7',
+    lastmod: post.sortDate ? post.sortDate.toISOString().split('T')[0] : today,
+  });
+}
+
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${sitemapEntries.map(e => `  <url>
+    <loc>${SITE_URL}${e.loc}</loc>
+    <lastmod>${e.lastmod}</lastmod>
+    <changefreq>${e.changefreq}</changefreq>
+    <priority>${e.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+fs.writeFileSync(path.join(ROOT, 'public', 'sitemap.xml'), sitemapXml, 'utf-8');
+
+// ====== Generate robots.txt ======
+const robotsTxt = `User-agent: *
+Allow: /
+
+Sitemap: ${SITE_URL}/sitemap.xml
+
+# Baidu
+User-agent: Baiduspider
+Allow: /
+
+# AI crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# Block non-benefit crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+`;
+
+fs.writeFileSync(path.join(ROOT, 'public', 'robots.txt'), robotsTxt, 'utf-8');
+
+console.log(`✅ Built ${posts.length} post(s), index.html, archive.html, sitemap.xml & robots.txt updated.`);

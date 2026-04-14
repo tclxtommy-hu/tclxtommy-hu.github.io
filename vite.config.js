@@ -4,7 +4,10 @@ import path from 'path';
 
 // Collect all HTML files for multi-page build
 function getHtmlInputs() {
-  const inputs = { main: path.resolve(__dirname, 'index.html') };
+  const inputs = {
+    main: path.resolve(__dirname, 'index.html'),
+    archive: path.resolve(__dirname, 'archive.html'),
+  };
 
   const postsHtmlDir = path.resolve(__dirname, 'posts-html');
   if (fs.existsSync(postsHtmlDir)) {

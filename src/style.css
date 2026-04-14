@@ -428,6 +428,49 @@ a:hover { color: var(--accent3); }
 }
 .back-link:hover { color: var(--accent3); }
 
+/* ====== Archive Page ====== */
+.archive-list { list-style: none; }
+.archive-item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 20px;
+  margin-bottom: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.archive-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.archive-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 100px;
+}
+.archive-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: color 0.2s;
+}
+.archive-title:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .archive-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .archive-date {
+    min-width: auto;
+  }
+}
+
 @media (max-width: 1100px) {
   .post-layout {
     grid-template-columns: minmax(0, 1fr);
