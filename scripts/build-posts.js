@@ -348,8 +348,8 @@ for (const post of posts) {
 }
 
 // ====== Generate index.html ======
-const homeTitle = 'HTTP200 3D Room - TommyHu';
-const homeDesc = 'HTTP200 3D 个人空间，点击房间物体探索关于我、技能、项目与联系方式。';
+const homeTitle = 'HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享';
+const homeDesc = 'HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。';
 const indexHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
