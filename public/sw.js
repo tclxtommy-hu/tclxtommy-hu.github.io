@@ -1,6 +1,13 @@
 const CACHE_NAME = 'http200-v1';
 const PRECACHE = ['/', '/manifest.json'];
 
+function canCacheRequest(request) {
+  if (!request || request.method !== 'GET') return false;
+  const url = new URL(request.url);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+  return url.origin === self.location.origin;
+}
+
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
@@ -18,10 +25,15 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  if (!canCacheRequest(e.request)) return;
+
   e.respondWith(
     fetch(e.request)
       .then((res) => {
+        if (!res || res.status !== 200 || res.type === 'error') {
+          return res;
+        }
+
         const clone = res.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
         return res;

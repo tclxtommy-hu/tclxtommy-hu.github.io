@@ -347,46 +347,53 @@ for (const post of posts) {
   fs.writeFileSync(path.join(POSTS_HTML_DIR, `${post.slug}.html`), postHtml, 'utf-8');
 }
 
-// ====== Generate index.html (only latest 3 posts) ======
-const latestPosts = posts.slice(0, 3);
-const listHtml = latestPosts.length === 0
-  ? '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">还没有文章，在 <code>posts/</code> 目录下添加 Markdown 文件即可。</p>'
-  : `<ul class="post-list">${latestPosts.map(p => `
-    <li class="post-item">
-      <div class="post-title"><a href="/posts-html/${p.slug}.html">${p.title}</a></div>
-      <div class="post-meta">${p.date}${p.tags.length ? ` · ${p.tags.join(', ')}` : ''}</div>
-      ${p.summary ? `<div class="post-summary">${p.summary}</div>` : ''}
-    </li>`).join('')}
-  </ul>`;
-
+// ====== Generate index.html ======
+const homeTitle = 'HTTP200 3D Room - TommyHu';
+const homeDesc = 'HTTP200 3D 个人空间，点击房间物体探索关于我、技能、项目与联系方式。';
 const indexHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享</title>
-  <meta name="description" content="${siteDesc}">
-  ${keywordsMeta}${buildOgMeta({ title: 'HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享', description: siteDesc, url: '/' })}${buildJsonLd({ type: 'WebSite', title: 'HTTP200', description: siteDesc, url: '/' })}${headExtra}
+  <title>${homeTitle}</title>
+  <meta name="description" content="${homeDesc}">
+  ${keywordsMeta}${buildOgMeta({ title: homeTitle, description: homeDesc, url: '/' })}${buildJsonLd({ type: 'WebSite', title: homeTitle, description: homeDesc, url: '/' })}${headExtra}
 </head>
-<body>
-  <canvas id="bg-canvas"></canvas>
-  <div class="page-wrap">
-  <header class="site-header">
-    <div class="logo"><a href="/">http200.cn</a></div>
-    <nav>${navHtml}</nav>
-  </header>
-  <main class="container">
-    <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">最新文章</h2>
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+<body class="home-3d" data-page="home-3d">
+  <div class="room-page">
+    <div id="room-canvas" class="room-canvas" aria-label="3D 房间场景"></div>
+
+    <aside class="room-card" id="room-info-card">
+      <div class="room-card-kicker">TommyHu · Interactive Resume</div>
+      <h1 id="room-card-title">欢迎来到我的 3D 房间</h1>
+      <p id="room-card-text">拖拽旋转视角，滚轮缩放，点击发光标签探索我的信息。</p>
+      <div class="room-card-actions">
+        <a href="/archive.html">进入博客归档</a>
+        <a href="https://github.com/tclxtommy-hu" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </aside>
+
+    <div class="room-hotspots" id="room-hotspots" aria-hidden="false">
+      <button type="button" class="room-hotspot" data-hotspot="about">✨ About Me</button>
+      <button type="button" class="room-hotspot" data-hotspot="skills">🧠 Skills</button>
+      <button type="button" class="room-hotspot" data-hotspot="projects">💻 Projects</button>
+      <button type="button" class="room-hotspot" data-hotspot="contact">📫 Contact</button>
     </div>
-    <div id="search-results" style="display:none;"></div>
-    <div id="post-list-wrap">
-    ${listHtml}
+
+    <div class="room-search-modal" id="room-search-modal" hidden>
+      <div class="room-search-panel">
+        <div class="room-search-header">
+          <h2>搜索文章</h2>
+          <button type="button" id="room-search-close" aria-label="关闭搜索">×</button>
+        </div>
+        <div class="search-box room-search-box">
+          <input type="text" id="room-search-input" placeholder="输入关键词，例如 Agent / 向量数据库 / PyTorch" autocomplete="off">
+        </div>
+        <div id="room-search-results"><p class="search-empty">输入关键词搜索文章</p></div>
+      </div>
     </div>
-    <div style="text-align:center;margin-top:24px;"><a href="/archive.html" style="color:var(--accent);font-size:0.95rem;">查看全部文章 →</a></div>
-  </main>
-  <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+
+    <div class="room-tip">Click an object to explore · Drag to orbit · Scroll to zoom</div>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>
@@ -422,7 +429,13 @@ const archiveHtml = `<!DOCTYPE html>
   </header>
   <main class="container">
     <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">文章归档</h2>
-    ${archiveListHtml}
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+    </div>
+    <div id="search-results" style="display:none;"></div>
+    <div id="post-list-wrap">
+      ${archiveListHtml}
+    </div>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
   </div>

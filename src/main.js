@@ -1,5 +1,108 @@
 import './style.css';
 
+async function initHomeRoomIfNeeded() {
+  if (document.body?.dataset?.page !== 'home-3d') return false;
+  const { initHome3DRoom } = await import('./three-room.js');
+  initHome3DRoom();
+  return true;
+}
+
+function initHomeSearchModal() {
+  if (document.body?.dataset?.page !== 'home-3d') return;
+
+  const modal = document.getElementById('room-search-modal');
+  const input = document.getElementById('room-search-input');
+  const results = document.getElementById('room-search-results');
+  const closeBtn = document.getElementById('room-search-close');
+  if (!modal || !input || !results || !closeBtn) return;
+
+  let indexData = null;
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlight(text, query) {
+    if (!query) return escapeHtml(text);
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escapeHtml(text).replace(new RegExp(escaped, 'gi'), (m) => `<span class="search-highlight">${m}</span>`);
+  }
+
+  async function loadIndex() {
+    if (indexData) return indexData;
+    const res = await fetch('/search-index.json');
+    indexData = await res.json();
+    return indexData;
+  }
+
+  function setOpen(open) {
+    modal.hidden = !open;
+    modal.classList.toggle('is-open', open);
+    document.body.classList.toggle('is-home-search-open', open);
+    if (open) {
+      requestAnimationFrame(() => input.focus());
+    }
+  }
+
+  async function runSearch(query) {
+    if (!query) {
+      results.innerHTML = '<p class="search-empty">输入关键词搜索文章</p>';
+      return;
+    }
+
+    const data = await loadIndex();
+    const lower = query.toLowerCase();
+    const matches = data.filter((p) =>
+      p.title.toLowerCase().includes(lower) ||
+      p.content.toLowerCase().includes(lower) ||
+      p.tags.some((t) => t.toLowerCase().includes(lower))
+    );
+
+    if (matches.length === 0) {
+      results.innerHTML = '<p class="search-empty">没有找到匹配的文章</p>';
+      return;
+    }
+
+    results.innerHTML = `<ul class="post-list">${matches.slice(0, 20).map((p) => {
+      const idx = p.content.toLowerCase().indexOf(lower);
+      let snippet = '';
+      if (idx !== -1) {
+        const start = Math.max(0, idx - 40);
+        const end = Math.min(p.content.length, idx + query.length + 80);
+        snippet = (start > 0 ? '…' : '') + p.content.slice(start, end) + (end < p.content.length ? '…' : '');
+      }
+      return `<li class="post-item">
+        <div class="post-title"><a href="/posts-html/${p.slug}.html">${highlight(p.title, query)}</a></div>
+        <div class="post-meta">${p.date}${p.tags.length ? ' · ' + p.tags.join(', ') : ''}</div>
+        ${snippet ? `<div class="post-summary">${highlight(snippet, query)}</div>` : ''}
+      </li>`;
+    }).join('')}</ul>`;
+  }
+
+  let timer;
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const value = input.value.trim();
+    timer = setTimeout(() => runSearch(value), 160);
+  });
+
+  closeBtn.addEventListener('click', () => setOpen(false));
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) setOpen(false);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.hidden) {
+      setOpen(false);
+    }
+  });
+
+  window.addEventListener('room:open-search', () => {
+    setOpen(true);
+    runSearch(input.value.trim());
+  });
+}
+
 // ====== Particle background animation ======
 function initParticles() {
   const canvas = document.getElementById('bg-canvas');
@@ -309,7 +412,12 @@ function initWeChatShare() {
 }
 
 // Init
-initParticles();
-initSearch();
-initPostToc();
-initWeChatShare();
+initHomeRoomIfNeeded().then((isHome3D) => {
+  if (!isHome3D) {
+    initParticles();
+  }
+  initHomeSearchModal();
+  initSearch();
+  initPostToc();
+  initWeChatShare();
+});

@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享</title>
-  <meta name="description" content="HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。">
+  <title>HTTP200 3D Room - TommyHu</title>
+  <meta name="description" content="HTTP200 3D 个人空间，点击房间物体探索关于我、技能、项目与联系方式。">
   <meta name="keywords" content="HTTP200,AI技术,大模型,人工智能,AI应用,网络技术,IT运维,软件开发,编程教程,AI工具,大语言模型">
   <link rel="canonical" href="https://http200.cn/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享">
-  <meta property="og:description" content="HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。">
+  <meta property="og:title" content="HTTP200 3D Room - TommyHu">
+  <meta property="og:description" content="HTTP200 3D 个人空间，点击房间物体探索关于我、技能、项目与联系方式。">
   <meta property="og:url" content="https://http200.cn/">
   <meta property="og:image" content="https://http200.cn/icons/icon-512.png">
   <meta property="og:site_name" content="http200.cn">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="HTTP200 - 最新AI技术、网络IT、软件开发与编程技术分享">
-  <meta name="twitter:description" content="HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。">
+  <meta name="twitter:title" content="HTTP200 3D Room - TommyHu">
+  <meta name="twitter:description" content="HTTP200 3D 个人空间，点击房间物体探索关于我、技能、项目与联系方式。">
   <meta name="twitter:image" content="https://http200.cn/icons/icon-512.png">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"HTTP200","description":"HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。","url":"https://http200.cn/","publisher":{"@type":"Organization","name":"http200.cn","logo":{"@type":"ImageObject","url":"https://http200.cn/icons/icon-512.png"}}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"HTTP200 3D Room - TommyHu","description":"HTTP200 3D 个人空间，点击房间物体探索关于我、技能、项目与联系方式。","url":"https://http200.cn/","publisher":{"@type":"Organization","name":"http200.cn","logo":{"@type":"ImageObject","url":"https://http200.cn/icons/icon-512.png"}}}</script>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,41 +32,41 @@
     @keyframes fadeIn { to { opacity: 1; } }
   </style>
 </head>
-<body>
-  <canvas id="bg-canvas"></canvas>
-  <div class="page-wrap">
-  <header class="site-header">
-    <div class="logo"><a href="/">http200.cn</a></div>
-    <nav><a href="/">首页</a><a href="/archive.html">归档</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
-  </header>
-  <main class="container">
-    <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">最新文章</h2>
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+<body class="home-3d" data-page="home-3d">
+  <div class="room-page">
+    <div id="room-canvas" class="room-canvas" aria-label="3D 房间场景"></div>
+
+    <aside class="room-card" id="room-info-card">
+      <div class="room-card-kicker">TommyHu · Interactive Resume</div>
+      <h1 id="room-card-title">欢迎来到我的 3D 房间</h1>
+      <p id="room-card-text">拖拽旋转视角，滚轮缩放，点击发光标签探索我的信息。</p>
+      <div class="room-card-actions">
+        <a href="/archive.html">进入博客归档</a>
+        <a href="https://github.com/tclxtommy-hu" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </aside>
+
+    <div class="room-hotspots" id="room-hotspots" aria-hidden="false">
+      <button type="button" class="room-hotspot" data-hotspot="about">✨ About Me</button>
+      <button type="button" class="room-hotspot" data-hotspot="skills">🧠 Skills</button>
+      <button type="button" class="room-hotspot" data-hotspot="projects">💻 Projects</button>
+      <button type="button" class="room-hotspot" data-hotspot="contact">📫 Contact</button>
     </div>
-    <div id="search-results" style="display:none;"></div>
-    <div id="post-list-wrap">
-    <ul class="post-list">
-    <li class="post-item">
-      <div class="post-title"><a href="/posts-html/mcp-comprehensive-guide.html">mcp-comprehensive-guide</a></div>
-      <div class="post-meta">2026/04/14</div>
-      <div class="post-summary">> 更新日期：2026-04-14 > 作者：刀哥的小助理 🦞🔪</div>
-    </li>
-    <li class="post-item">
-      <div class="post-title"><a href="/posts-html/2026-04-14-agent-skills-standard.html">Agent Skills 标准指南</a></div>
-      <div class="post-meta">2026/04/14 · agent-skills, ai-agent, npx-skills, guide</div>
-      <div class="post-summary">现在我明白了！你指的是 Agent Skills 标准，这是一个通用的 AI Agent 技能包格式，通过 npx skills add 命令来管理。这是由 Vercel Labs 推出的开放标准。</div>
-    </li>
-    <li class="post-item">
-      <div class="post-title"><a href="/posts-html/PyTorch快速安装与入门代码.html">PyTorch快速安装与入门代码</a></div>
-      <div class="post-meta">2026/04/09</div>
-      <div class="post-summary">PyTorch 是一个开源的深度学习框架，由 Facebook AI Research (FAIR) 团队开发。它具有以下特点：</div>
-    </li>
-  </ul>
+
+    <div class="room-search-modal" id="room-search-modal" hidden>
+      <div class="room-search-panel">
+        <div class="room-search-header">
+          <h2>搜索文章</h2>
+          <button type="button" id="room-search-close" aria-label="关闭搜索">×</button>
+        </div>
+        <div class="search-box room-search-box">
+          <input type="text" id="room-search-input" placeholder="输入关键词，例如 Agent / 向量数据库 / PyTorch" autocomplete="off">
+        </div>
+        <div id="room-search-results"><p class="search-empty">输入关键词搜索文章</p></div>
+      </div>
     </div>
-    <div style="text-align:center;margin-top:24px;"><a href="/archive.html" style="color:var(--accent);font-size:0.95rem;">查看全部文章 →</a></div>
-  </main>
-  <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+
+    <div class="room-tip">Click an object to explore · Drag to orbit · Scroll to zoom</div>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>
