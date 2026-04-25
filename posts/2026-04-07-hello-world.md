@@ -31,6 +31,10 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 # git代理
 http.proxy → http://127.0.0.1:7897
 https.proxy → http://127.0.0.1:7897
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+git clone -c core.sshCommand="ssh -i ~/.ssh/id_ed25519" git@github.com:tclxtommy-hu/tclxtommy-hu.github.io.git
 ```
 
 ### Markdown 支持
