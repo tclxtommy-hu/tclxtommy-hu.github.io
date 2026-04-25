@@ -411,96 +411,104 @@ function addCharacter(parent) {
   const mouthMat = new THREE.MeshStandardMaterial({ color: 0xbe7471, roughness: 0.5, metalness: 0.01 });
 
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.46, 0.3), shirtMat);
-  body.position.set(0, 0.9, 0.03);
+  // Body sits on top of hips (hips top = 0.41 + 0.09 = 0.50)
+  body.position.set(0, 0.73, 0.03);
   body.rotation.z = 0.02;
 
   const neck = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.08, 0.1), skinMat);
-  neck.position.set(0, 1.16, 0.02);
+  neck.position.set(0, 0.99, 0.02);
 
   const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.29, 0.3), skinMat);
-  head.position.set(0, 1.33, 0.02);
+  head.position.set(0, 1.16, 0.02);
 
   const hairTop = new THREE.Mesh(new THREE.BoxGeometry(0.33, 0.11, 0.33), hairMat);
-  hairTop.position.set(0, 1.47, 0.02);
+  hairTop.position.set(0, 1.30, 0.02);
 
   // Thicker back and side hair to avoid bare back-head view.
   const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.09), hairMat);
-  hairBack.position.set(0, 1.33, -0.125);
+  hairBack.position.set(0, 1.16, -0.125);
 
   const hairSideLeft = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.19, 0.08), hairMat);
-  hairSideLeft.position.set(-0.148, 1.31, 0.0);
+  hairSideLeft.position.set(-0.148, 1.14, 0.0);
 
   const hairSideRight = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 0.07), hairMat);
-  hairSideRight.position.set(0.145, 1.33, 0.0);
+  hairSideRight.position.set(0.145, 1.16, 0.0);
 
   const bangsLeft = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.07, 0.05), hairMat);
-  bangsLeft.position.set(-0.072, 1.37, 0.155);
+  bangsLeft.position.set(-0.072, 1.24, 0.155);
   bangsLeft.rotation.z = 0.08;
 
   const bangsCenter = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.055, 0.05), hairMat);
-  bangsCenter.position.set(0.01, 1.362, 0.156);
+  bangsCenter.position.set(0.01, 1.232, 0.156);
   bangsCenter.rotation.z = -0.05;
 
   const earLeft = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.07, 0.04), skinMat);
-  earLeft.position.set(-0.168, 1.295, 0.01);
+  earLeft.position.set(-0.168, 1.125, 0.01);
 
   const earRight = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.065, 0.04), skinMat);
-  earRight.position.set(0.168, 1.302, 0.01);
+  earRight.position.set(0.168, 1.132, 0.01);
 
   const eyeLeftWhite = new THREE.Mesh(new THREE.BoxGeometry(0.058, 0.026, 0.012), eyeWhiteMat);
-  eyeLeftWhite.position.set(-0.055, 1.318, 0.171);
+  eyeLeftWhite.position.set(-0.055, 1.148, 0.171);
 
   const eyeRightWhite = new THREE.Mesh(new THREE.BoxGeometry(0.058, 0.026, 0.012), eyeWhiteMat);
-  eyeRightWhite.position.set(0.055, 1.318, 0.171);
+  eyeRightWhite.position.set(0.055, 1.148, 0.171);
 
   const eyeLeftPupil = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.022, 0.014), eyePupilMat);
-  eyeLeftPupil.position.set(-0.053, 1.317, 0.177);
+  eyeLeftPupil.position.set(-0.053, 1.147, 0.177);
 
   const eyeRightPupil = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.022, 0.014), eyePupilMat);
-  eyeRightPupil.position.set(0.053, 1.317, 0.177);
+  eyeRightPupil.position.set(0.053, 1.147, 0.177);
 
   const browLeft = new THREE.Mesh(new THREE.BoxGeometry(0.062, 0.012, 0.012), browMat);
-  browLeft.position.set(-0.055, 1.348, 0.171);
+  browLeft.position.set(-0.055, 1.178, 0.171);
   browLeft.rotation.z = 0.06;
 
   const browRight = new THREE.Mesh(new THREE.BoxGeometry(0.062, 0.012, 0.012), browMat);
-  browRight.position.set(0.055, 1.347, 0.171);
+  browRight.position.set(0.055, 1.177, 0.171);
   browRight.rotation.z = -0.04;
 
   const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.01, 0.01), mouthMat);
-  mouth.position.set(0, 1.262, 0.171);
+  mouth.position.set(0, 1.092, 0.171);
 
   const collar = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.05), makeMaterial(0xecf1ff));
-  collar.position.set(0, 1.11, 0.145);
+  collar.position.set(0, 0.94, 0.145);
 
   const hips = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.18, 0.22), pantsMat);
-  hips.position.set(0, 0.63, 0.05);
+  // Seat top is at y ≈ 0.32; hips bottom sits on seat, so hips.center y = 0.32 + 0.09 = 0.41
+  hips.position.set(0, 0.41, 0.02);
 
+  // Thighs: horizontal, resting on the seat. rotation.x = -π/2 flattens them forward.
   const leftThigh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.24, 0.14), pantsMat);
-  leftThigh.position.set(-0.085, 0.46, 0.09);
-  leftThigh.rotation.x = -0.42;
+  // thigh center y = seat top = 0.32; z forward so the leg extends toward the seat front
+  leftThigh.position.set(-0.085, 0.32, 0.14);
+  leftThigh.rotation.x = -Math.PI / 2;
 
   const rightThigh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.24, 0.14), pantsMat);
-  rightThigh.position.set(0.085, 0.47, 0.08);
-  rightThigh.rotation.x = -0.34;
+  rightThigh.position.set(0.085, 0.32, 0.14);
+  rightThigh.rotation.x = -Math.PI / 2;
 
+  // Calves: hang straight down from the knees. Knee is at y=0.32 (thigh center),
+  // calf is 0.3 long, so calf.center y = 0.32 - 0.15 = 0.17
   const leftCalf = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.11), pantsMat);
-  leftCalf.position.set(-0.085, 0.24, 0.22);
-  leftCalf.rotation.x = 0.2;
+  leftCalf.position.set(-0.085, 0.17, 0.14);
+  leftCalf.rotation.x = 0;
 
   const rightCalf = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.11), pantsMat);
-  rightCalf.position.set(0.085, 0.24, 0.2);
-  rightCalf.rotation.x = 0.12;
+  rightCalf.position.set(0.085, 0.17, 0.14);
+  rightCalf.rotation.x = 0;
 
+  // Shoes: at the bottom of the calves. calf.center y=0.17, half-calf=0.15, so shoe y≈0.02
   const leftShoe = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.18), shoeMat);
-  leftShoe.position.set(-0.085, 0.07, 0.28);
+  leftShoe.position.set(-0.085, 0.03, 0.20);
 
   const rightShoe = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.18), shoeMat);
-  rightShoe.position.set(0.085, 0.07, 0.25);
+  rightShoe.position.set(0.085, 0.03, 0.20);
 
   // Shoulder pivots to make animation feel like real shoulder sway.
+  // Body moved from y=0.9 to y=0.73; shift arms down by 0.17
   const leftUpperArm = new THREE.Group();
-  leftUpperArm.position.set(-0.25, 1.04, 0.03);
+  leftUpperArm.position.set(-0.25, 0.87, 0.03);
   const leftUpperArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.21, 0.1), shirtMat);
   leftUpperArmMesh.position.set(0, -0.105, 0);
   const leftForearm = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.19, 0.09), skinMat);
@@ -513,7 +521,7 @@ function addCharacter(parent) {
   leftUpperArm.rotation.x = -0.18;
 
   const rightUpperArm = new THREE.Group();
-  rightUpperArm.position.set(0.25, 1.04, 0.03);
+  rightUpperArm.position.set(0.25, 0.87, 0.03);
   const rightUpperArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.21, 0.1), shirtMat);
   rightUpperArmMesh.position.set(0, -0.105, 0);
   const rightForearm = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.19, 0.09), skinMat);
@@ -537,23 +545,37 @@ function addCharacter(parent) {
   );
   chairBack.position.set(0, 0.55, -0.2);
 
-  const chairLegL = new THREE.Mesh(
+  const chairLegFL = new THREE.Mesh(
     new THREE.BoxGeometry(0.08, 0.25, 0.08),
     makeMaterial(0x171a28)
   );
-  chairLegL.position.set(-0.2, 0.12, 0.12);
+  chairLegFL.position.set(-0.2, 0.12, 0.12);
 
-  const chairLegR = new THREE.Mesh(
+  const chairLegFR = new THREE.Mesh(
     new THREE.BoxGeometry(0.08, 0.25, 0.08),
     makeMaterial(0x171a28)
   );
-  chairLegR.position.set(0.2, 0.12, 0.12);
+  chairLegFR.position.set(0.2, 0.12, 0.12);
+
+  const chairLegBL = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, 0.25, 0.08),
+    makeMaterial(0x171a28)
+  );
+  chairLegBL.position.set(-0.2, 0.12, -0.2);
+
+  const chairLegBR = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, 0.25, 0.08),
+    makeMaterial(0x171a28)
+  );
+  chairLegBR.position.set(0.2, 0.12, -0.2);
 
   group.add(
     chair,
     chairBack,
-    chairLegL,
-    chairLegR,
+    chairLegFL,
+    chairLegFR,
+    chairLegBL,
+    chairLegBR,
     body,
     neck,
     head,
@@ -1137,6 +1159,14 @@ export function initHome3DRoom() {
   }
 
   animate();
+
+  // Hide loading overlay once the 3D scene is ready
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const overlay = document.getElementById('loading-overlay');
+      if (overlay) overlay.classList.add('is-hidden');
+    });
+  });
 
   const defaultBtn = hotspotButtons.get('about');
   if (defaultBtn) defaultBtn.click();
