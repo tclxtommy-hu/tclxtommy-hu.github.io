@@ -180,7 +180,14 @@ const headExtra = `
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">${criticalCss}`;
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>${criticalCss}`;
 
 function buildOgMeta({ title, description, url, type = 'website', image = '/icons/icon-512.png' }) {
   const fullImage = image.startsWith('http') ? image : `https://http200.cn${image}`;

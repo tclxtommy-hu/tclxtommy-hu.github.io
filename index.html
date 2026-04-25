@@ -26,6 +26,13 @@
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
   <style>
     body { background: #0a0a0f; color: #e0e0e6; margin: 0; }
     .page-wrap { opacity: 0; animation: fadeIn .3s ease .05s forwards; }

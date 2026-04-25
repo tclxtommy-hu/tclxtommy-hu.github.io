@@ -1,5 +1,12 @@
 const CACHE_NAME = 'http200-v1';
-const PRECACHE = ['/', '/manifest.json'];
+const PRECACHE = [
+  '/',
+  '/archive.html',
+  '/manifest.json',
+  '/src/main.js',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+];
 
 function canCacheRequest(request) {
   if (!request || request.method !== 'GET') return false;
