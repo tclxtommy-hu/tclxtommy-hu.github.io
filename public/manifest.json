@@ -5,8 +5,11 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["minimal-ui"],
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",
+  "orientation": "any",
+  "categories": ["utilities", "education"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
