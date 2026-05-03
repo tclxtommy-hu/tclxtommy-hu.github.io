@@ -10,7 +10,12 @@ tags: [日志, 博客]
 
 ## 关于本站
 
-本站使用 Vite 构建，通过 GitHub Actions 自动部署到 GitHub Pages。
+> 作为个人的知识库体系的一部分。本站使用 Vite 构建，通过 GitHub Actions 自动部署到 GitHub Pages。
+> 在日常与AI对话中，对于一些有益且需要积极归类的知识，我会将其记录到本站中。
+
+> 本站的目的是提供一个方便的知识库，方便我自己查阅和分享。
+
+
 
 ### 工作流程
 
@@ -51,4 +56,4 @@ git clone -c core.sshCommand="ssh -i ~/.ssh/id_ed25519" git@github.com:tclxtommy
 console.log('Hello from http200.cn!');
 ```
 
-欢迎访问！
+欢迎访问，您也可以fork本站来搭建自己的个人知识库站点！
