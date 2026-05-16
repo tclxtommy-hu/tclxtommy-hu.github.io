@@ -768,3 +768,30 @@ body.is-home-search-open {
     border-radius: 12px;
   }
 }
+
+/* ====== Background Music Button ====== */
+.bgm-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(137, 165, 237, 0.4);
+  background: rgba(9, 13, 38, 0.88);
+  backdrop-filter: blur(8px);
+  color: #e9f1ff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.bgm-btn:hover {
+  background: rgba(35, 47, 102, 0.9);
+  border-color: rgba(234, 242, 255, 0.6);
+  transform: scale(1.08);
+}
