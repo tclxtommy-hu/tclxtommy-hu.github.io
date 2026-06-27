@@ -1,8 +1,10 @@
 /**
  * build-posts.js
- * Pre-build step: reads posts/*.md, generates:
+ * Pre-build step: reads posts/**​/*.md recursively, generates:
  *   - index.html (post list)
- *   - posts-html/<slug>.html (each post page)
+ *   - posts-html/<slug>.html (each post page, preserving directory structure)
+ *   - archive.html with category filtering
+ *   - search-index.json with category support
  */
 
 import fs from 'fs';
@@ -19,6 +21,44 @@ const POSTS_HTML_DIR = path.join(ROOT, 'posts-html');
 // Ensure directories exist
 if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
 if (!fs.existsSync(POSTS_HTML_DIR)) fs.mkdirSync(POSTS_HTML_DIR, { recursive: true });
+
+// ====== Utility: recursive directory scan for .md files ======
+function findMdFiles(dir, baseDir) {
+  const results = [];
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name.startsWith('.') || entry.name === 'README.md') continue;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...findMdFiles(fullPath, baseDir));
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      results.push({
+        fullPath,
+        relativePath: path.relative(baseDir, fullPath),
+        relativeDir: path.relative(baseDir, path.dirname(fullPath)),
+      });
+    }
+  }
+  return results;
+}
+
+// ====== Utility: derive category / subcategory from path ======
+function deriveCategories(relativeDir) {
+  if (!relativeDir || relativeDir === '.') return { category: '', subcategory: '' };
+  const parts = relativeDir.split(path.sep);
+  const category = parts[0] || '';
+  const subcategory = parts.length > 1 ? parts.slice(1).join(' / ') : '';
+  return { category, subcategory };
+}
+
+// Escape text for use inside HTML attributes (double-quoted)
+function attrEscape(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 function slugifyHeading(text) {
   return text
@@ -72,22 +112,36 @@ renderer.heading = function heading({ tokens, depth, _headingId }) {
   return `<h${depth} id="${_headingId}">${text}</h${depth}>`;
 };
 
-// Clean old generated HTML
-for (const f of fs.readdirSync(POSTS_HTML_DIR)) {
-  fs.unlinkSync(path.join(POSTS_HTML_DIR, f));
+// Clean old generated HTML (recursive)
+function cleanDir(dir) {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      cleanDir(fullPath);
+    } else {
+      fs.unlinkSync(fullPath);
+    }
+  }
+  // Remove empty subdirectories (but keep posts-html root)
+  if (dir !== POSTS_HTML_DIR) {
+    try { fs.rmdirSync(dir); } catch (_) { /* not empty */ }
+  }
 }
+cleanDir(POSTS_HTML_DIR);
 
-// Read all markdown files
-const mdFiles = fs.readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
+// Read all markdown files recursively
+const mdFiles = findMdFiles(POSTS_DIR, POSTS_DIR);
 
-const posts = mdFiles.map(file => {
-  const raw = fs.readFileSync(path.join(POSTS_DIR, file), 'utf-8');
+const posts = mdFiles.map(({ fullPath, relativeDir }) => {
+  const raw = fs.readFileSync(fullPath, 'utf-8');
   const { data, content } = matter(raw);
-  const slug = file.replace(/\.md$/, '');
+  const slug = path.basename(fullPath, '.md');
   const tokens = marked.lexer(content);
   const headings = collectHeadings(tokens, new Map());
-  // Rewrite image paths: ../public/images/xxx -> /images/xxx (for production)
-  const html = marked.parser(tokens, { renderer }).replace(/(<img\s[^>]*src=")\.\.\/public\//g, '$1/');
+
+  // Rewrite image paths: ../../public/images/xxx → /images/xxx (for nested posts)
+  const html = marked.parser(tokens, { renderer }).replace(/(<img\s[^>]*src=")(?:\.\.\/)*public\//g, '$1/');
 
   // Extract first paragraph as summary
   const summaryMatch = content.replace(/^#.+\n*/m, '').trim().split('\n\n')[0];
@@ -100,11 +154,15 @@ const posts = mdFiles.map(file => {
     return !(heading.depth === 1 && heading.text.trim().toLowerCase() === normalizedTitle);
   });
 
+  // Derive category from frontmatter first, then from directory path
+  const pathCategories = deriveCategories(relativeDir);
+  const category = data.category || pathCategories.category;
+  const subcategory = data.subcategory || pathCategories.subcategory;
+
   // Format date nicely
-  // Priority: frontmatter date > date from slug > file mtime > file birthtime
   const formatDate = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
   let dateStr;
-  let sortDate; // for sorting
+  let sortDate;
 
   if (data.date) {
     const d = data.date instanceof Date ? data.date : new Date(data.date);
@@ -116,20 +174,21 @@ const posts = mdFiles.map(file => {
       sortDate = new Date(data.date);
     }
   } else {
-    // Try to extract date from slug (e.g. 2026-04-07-xxx or xxx-2026-04-09)
     const m = slug.match(/(\d{4}-\d{2}-\d{2})/);
     if (m) {
       const d = new Date(m[1]);
       dateStr = formatDate(d);
       sortDate = d;
     } else {
-      // Fall back to file mtime then birthtime
-      const filePath = path.join(POSTS_DIR, file);
-      const stat = fs.statSync(filePath);
+      const stat = fs.statSync(fullPath);
       sortDate = stat.mtime || stat.birthtime || new Date(0);
       dateStr = formatDate(sortDate);
     }
   }
+
+  // Build output path preserving directory structure
+  const outputDir = path.join(POSTS_HTML_DIR, relativeDir);
+  const outputFile = path.join(outputDir, `${slug}.html`);
 
   return {
     slug,
@@ -137,22 +196,29 @@ const posts = mdFiles.map(file => {
     date: dateStr,
     sortDate,
     tags: data.tags || [],
+    category,
+    subcategory,
     summary,
     image: data.image || '',
     html,
     tocHeadings,
+    relativeDir,      // e.g. "AI/AI知识库/01-AI基础概念"
+    outputFile,       // absolute path for writing
   };
 });
 
 // Sort by date descending
 posts.sort((a, b) => (b.sortDate > a.sortDate ? 1 : -1));
 
-// ====== Generate search index ======
+// ====== Generate search index (with category support) ======
 const searchIndex = posts.map(p => ({
   slug: p.slug,
   title: p.title,
   date: p.date,
   tags: p.tags,
+  category: p.category,
+  subcategory: p.subcategory,
+  relativeDir: p.relativeDir,
   // Strip HTML tags for plain-text search content
   content: p.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
 }));
@@ -161,6 +227,132 @@ fs.writeFileSync(
   JSON.stringify(searchIndex),
   'utf-8'
 );
+
+// ====== Build directory tree ======
+function buildPostsTree(baseDir) {
+  const root = { name: '全部', path: '', children: [], posts: [], readme: null, totalCount: 0 };
+
+  function walk(dir, node, relPath) {
+    node.path = relPath;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    // Sort: folders first, then files, alphabetically
+    entries.sort((a, b) => {
+      if (a.isDirectory() && !b.isDirectory()) return -1;
+      if (!a.isDirectory() && b.isDirectory()) return 1;
+      return a.name.localeCompare(b.name, 'zh-CN');
+    });
+
+    let readmeHtml = null;
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue;
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        const childRelPath = path.relative(baseDir, fullPath);
+        const child = { name: entry.name, path: childRelPath, children: [], posts: [], readme: null, totalCount: 0 };
+        walk(fullPath, child, childRelPath);
+        // Include if it has children or any .md files (we count posts later)
+        const hasContent = child.children.length > 0 || fs.readdirSync(fullPath).some(f => f.endsWith('.md') && f !== 'README.md');
+        if (hasContent) {
+          node.children.push(child);
+        }
+      } else if (entry.isFile() && entry.name === 'README.md') {
+        if (!relPath) continue; // skip root README
+        // Read and render README.md
+        try {
+          const raw = fs.readFileSync(fullPath, 'utf-8');
+          const { content } = matter(raw);
+          readmeHtml = marked.parse(content);
+        } catch (_) { /* ignore */ }
+      }
+    }
+    node.readme = readmeHtml;
+  }
+
+  walk(baseDir, root, '');
+
+  // Attach posts to tree nodes
+  for (const p of posts) {
+    const dirPath = p.relativeDir;
+    if (!dirPath) {
+      root.posts.push(p);
+      root.totalCount++;
+      continue;
+    }
+
+    // Find or create nodes for each path segment
+    const parts = dirPath.split(path.sep);
+    let currentNode = root;
+    for (let i = 0; i < parts.length; i++) {
+      const segPath = parts.slice(0, i + 1).join(path.sep);
+      let child = currentNode.children.find(c => c.path === segPath);
+      if (!child) {
+        child = { name: parts[i], path: segPath, children: [], posts: [], readme: null, totalCount: 0 };
+        currentNode.children.push(child);
+      }
+      currentNode = child;
+      currentNode.totalCount++;
+    }
+    currentNode.posts.push(p);
+    root.totalCount++;
+  }
+
+  return root;
+}
+
+const postsTree = buildPostsTree(POSTS_DIR);
+
+// ====== Generate tree HTML ======
+function buildTreeHtml(node, level) {
+  const name = node.path ? node.name : '全部';
+  const indent = '  '.repeat(level);
+  const hasChildren = node.children.length > 0;
+  const hasPosts = node.posts.length > 0;
+
+  if (!hasChildren && !hasPosts) return '';
+
+  // Every non-empty node is a collapsible folder
+  const open = (level === 0 || level === 1) ? ' open' : '';
+  let html = `${indent}<details class="tree-folder" data-path="${node.path}"${open}>\n`;
+  html += `${indent}  <summary class="tree-node${level === 0 ? ' tree-root' : ''}" data-path="${node.path}">`;
+  html += level === 0 ? '' : '📁 ';
+  html += `${name} <span class="tree-count">${node.totalCount}</span></summary>\n`;
+
+  // Sub-folders first
+  for (const child of node.children) {
+    html += buildTreeHtml(child, level + 1);
+  }
+  // Then individual posts (as links)
+  for (const p of node.posts) {
+    const postUrl = p.relativeDir
+      ? `/posts-html/${p.relativeDir}/${p.slug}.html`
+      : `/posts-html/${p.slug}.html`;
+    html += `${indent}  <a href="${postUrl}" class="tree-post" data-slug="${p.slug}" data-path="${p.relativeDir || ''}">📄 ${attrEscape(p.title)}</a>\n`;
+  }
+
+  html += `${indent}</details>\n`;
+  return html;
+}
+
+const treeHtml = `<div class="archive-tree" id="archive-tree">\n${buildTreeHtml(postsTree, 0)}\n</div>`;
+
+// ====== Generate tree JSON for JS ======
+function treeToJson(node) {
+  return {
+    name: node.name,
+    path: node.path,
+    readme: node.readme,
+    totalCount: node.totalCount,
+    children: node.children.map(treeToJson),
+    posts: node.posts.map(p => ({
+      slug: p.slug,
+      title: p.title,
+      date: p.date,
+      relativeDir: p.relativeDir,
+    })),
+  };
+}
+const treeJson = JSON.stringify(treeToJson(postsTree));
 
 // ====== Shared HTML fragments ======
 const criticalCss = `
@@ -191,18 +383,19 @@ const headExtra = `
 
 function buildOgMeta({ title, description, url, type = 'website', image = '/icons/icon-512.png' }) {
   const fullImage = image.startsWith('http') ? image : `https://http200.cn${image}`;
-  const cleanDesc = description.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleanDesc = attrEscape(description.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim());
+  const escTitle = attrEscape(title);
   return `
   <link rel="canonical" href="https://http200.cn${url}">
   <meta property="og:type" content="${type}">
-  <meta property="og:title" content="${title}">
+  <meta property="og:title" content="${escTitle}">
   <meta property="og:description" content="${cleanDesc}">
   <meta property="og:url" content="https://http200.cn${url}">
   <meta property="og:image" content="${fullImage}">
   <meta property="og:site_name" content="http200.cn">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:title" content="${escTitle}">
   <meta name="twitter:description" content="${cleanDesc}">
   <meta name="twitter:image" content="${fullImage}">`;
 }
@@ -230,6 +423,18 @@ const navHtml = '<a href="/">首页</a><a href="/archive.html">归档</a><a href
 
 // ====== Generate post pages ======
 for (const post of posts) {
+  // Build category breadcrumb HTML
+  let categoryHtml = '';
+  if (post.category) {
+    const parts = [post.category];
+    if (post.subcategory) parts.push(...post.subcategory.split(' / '));
+    categoryHtml = `<span class="post-category"> · ${parts.map((p, i, arr) => {
+      // Link to archive with category filter
+      const filter = arr.slice(0, i + 1).join('/');
+      return `<a href="/archive.html?path=${encodeURIComponent(filter)}" title="在归档中查看: ${p}">${p}</a>`;
+    }).join(' › ')}</span>`;
+  }
+
   const tagsHtml = post.tags.length
     ? `<span class="post-tags"> · ${post.tags.join(', ')}</span>`
     : '';
@@ -249,10 +454,15 @@ for (const post of posts) {
     </aside>`
     : '';
 
+  // Build post URL preserving directory structure
+  const postUrl = post.relativeDir
+    ? `/posts-html/${post.relativeDir}/${post.slug}.html`
+    : `/posts-html/${post.slug}.html`;
+
   const ogMeta = buildOgMeta({
     title: `${post.title} - http200.cn`,
     description: post.summary,
-    url: `/posts-html/${post.slug}.html`,
+    url: postUrl,
     type: 'article',
     image: post.image || undefined,
   });
@@ -260,7 +470,7 @@ for (const post of posts) {
     type: 'Article',
     title: post.title,
     description: post.summary,
-    url: `/posts-html/${post.slug}.html`,
+    url: postUrl,
     datePublished: post.sortDate ? post.sortDate.toISOString().split('T')[0] : '',
     dateModified: post.sortDate ? post.sortDate.toISOString().split('T')[0] : '',
   });
@@ -271,9 +481,10 @@ for (const post of posts) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${post.title} - http200.cn</title>
-  <meta name="description" content="${post.summary}">
+  <meta name="description" content="${attrEscape(post.summary)}">
   <meta property="article:published_time" content="${post.sortDate ? post.sortDate.toISOString() : ''}">
   ${post.tags.length ? `<meta property="article:tag" content="${post.tags.join(',')}">` : ''}
+  ${post.category ? `<meta property="article:section" content="${post.category}">` : ''}
   ${keywordsMeta}${ogMeta}${jsonLd}${headExtra}
 </head>
 <body>
@@ -289,7 +500,7 @@ for (const post of posts) {
         <article>
           <div class="post-header">
             <h1>${post.title}</h1>
-            <div class="post-meta">${post.date}${tagsHtml}</div>
+            <div class="post-meta">${post.date}${categoryHtml}${tagsHtml}</div>
           </div>
           <div class="post-content">${post.html}</div>
         </article>
@@ -299,7 +510,7 @@ for (const post of posts) {
           <script>
           (async function(){
             var repo='tclxtommy-hu/tclxtommy-hu.github.io';
-            var postPath='/posts-html/${post.slug}.html';
+            var postPath='${postUrl}';
             var el=document.getElementById('comments-widget');
             var API='https://api.github.com/repos/'+repo;
             var HDR={Accept:'application/vnd.github.full+json'};
@@ -343,7 +554,7 @@ for (const post of posts) {
       </div>
       ${tocHtml}
     </div>
-    <a href="/" class="back-link">← 返回首页</a>
+    <a href="/archive.html" class="back-link">← 返回归档</a>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
   </div>
@@ -351,7 +562,10 @@ for (const post of posts) {
 </body>
 </html>`;
 
-  fs.writeFileSync(path.join(POSTS_HTML_DIR, `${post.slug}.html`), postHtml, 'utf-8');
+  // Ensure output directory exists
+  const outDir = path.dirname(post.outputFile);
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(post.outputFile, postHtml, 'utf-8');
 }
 
 // ====== Generate index.html ======
@@ -432,11 +646,18 @@ fs.writeFileSync(path.join(ROOT, 'index.html'), indexHtml, 'utf-8');
 // ====== Generate archive.html ======
 const archiveListHtml = posts.length === 0
   ? '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">还没有文章。</p>'
-  : `<ul class="archive-list">${posts.map(p => `
-    <li class="archive-item">
+  : `<ul class="archive-list" id="archive-list">${posts.map(p => {
+    const postUrl = p.relativeDir
+      ? `/posts-html/${p.relativeDir}/${p.slug}.html`
+      : `/posts-html/${p.slug}.html`;
+    return `
+    <li class="archive-item" data-path="${p.relativeDir || ''}">
       ${p.date ? `<span class="archive-date">${p.date}</span>` : ''}
-      <a class="archive-title" href="/posts-html/${p.slug}.html">${p.title}</a>
-    </li>`).join('')}
+      <div class="archive-info">
+        <a class="archive-title" href="${postUrl}">${p.title}</a>
+        ${p.relativeDir ? `<span class="archive-category">${p.relativeDir.replace(/\\/g, ' › ')}</span>` : ''}
+      </div>
+    </li>`}).join('')}
   </ul>`;
 
 const archiveHtml = `<!DOCTYPE html>
@@ -455,18 +676,30 @@ const archiveHtml = `<!DOCTYPE html>
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav>${navHtml}</nav>
   </header>
-  <main class="container">
+  <main class="container container-archive">
     <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">文章归档</h2>
     <div class="search-box">
       <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
     </div>
-    <div id="search-results" style="display:none;"></div>
-    <div id="post-list-wrap">
-      ${archiveListHtml}
+    <div class="archive-layout">
+      <aside class="archive-sidebar">
+        <div class="archive-tree-header">📂 目录结构</div>
+        ${treeHtml}
+      </aside>
+      <div class="archive-main">
+        <div id="archive-readme" class="archive-readme" style="display:none;"></div>
+        <div id="search-results" style="display:none;"></div>
+        <div id="post-list-wrap">
+          ${archiveListHtml}
+        </div>
+      </div>
     </div>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
   </div>
+  <script>
+    window.__POSTS_TREE__ = ${treeJson};
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>`;
@@ -485,8 +718,11 @@ sitemapEntries.push({ loc: '/archive.html', changefreq: 'weekly', priority: '0.8
 
 // Post pages
 for (const post of posts) {
+  const postUrl = post.relativeDir
+    ? `/posts-html/${post.relativeDir}/${post.slug}.html`
+    : `/posts-html/${post.slug}.html`;
   sitemapEntries.push({
-    loc: `/posts-html/${post.slug}.html`,
+    loc: postUrl,
     changefreq: 'weekly',
     priority: '0.7',
     lastmod: post.sortDate ? post.sortDate.toISOString().split('T')[0] : today,

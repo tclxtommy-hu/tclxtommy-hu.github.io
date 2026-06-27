@@ -55,7 +55,9 @@ function initHomeSearchModal() {
     const matches = data.filter((p) =>
       p.title.toLowerCase().includes(lower) ||
       p.content.toLowerCase().includes(lower) ||
-      p.tags.some((t) => t.toLowerCase().includes(lower))
+      p.tags.some((t) => t.toLowerCase().includes(lower)) ||
+      (p.category && p.category.toLowerCase().includes(lower)) ||
+      (p.subcategory && p.subcategory.toLowerCase().includes(lower))
     );
 
     if (matches.length === 0) {
@@ -71,9 +73,15 @@ function initHomeSearchModal() {
         const end = Math.min(p.content.length, idx + query.length + 80);
         snippet = (start > 0 ? '…' : '') + p.content.slice(start, end) + (end < p.content.length ? '…' : '');
       }
+      const postUrl = p.relativeDir
+        ? `/posts-html/${p.relativeDir}/${p.slug}.html`
+        : `/posts-html/${p.slug}.html`;
+      const catMeta = p.category
+        ? ` · <span class="search-category">${p.category}${p.subcategory ? ' › ' + p.subcategory.replace(/ \/ /g, ' › ') : ''}</span>`
+        : '';
       return `<li class="post-item">
-        <div class="post-title"><a href="/posts-html/${p.slug}.html">${highlight(p.title, query)}</a></div>
-        <div class="post-meta">${p.date}${p.tags.length ? ' · ' + p.tags.join(', ') : ''}</div>
+        <div class="post-title"><a href="${postUrl}">${highlight(p.title, query)}</a></div>
+        <div class="post-meta">${p.date}${catMeta}${p.tags.length ? ' · ' + p.tags.join(', ') : ''}</div>
         ${snippet ? `<div class="post-summary">${highlight(snippet, query)}</div>` : ''}
       </li>`;
     }).join('')}</ul>`;
@@ -202,10 +210,106 @@ function initSearch() {
     debounceTimer = setTimeout(() => doSearch(input.value.trim()), 200);
   });
 
+  // ====== Tree-based filter ======
+  const readmeEl = document.getElementById('archive-readme');
+  const treeFolders = document.querySelectorAll('.archive-tree .tree-node');
+  let currentPath = '';
+
+  function findTreeNode(path) {
+    if (!window.__POSTS_TREE__) return null;
+    function search(node) {
+      if (node.path === path) return node;
+      if (node.children) {
+        for (const child of node.children) {
+          const found = search(child);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+    return search(window.__POSTS_TREE__);
+  }
+
+  function showReadmeOrHint(node) {
+    if (!readmeEl) return;
+    if (node && node.readme) {
+      readmeEl.innerHTML = node.readme;
+      readmeEl.style.display = '';
+    } else if (node && node.children && node.children.length > 0) {
+      // Folder has subfolders but no README
+      readmeEl.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px 0;font-size:0.95rem;">📂 请点击具体文档查看内容</p>';
+      readmeEl.style.display = '';
+    } else {
+      readmeEl.style.display = 'none';
+    }
+  }
+
+  function applyPathFilter(path) {
+    currentPath = path;
+    const items = listWrap.querySelectorAll('.archive-item');
+
+    // Highlight active tree node
+    treeFolders.forEach(n => {
+      n.classList.toggle('is-active', n.dataset.path === path);
+    });
+
+    // Show README or hint for the selected path
+    if (path) {
+      const node = findTreeNode(path);
+      showReadmeOrHint(node);
+    } else {
+      if (readmeEl) readmeEl.style.display = 'none';
+    }
+
+    if (!path) {
+      items.forEach(el => el.style.display = '');
+      return;
+    }
+
+    items.forEach(el => {
+      const itemPath = el.dataset.path || '';
+      // Show items whose path matches exactly or is under currentPath
+      el.style.display = (itemPath === path || itemPath.startsWith(path + '\\') || itemPath.startsWith(path + '/')) ? '' : 'none';
+    });
+
+    // Update URL
+    const url = new URL(window.location);
+    if (path) {
+      url.searchParams.set('path', path);
+    } else {
+      url.searchParams.delete('path');
+    }
+    window.history.replaceState({}, '', url);
+  }
+
+  treeFolders.forEach(node => {
+    node.addEventListener('click', (e) => {
+      // Don't interfere with native <details> toggle or <a> links
+      const path = node.dataset.path;
+      const details = node.closest('details');
+      if (details && node.tagName === 'SUMMARY') {
+        // Let native toggle happen, then apply filter
+        setTimeout(() => applyPathFilter(path), 10);
+      }
+    });
+  });
+
+  // Init from URL on load
+  function initPathFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const path = params.get('path');
+    if (path) {
+      applyPathFilter(path);
+    }
+  }
+  initPathFromUrl();
+
   async function doSearch(query) {
     if (!query) {
       resultsEl.style.display = 'none';
       listWrap.style.display = '';
+      // Restore tree filter
+      applyPathFilter(currentPath);
       return;
     }
 
@@ -214,11 +318,14 @@ function initSearch() {
     const matches = data.filter(p =>
       p.title.toLowerCase().includes(lower) ||
       p.content.toLowerCase().includes(lower) ||
-      p.tags.some(t => t.toLowerCase().includes(lower))
+      p.tags.some(t => t.toLowerCase().includes(lower)) ||
+      (p.category && p.category.toLowerCase().includes(lower)) ||
+      (p.subcategory && p.subcategory.toLowerCase().includes(lower))
     );
 
     listWrap.style.display = 'none';
     resultsEl.style.display = '';
+    if (readmeEl) readmeEl.style.display = 'none';
 
     if (matches.length === 0) {
       resultsEl.innerHTML = '<p class="search-empty">没有找到匹配的文章</p>';
@@ -235,9 +342,16 @@ function initSearch() {
         snippet = (start > 0 ? '…' : '') + p.content.slice(start, end) + (end < p.content.length ? '…' : '');
       }
 
+      const postUrl = p.relativeDir
+        ? `/posts-html/${p.relativeDir}/${p.slug}.html`
+        : `/posts-html/${p.slug}.html`;
+      const catMeta = p.category
+        ? ` · <span class="search-category">${p.category}${p.subcategory ? ' › ' + p.subcategory.replace(/ \/ /g, ' › ') : ''}</span>`
+        : '';
+
       return `<li class="post-item">
-        <div class="post-title"><a href="/posts-html/${p.slug}.html">${highlight(p.title, query)}</a></div>
-        <div class="post-meta">${p.date}${p.tags.length ? ' · ' + p.tags.join(', ') : ''}</div>
+        <div class="post-title"><a href="${postUrl}">${highlight(p.title, query)}</a></div>
+        <div class="post-meta">${p.date}${catMeta}${p.tags.length ? ' · ' + p.tags.join(', ') : ''}</div>
         ${snippet ? `<div class="post-summary">${highlight(snippet, query)}</div>` : ''}
       </li>`;
     }).join('')}</ul>`;
