@@ -203,6 +203,20 @@ a:hover { color: var(--accent3); }
   background: transparent;
   padding: 0;
 }
+.post-content .mermaid {
+  margin: 1.5em 0;
+  padding: 16px;
+  background: #111122;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+.post-content .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
 .post-content table {
   width: 100%;
   border-collapse: collapse;

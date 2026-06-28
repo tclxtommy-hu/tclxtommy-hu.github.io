@@ -170,6 +170,33 @@ function initParticles() {
   animate();
 }
 
+// ====== Mermaid diagram rendering ======
+async function initMermaid() {
+  const blocks = document.querySelectorAll('pre code.language-mermaid');
+  if (blocks.length === 0) return;
+
+  const mermaid = await import('mermaid');
+  mermaid.default.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#7b2fff',
+      primaryTextColor: '#e0e0e6',
+      lineColor: '#00f0ff',
+    },
+  });
+
+  for (const block of blocks) {
+    const pre = block.parentElement;
+    const code = block.textContent;
+    const div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = code;
+    pre.replaceWith(div);
+  }
+  await mermaid.default.run();
+}
+
 // ====== PWA Service Worker ======
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -244,9 +271,39 @@ function initSearch() {
     }
   }
 
+  // Normalize path to use backslash separator (matching tree data-path)
+  function normalizePath(path) {
+    if (!path) return path;
+    return path.replace(/\//g, '\\');
+  }
+
+  function expandTreeAncestors(path) {
+    if (!path) return;
+    const treeEl = document.getElementById('archive-tree');
+    if (!treeEl) return;
+
+    // Ensure root is always open
+    const rootDetails = treeEl.querySelector('.tree-folder[data-path=""]');
+    if (rootDetails) rootDetails.open = true;
+
+    // Build ancestor paths: e.g., "AI\Agent开发知识\02-推理范式" → ["AI", "AI\Agent开发知识", "AI\Agent开发知识\02-推理范式"]
+    const parts = path.split('\\');
+    let accumulated = '';
+    for (const part of parts) {
+      accumulated = accumulated ? accumulated + '\\' + part : part;
+      const details = treeEl.querySelector(`.tree-folder[data-path="${CSS.escape(accumulated)}"]`);
+      if (details) details.open = true;
+    }
+  }
+
   function applyPathFilter(path) {
+    // Normalize: breadcrumb links use '/' but tree uses '\'
+    path = normalizePath(path);
     currentPath = path;
     const items = listWrap.querySelectorAll('.archive-item');
+
+    // Expand tree ancestors along the path
+    expandTreeAncestors(path);
 
     // Highlight active tree node
     treeFolders.forEach(n => {
@@ -534,4 +591,5 @@ initHomeRoomIfNeeded().then((isHome3D) => {
   initSearch();
   initPostToc();
   initWeChatShare();
+  initMermaid();
 });
