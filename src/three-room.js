@@ -948,7 +948,52 @@ export function initHome3DRoom() {
   controls.minDistance = isMobile ? 3.5 : 4;
   controls.maxDistance = isMobile ? 16 : 12;
   controls.maxPolarAngle = Math.PI * 0.48;
-  controls.target.set(0, 1.5, 0);
+  const normalTarget = new THREE.Vector3(0, 1.5, 0);
+  controls.target.copy(normalTarget);
+
+  // ---- Intro animation: god's-eye view fly-in ----
+  const normalCameraPos = new THREE.Vector3(
+    isMobile ? 0.6 : 0.9,
+    isMobile ? 2.4 : 2.05,
+    isMobile ? 9.5 : 7.1
+  );
+  const introStartPos = new THREE.Vector3(
+    isMobile ? 0.6 : 0.1,
+    isMobile ? 5.5 : 6.8,
+    isMobile ? 2 : 1.8
+  );
+  const introStartTarget = new THREE.Vector3(0, 2.5, 0);
+  camera.position.copy(introStartPos);
+  controls.target.copy(introStartTarget);
+  controls.enabled = false;
+
+  const introDuration = 2400; // ms
+  let introElapsed = 0;
+  let introStartTime = null;
+  let introDone = false;
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function updateIntroAnim(now) {
+    if (introDone) return;
+    if (!introStartTime) introStartTime = now;
+    introElapsed = now - introStartTime;
+    let t = Math.min(introElapsed / introDuration, 1);
+    const eased = easeInOutCubic(t);
+
+    // Camera position: lerp from introStartPos to normalCameraPos
+    camera.position.lerpVectors(introStartPos, normalCameraPos, eased);
+
+    // Target: lerp from introStartTarget to normalTarget
+    controls.target.lerpVectors(introStartTarget, normalTarget, eased);
+
+    if (t >= 1) {
+      controls.enabled = true;
+      introDone = true;
+    }
+  }
 
   const hemiLight = new THREE.HemisphereLight(0x6f88ff, 0x27315f, 0.75);
   scene.add(hemiLight);
@@ -1171,6 +1216,7 @@ export function initHome3DRoom() {
   const clock = new THREE.Clock();
 
   function animate() {
+    const now = performance.now();
     const t = clock.getElapsedTime();
     stars.rotation.y = t * 0.03;
     stars.rotation.x = Math.sin(t * 0.08) * 0.03;
@@ -1181,6 +1227,9 @@ export function initHome3DRoom() {
       characterRig.rightUpperArm.rotation.z = -0.19 - Math.sin(t * 1.2 + 0.4) * 0.026;
       characterRig.rightUpperArm.rotation.x = -0.16 + Math.cos(t * 1.05 + 0.32) * 0.014;
     }
+
+    // Intro fly-in animation
+    updateIntroAnim(now);
 
     controls.update();
     updateHotspots();

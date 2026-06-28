@@ -780,6 +780,17 @@ body.home-3d {
   z-index: 10;
 }
 
+.room-card-toggle {
+  display: none;
+}
+
+.room-card-body {
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.35s ease;
+  max-height: 600px;
+  opacity: 1;
+}
+
 .home-3d .room-card-kicker {
   display: inline-block;
   margin-bottom: 10px;
@@ -949,11 +960,57 @@ body.is-home-search-open {
     right: 12px;
     top: 12px;
     width: min(360px, calc(100vw - 24px));
-    padding: 14px;
+    padding: 12px 14px;
   }
 
   .home-3d .room-card h1 {
-    font-size: 1.28rem;
+    font-size: 1.15rem;
+    padding-right: 32px;
+  }
+
+  .room-card-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(165, 195, 255, 0.3);
+    border-radius: 50%;
+    background: rgba(35, 47, 102, 0.5);
+    color: #cfddff;
+    font-size: 0.7rem;
+    cursor: pointer;
+    z-index: 2;
+    transition: transform 0.3s ease, background 0.2s;
+  }
+
+  .room-card-toggle:hover {
+    background: rgba(76, 105, 188, 0.65);
+  }
+
+  .home-3d .room-card.is-collapsed {
+    padding-bottom: 10px;
+  }
+
+  .home-3d .room-card.is-collapsed .room-card-body {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+  }
+
+  .home-3d .room-card.is-collapsed .room-card-body p {
+    margin: 0;
+  }
+
+  .home-3d .room-card.is-collapsed .room-card-body .room-card-actions {
+    margin: 0;
+  }
+
+  .home-3d .room-card.is-collapsed .room-card-toggle {
+    transform: rotate(180deg);
   }
 
   .home-3d .room-tip {

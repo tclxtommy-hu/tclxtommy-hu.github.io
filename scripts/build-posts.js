@@ -585,12 +585,15 @@ const indexHtml = `<!DOCTYPE html>
     <div id="room-canvas" class="room-canvas" aria-label="3D 房间场景"></div>
 
     <aside class="room-card" id="room-info-card">
-      <div class="room-card-kicker">TommyHu · Interactive Resume</div>
+      <button type="button" class="room-card-toggle" id="room-card-toggle" aria-label="收起卡片" title="收起">▲</button>
+      <!-- <div class="room-card-kicker">TommyHu · Interactive Resume</div> -->
       <h1 id="room-card-title">欢迎来到我的 3D 房间</h1>
-      <p id="room-card-text">拖拽旋转视角，滚轮缩放，点击发光标签探索我的信息。</p>
-      <div class="room-card-actions">
-        <a href="/archive.html">进入博客归档</a>
-        <a href="https://github.com/tclxtommy-hu" target="_blank" rel="noreferrer">GitHub</a>
+      <div class="room-card-body" id="room-card-body">
+        <p id="room-card-text">拖拽旋转视角，滚轮缩放，点击发光标签探索我的信息。</p>
+        <div class="room-card-actions">
+          <a href="/archive.html">进入博客归档</a>
+          <a href="https://github.com/tclxtommy-hu" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
       </div>
     </aside>
 
@@ -635,6 +638,18 @@ const indexHtml = `<!DOCTYPE html>
         if (playing) { bgm.pause(); btn.textContent = '🔇'; }
         else { bgm.play().catch(function(){}); btn.textContent = '🎵'; }
         playing = !playing;
+      });
+    })();
+  </script>
+  <script>
+    (function() {
+      var toggle = document.getElementById('room-card-toggle');
+      var card = document.getElementById('room-info-card');
+      if (!toggle || !card) return;
+      toggle.addEventListener('click', function() {
+        var collapsed = card.classList.toggle('is-collapsed');
+        toggle.setAttribute('aria-label', collapsed ? '展开卡片' : '收起卡片');
+        toggle.setAttribute('title', collapsed ? '展开' : '收起');
       });
     })();
   </script>
