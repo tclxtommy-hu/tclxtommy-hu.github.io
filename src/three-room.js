@@ -4,19 +4,19 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 const INFO_CONTENT = {
   about: {
     title: 'About Me',
-    text: '你好，我是 TommyHu，关注 AI 工程化、开发效率工具和知识分享。这个房间是我的交互式个人主页。',
+    text: '你好，我是 TommyHu，一个从web1.0时代过来的 IT老登 ，喜欢探索新技术和分享经验，饱藏着对行业的兴趣和热爱。'
   },
   skills: {
     title: 'Skills',
-    text: 'JavaScript / Node.js / Python / Prompt Engineering / Agent Workflow / DevOps。擅长把复杂流程做成可复用工具。',
+    text: '电视台做过策划，房地产网站里用过frontpage，实业公司里在弱电柜前做个几百个水晶头，玩过域控的网络管理员，外包公司做个千万项目的ERP，玩过data access，也搞过startrocks的亿万数据，工具，是给人用的，善于使用工具的人才不会被时代淘汰，AI时代，一直在路上……',
   },
   projects: {
     title: 'Projects',
-    text: '近期项目聚焦 AI 应用落地、MCP 工具链和技术博客体系。可在博客归档查看完整实践记录与代码片段。',
+    text: '几十年来项目无数，包罗千奇百怪，始终坚持客户第一，老板第一，有价值能变现的产品才是好产品。',
   },
   contact: {
     title: 'Contact',
-    text: '邮箱: 258546962@qq.com · GitHub: tclxtommy-hu。欢迎交流 AI 产品化、工程实践和效率系统。',
+    text: '邮箱: 258546962@qq.com',
   },
 };
 
