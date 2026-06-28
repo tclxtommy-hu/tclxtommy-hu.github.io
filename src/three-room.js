@@ -271,6 +271,15 @@ function addTable(parent) {
   suzhouGate.position.set(0.72, 1.2, -0.02);
   suzhouGate.rotation.y = -0.35;
 
+  const gateHit = new THREE.Mesh(
+    new THREE.BoxGeometry(0.2, 0.25, 0.06),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.01 })
+  );
+  gateHit.position.copy(suzhouGate.position);
+  gateHit.userData.action = 'open-link';
+  gateHit.userData.url = '/posts-html/second-hometown.html';
+  gateHit.userData.interactiveName = 'gate';
+
   const magnifierModel = createMagnifierModel();
   magnifierModel.group.scale.set(1.4, 1.4, 1.4);
   magnifierModel.group.position.set(-0.44, 1.12, 0.16);
@@ -282,11 +291,11 @@ function addTable(parent) {
   deskCat.position.set(-0.35, 0, 0.28);
   deskCat.rotation.y = 0.32;
 
-  group.add(laptopBase, screen, suzhouGate, magnifierModel.group, deskCat);
+  group.add(laptopBase, screen, suzhouGate, magnifierModel.group, deskCat, gateHit);
   parent.add(group);
 
   return {
-    interactives: [magnifierModel.clickable],
+    interactives: [magnifierModel.clickable, gateHit],
   };
 }
 
@@ -635,7 +644,17 @@ function addPicture(parent) {
   );
   art.position.set(0, 2.05, -3.42);
 
-  parent.add(frame, art);
+  const hitArea = new THREE.Mesh(
+    new THREE.BoxGeometry(1.4, 0.9, 0.08),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.01 })
+  );
+  hitArea.position.set(0, 2.05, -3.44);
+  hitArea.userData.action = 'open-link';
+  hitArea.userData.url = '/posts-html/hometown.html';
+  hitArea.userData.interactiveName = 'picture';
+
+  parent.add(frame, art, hitArea);
+  return { clickable: hitArea };
 }
 
 function createZhenfengTowerArtTexture() {
@@ -907,8 +926,14 @@ export function initHome3DRoom() {
   scene.background = new THREE.Color(0x070e3f);
   scene.fog = new THREE.Fog(0x070e3f, 8, 20);
 
-  const camera = new THREE.PerspectiveCamera(56, mount.clientWidth / mount.clientHeight, 0.1, 80);
-  camera.position.set(0.9, 2.05, 7.1);
+  const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || window.innerWidth < 768;
+  const camera = new THREE.PerspectiveCamera(
+    isMobile ? 60 : 56,
+    mount.clientWidth / mount.clientHeight,
+    0.1,
+    80
+  );
+  camera.position.set(isMobile ? 0.6 : 0.9, isMobile ? 2.4 : 2.05, isMobile ? 9.5 : 7.1);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -920,8 +945,8 @@ export function initHome3DRoom() {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
-  controls.minDistance = 4;
-  controls.maxDistance = 12;
+  controls.minDistance = isMobile ? 3.5 : 4;
+  controls.maxDistance = isMobile ? 16 : 12;
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 1.5, 0);
 
@@ -1012,7 +1037,7 @@ export function initHome3DRoom() {
   addShelf(shelfWrap);
   room.add(shelfWrap);
 
-  addPicture(room);
+  const picMeta = addPicture(room);
   addWindow(room);
   addPlants(room);
 
@@ -1047,6 +1072,7 @@ export function initHome3DRoom() {
   Object.values(anchors).forEach(anchor => scene.add(anchor));
 
   const interactiveTargets = [...(deskMeta?.interactives || [])];
+  if (picMeta?.clickable) interactiveTargets.push(picMeta.clickable);
 
   const hotspotButtons = new Map();
   hotspotWrap.querySelectorAll('.room-hotspot').forEach((btn) => {
@@ -1133,6 +1159,10 @@ export function initHome3DRoom() {
     const action = hits[0].object.userData.action;
     if (action === 'open-search') {
       window.dispatchEvent(new CustomEvent('room:open-search'));
+    }
+    if (action === 'open-link') {
+      const url = hits[0].object.userData.url;
+      if (url) window.location.href = url;
     }
   });
 
