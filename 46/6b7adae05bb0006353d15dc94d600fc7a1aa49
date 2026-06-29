@@ -1,0 +1,29 @@
+posts/AI/Agent开发知识/03-工具调用/01-Function-Calling.md
+  s_94e575f6f95921::t_348cd413bb0e40 66-89
+  h_63381fac4a1ac5 94
+  s_94e575f6f95921::t_008f9e1ed6f486 63-64
+  s_94e575f6f95921::t_0d8d97d514f6a7 119
+  s_94e575f6f95921::t_852b9b35f808ad 90-93,95-103,108-118
+  s_94e575f6f95921::t_732d7983f073a2 42-62,65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "466b7adae05bb0006353d15dc94d600fc7a1aa49",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_94e575f6f95921": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "ccaa8909b32a43309f9b845f0da9f9f2",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
