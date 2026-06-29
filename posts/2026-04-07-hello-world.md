@@ -34,8 +34,14 @@ ssh -T git@github.com
 Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 
 # git代理
-http.proxy → http://127.0.0.1:7897
-https.proxy → http://127.0.0.1:7897
+git config http.proxy http://127.0.0.1:7897
+git config https.proxy http://127.0.0.1:7897
+# 或
+git config --global http.proxy http://127.0.0.1:7897
+git config --global https.proxy http://127.0.0.1:7897
+# 查看是否生效
+git config --global --get http.proxy
+git config --global --get https.proxy
 
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
