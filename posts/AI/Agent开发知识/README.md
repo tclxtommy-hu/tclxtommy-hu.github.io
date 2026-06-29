@@ -42,6 +42,8 @@ flowchart LR
 |------|------|
 | [01-Function-Calling.md](03-工具调用/01-Function-Calling.md) | 函数调用机制、工具设计原则 |
 | [02-MCP协议.md](03-工具调用/02-MCP协议.md) | Model Context Protocol 标准化工具生态 |
+| [03-MCP项目基础结构.md](03-工具调用/03-MCP项目基础结构.md) | MCP Server 项目搭建：目录、依赖、代码骨架、运行与调试 |
+| [04-MCP使用指南.md](03-工具调用/04-MCP使用指南.md) | MCP 接入各客户端：VSCode/Copilot、Claude Desktop、Cursor、Cline、自研 Agent |
 
 ### 04 记忆系统
 | 文件 | 主题 |

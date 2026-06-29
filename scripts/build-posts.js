@@ -228,6 +228,40 @@ fs.writeFileSync(
   'utf-8'
 );
 
+// ====== Rewrite relative .md links in README HTML to absolute HTML paths ======
+// README is displayed on /archive.html, so relative .md links must be converted
+// to absolute /posts-html/<dir>/<file>.html URLs to work correctly.
+function rewriteReadmeLinks(html, readmeRelDir) {
+  // Normalize to forward slashes (POSIX style)
+  const baseDir = (readmeRelDir || '').replace(/\\/g, '/');
+  return html.replace(/(<a\s+[^>]*href=")([^"]*)("[^>]*>)/gi, (match, pre, href, post) => {
+    // Skip external URLs, anchors, mailto, tel, data URIs
+    if (/^(https?:)?\/\//i.test(href)) return match;
+    if (href.startsWith('#')) return match;
+    if (/^(mailto:|tel:|data:)/i.test(href)) return match;
+
+    // Split off any anchor fragment (#section)
+    let anchor = '';
+    let linkPath = href;
+    const hashIdx = linkPath.indexOf('#');
+    if (hashIdx !== -1) {
+      anchor = linkPath.slice(hashIdx);
+      linkPath = linkPath.slice(0, hashIdx);
+    }
+
+    // Only rewrite links to .md files
+    if (!linkPath.endsWith('.md')) return match;
+
+    // Resolve path relative to README's directory, normalize ../ and ./
+    const resolved = path.posix.join('/', baseDir, linkPath);
+    // Change .md extension to .html
+    const htmlPath = resolved.replace(/\.md$/, '.html');
+    const newHref = '/posts-html' + htmlPath + anchor;
+
+    return pre + newHref + post;
+  });
+}
+
 // ====== Build directory tree ======
 function buildPostsTree(baseDir) {
   const root = { name: '全部', path: '', children: [], posts: [], readme: null, totalCount: 0 };
@@ -258,11 +292,11 @@ function buildPostsTree(baseDir) {
         }
       } else if (entry.isFile() && entry.name === 'README.md') {
         if (!relPath) continue; // skip root README
-        // Read and render README.md
+        // Read and render README.md, rewriting relative .md links to absolute HTML paths
         try {
           const raw = fs.readFileSync(fullPath, 'utf-8');
           const { content } = matter(raw);
-          readmeHtml = marked.parse(content);
+          readmeHtml = rewriteReadmeLinks(marked.parse(content), relPath);
         } catch (_) { /* ignore */ }
       }
     }
