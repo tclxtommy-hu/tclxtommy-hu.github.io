@@ -14,6 +14,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://http200.cn/posts-html/AI\Agent开发知识\04-记忆系统/01-记忆系统.html</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://http200.cn/posts-html/AI\Agent开发知识\03-工具调用/04-MCP使用指南.html</loc>
     <lastmod>2026-06-29</lastmod>
     <changefreq>weekly</changefreq>
@@ -93,12 +99,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI\Agent开发知识\05-规划与任务分解/01-规划与任务分解.html</loc>
-    <lastmod>2026-06-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI\Agent开发知识\04-记忆系统/01-记忆系统.html</loc>
     <lastmod>2026-06-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
