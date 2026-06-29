@@ -1,10 +1,14 @@
 import * as readline from "node:readline";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { AgentExecutor, createToolCallingAgent } from "langchain/agents";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { BufferWindowMemory } from "langchain/memory";
 import { createDeepSeekModel } from "./config.js";
 import { getCurrentDateTime, calculator, textTools } from "./tools.js";
 import { AgentLogger } from "./logger.js";
+import { FileChatMessageHistory } from "./file_history.js";
+
+/** 记忆窗口大小：保留最近 N 轮对话 */
+const MEMORY_WINDOW_SIZE = 10;
 
 function createReadline() {
   return readline.createInterface({
@@ -21,9 +25,9 @@ function ask(rl: readline.Interface, question: string): Promise<string> {
 
 async function main() {
   console.log("=".repeat(50));
-  console.log("🤖 LangChain Agent 交互模式（DeepSeek）");
+  console.log("🤖 LangChain Agent 交互模式（DeepSeek + 记忆）");
   console.log("工具：日期时间 | 计算器 | 字数统计 | 文本反转");
-  console.log("输入 /exit 退出，输入 /clear 清空对话");
+  console.log("输入 /exit 退出，/clear 清空记忆，/memory 查看记忆状态");
   console.log("=".repeat(50));
 
   const rl = createReadline();
@@ -64,17 +68,28 @@ async function main() {
   // 创建 Agent
   const agent = createToolCallingAgent({ llm: model, tools, prompt });
 
-  // 创建执行器
+  // 创建记忆：文件持久化 + 滑动窗口
+  // - 历史存储在 data/chat_history.json，进程重启不丢失
+  // - 窗口大小 10 轮，超出部分不传给 LLM
+  const chatHistory = new FileChatMessageHistory("./data/chat_history.json");
+  const memory = new BufferWindowMemory({
+    chatHistory,
+    returnMessages: true,
+    memoryKey: "chat_history",
+    inputKey: "input",
+    outputKey: "output",
+    k: MEMORY_WINDOW_SIZE,
+  });
+
+  // 创建执行器（传入 memory，AgentExecutor 自动管理对话历史）
   const executor = new AgentExecutor({
     agent,
     tools,
+    memory,
     verbose: false, // 详细日志由 AgentLogger 写入文件
   });
 
-  // 对话历史
-  const chatHistory: (HumanMessage | AIMessage)[] = [];
-
-  console.log("✅ Agent 就绪，开始对话吧！\n");
+  console.log(`✅ Agent 就绪（记忆窗口：${MEMORY_WINDOW_SIZE} 轮，持久化：data/chat_history.json），开始对话吧！\n`);
 
   // 交互循环
   while (true) {
@@ -87,28 +102,30 @@ async function main() {
       break;
     }
     if (input === "/clear") {
-      chatHistory.length = 0;
-      console.log("🗑️  对话已清空\n");
+      await memory.clear();
+      console.log("🗑️  对话记忆已清空\n");
+      continue;
+    }
+    if (input === "/memory") {
+      const vars = await memory.loadMemoryVariables({});
+      const msgs = vars.chat_history as Array<unknown> | undefined;
+      const count = Array.isArray(msgs) ? msgs.length : 0;
+      console.log(`🧠 记忆状态：${count} 条消息（窗口上限 ${MEMORY_WINDOW_SIZE * 2} 条）`);
+      console.log(`📁 持久化文件：data/chat_history.json`);
       continue;
     }
 
     process.stdout.write("🤖 Agent：");
 
     // 传入 callbacks，AgentLogger 将记录所有内部事件
+    // memory 会自动将 chat_history 注入到 executor.invoke 的输入中
     const result = await executor.invoke(
-      {
-        input,
-        chat_history: chatHistory,
-      },
+      { input },
       { callbacks: [logger] }
     );
 
     console.log(result.output);
     console.log();
-
-    // 保存对话历史
-    chatHistory.push(new HumanMessage(input));
-    chatHistory.push(new AIMessage(result.output));
   }
 
   rl.close();

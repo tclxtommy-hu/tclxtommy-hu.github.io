@@ -7,12 +7,16 @@
 ```
 langChain_ts_agent/
 ├── src/
-│   ├── config.ts      # DeepSeek 模型配置（ChatOpenAI 适配）
-│   ├── tools.ts       # Agent 工具集（日期、计算器、文本处理）
-│   ├── chat.ts        # 基础多轮对话示例
-│   ├── agent.ts       # Agent + 工具调用示例
-│   └── index.ts       # 入口文件
-├── .env.example       # 环境变量模板
+│   ├── config.ts          # DeepSeek 模型配置（ChatOpenAI 适配）
+│   ├── tools.ts           # Agent 工具集（日期、计算器、文本处理）
+│   ├── file_history.ts    # 文件持久化聊天历史
+│   ├── logger.ts          # Agent 执行日志记录器
+│   ├── chat.ts            # 基础多轮对话示例
+│   ├── agent.ts           # Agent + 工具调用 + 记忆示例
+│   └── index.ts           # 入口文件
+├── data/                  # 聊天历史持久化目录（gitignore）
+├── logs/                  # 执行日志目录（gitignore）
+├── .env.example           # 环境变量模板
 ├── tsconfig.json
 └── package.json
 ```
@@ -52,6 +56,36 @@ npm run agent   # Agent + 工具调用
 | **Tool** | `tools.ts` | 用 `tool()` + `zod` 定义可调用工具 |
 | **Agent** | `agent.ts` | `createToolCallingAgent` 创建具备推理+工具调用能力的 Agent |
 | **AgentExecutor** | `agent.ts` | Agent 执行循环，管理推理→调用→观察→输出 |
+| **Memory** | `agent.ts` | `BufferWindowMemory` 滑动窗口记忆，自动注入对话上下文 |
+| **持久化** | `file_history.ts` | `FileChatMessageHistory` 基于 JSON 文件的记忆持久化，重启不丢失 |
+
+## Agent 交互命令
+
+| 命令 | 说明 |
+|------|------|
+| 直接输入 | 与 Agent 对话，可使用工具 |
+| `/clear` | 清空对话记忆（同时清除持久化文件） |
+| `/memory` | 查看当前记忆状态（消息数、存储位置） |
+| `/exit` | 退出程序 |
+
+## 记忆机制
+
+### 架构
+
+```
+用户输入 → AgentExecutor
+            ├── BufferWindowMemory.loadMemoryVariables()  ← 只取最近 k 轮
+            │     └── FileChatMessageHistory.getMessages() ← 从文件读取全量
+            ├── LLM 调用（只收到窗口内上下文）
+            └── BufferWindowMemory.saveContext()
+                  └── FileChatMessageHistory.addMessages() ← 追加写入文件
+```
+
+### 关键参数
+
+- **窗口大小** `k=10`：每次传给 LLM 最多 10 轮对话（20 条消息），避免 token 爆炸
+- **持久化文件** `data/chat_history.json`：全量历史存于文件，超出窗口的消息不会丢失，只是不传给 LLM
+- **重启恢复**：程序重启后自动从文件加载历史，实现跨会话记忆
 
 ## 内置工具
 
@@ -92,4 +126,24 @@ const myTool = tool(
     schema: z.object({ param: z.string() }),
   }
 );
+```
+
+## 调整记忆策略
+
+`agent.ts` 中 `MEMORY_WINDOW_SIZE` 控制记忆窗口大小：
+
+```ts
+const MEMORY_WINDOW_SIZE = 10; // 保留最近 10 轮对话
+```
+
+替换记忆类型（按需选择）：
+
+```ts
+// 方案 A：摘要记忆（全部历史压缩为一段摘要，最省 token）
+import { ConversationSummaryMemory } from "langchain/memory";
+const memory = new ConversationSummaryMemory({ llm: model, ... });
+
+// 方案 B：混合记忆（近 3 轮原文 + 更早的摘要）
+import { ConversationSummaryBufferMemory } from "langchain/memory";
+const memory = new ConversationSummaryBufferMemory({ llm: model, maxTokenLimit: 2000, ... });
 ```
