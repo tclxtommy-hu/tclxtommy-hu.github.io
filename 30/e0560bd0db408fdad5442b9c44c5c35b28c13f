@@ -1,0 +1,26 @@
+posts/AI/Agent开发知识/03-工具调用/03-MCP项目基础结构.md
+  s_8c4424f92b07d3::t_20f71ed6492431 1-248
+posts/AI/Agent开发知识/03-工具调用/04-MCP使用指南.md
+  s_8c4424f92b07d3::t_bd06c2e8c86c52 1-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "30e0560bd0db408fdad5442b9c44c5c35b28c13f",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_8c4424f92b07d3": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "1b9df4828d6d4a06b25aeb6ddf889cac",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
