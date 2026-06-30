@@ -599,19 +599,24 @@ a:hover { color: var(--accent3); }
 /* ====== Archive list ====== */
 .archive-list { list-style: none; }
 .archive-item {
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 14px 20px;
   margin-bottom: 8px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
   transition: border-color 0.2s, transform 0.2s;
+  list-style: none;
 }
 .archive-item:hover {
   border-color: var(--accent);
   transform: translateY(-1px);
+}
+.archive-item-link {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 20px;
+  text-decoration: none;
+  color: inherit;
 }
 .archive-date {
   font-size: 0.85rem;
@@ -631,7 +636,7 @@ a:hover { color: var(--accent3); }
   color: var(--text);
   transition: color 0.2s;
 }
-.archive-title:hover {
+.archive-item-link:hover .archive-title {
   color: var(--accent);
 }
 .archive-category {
@@ -656,7 +661,7 @@ a:hover { color: var(--accent3); }
 }
 
 @media (max-width: 600px) {
-  .archive-item {
+  .archive-item-link {
     flex-direction: column;
     gap: 4px;
   }

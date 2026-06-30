@@ -701,11 +701,13 @@ const archiveListHtml = posts.length === 0
       : `/posts-html/${p.slug}.html`;
     return `
     <li class="archive-item" data-path="${p.relativeDir || ''}">
-      ${p.date ? `<span class="archive-date">${p.date}</span>` : ''}
-      <div class="archive-info">
-        <a class="archive-title" href="${postUrl}">${p.title}</a>
-        ${p.relativeDir ? `<span class="archive-category">${p.relativeDir.replace(/\\/g, ' › ')}</span>` : ''}
-      </div>
+      <a class="archive-item-link" href="${postUrl}">
+        ${p.date ? `<span class="archive-date">${p.date}</span>` : ''}
+        <div class="archive-info">
+          <span class="archive-title">${p.title}</span>
+          ${p.relativeDir ? `<span class="archive-category">${p.relativeDir.replace(/\\/g, ' › ')}</span>` : ''}
+        </div>
+      </a>
     </li>`}).join('')}
   </ul>`;
 
