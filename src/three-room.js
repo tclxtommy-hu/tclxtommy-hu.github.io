@@ -325,6 +325,56 @@ function addBed(parent) {
   parent.add(group);
 }
 
+function createCalligraphyTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  // Aged paper background
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  bg.addColorStop(0, 'rgba(228, 210, 168, 0.18)');
+  bg.addColorStop(0.5, 'rgba(240, 225, 185, 0.24)');
+  bg.addColorStop(1, 'rgba(228, 210, 168, 0.18)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Vertical text "精忠报国"
+  const chars = ['精', '忠', '报', '国'];
+  ctx.fillStyle = '#1a1005';
+  ctx.font = 'bold 130px "KaiTi", "STKaiti", "FangSong", "SimSun", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const spacing = canvas.height / 5;
+  for (let i = 0; i < 4; i++) {
+    const y = spacing * (i + 1);
+    // Subtle ink texture with slight offset shadow for depth
+    ctx.fillStyle = 'rgba(26, 16, 5, 0.85)';
+    ctx.fillText(chars[i], canvas.width / 2 + 2, y + 2);
+    ctx.fillStyle = '#0d0800';
+    ctx.fillText(chars[i], canvas.width / 2, y);
+  }
+
+  // Subtle vertical line decorations (traditional scroll style)
+  ctx.strokeStyle = 'rgba(26, 16, 5, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(36, spacing * 0.7);
+  ctx.lineTo(36, spacing * 4.3);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(canvas.width - 36, spacing * 0.7);
+  ctx.lineTo(canvas.width - 36, spacing * 4.3);
+  ctx.stroke();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function addShelf(parent) {
   const group = new THREE.Group();
 
@@ -347,7 +397,20 @@ function addShelf(parent) {
   );
   backPanel.position.set(0, 1.36, -0.19);
 
-  group.add(leftSide, rightSide, topBoard, bottomBoard, backPanel);
+  // Calligraphy "精忠报国" on cabinet left side panel (vertical brush writing)
+  const calligraphyTexture = createCalligraphyTexture();
+  const calligraphyPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.35, 2.1),
+    new THREE.MeshBasicMaterial({
+      map: calligraphyTexture,
+      transparent: true,
+      depthWrite: false,
+    })
+  );
+  calligraphyPlane.rotation.y = -Math.PI / 2; // face -X (left side exterior)
+  calligraphyPlane.position.set(-0.61, 1.36, 0);
+
+  group.add(leftSide, rightSide, topBoard, bottomBoard, backPanel, calligraphyPlane);
 
   const shelfLevels = [0.56, 1.08, 1.6, 2.12];
   for (const y of shelfLevels) {
