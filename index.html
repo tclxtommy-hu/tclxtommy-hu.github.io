@@ -87,16 +87,23 @@
       var btn = document.getElementById('bgm-btn');
       var bgm = document.getElementById('bgm');
       var playing = true;
+      function setPlaying(state) {
+        playing = state;
+        if (state) { btn.classList.add('playing'); btn.textContent = '🎵'; }
+        else { btn.classList.remove('playing'); btn.textContent = '🔇'; }
+      }
+      setPlaying(true);
       bgm.muted = false;
-      bgm.play().catch(function(err) {
-        playing = false;
-        console.log('浏览器阻止播放', error)
+      bgm.play().then(function() {
+        setPlaying(true);
+      }).catch(function(err) {
+        setPlaying(false);
+        console.log('浏览器阻止播放', err);
       });
-      
+
       btn.addEventListener('click', function() {
-        if (playing) { bgm.pause(); btn.textContent = '🔇'; }
-        else { bgm.play().catch(function(){}); btn.textContent = '🎵'; }
-        playing = !playing;
+        if (playing) { bgm.pause(); setPlaying(false); }
+        else { bgm.play().then(function(){ setPlaying(true); }).catch(function(){}); }
       });
     })();
   </script>

@@ -1061,3 +1061,12 @@ body.is-home-search-open {
   border-color: rgba(234, 242, 255, 0.6);
   transform: scale(1.08);
 }
+
+@keyframes bgm-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.bgm-btn.playing {
+  animation: bgm-spin 4s linear infinite;
+}
