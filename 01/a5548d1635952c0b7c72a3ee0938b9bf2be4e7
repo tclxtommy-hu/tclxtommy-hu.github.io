@@ -1,0 +1,19 @@
+index.html
+  s_03d2083b08c8f9::t_86eae2d7ca66b2 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "01a5548d1635952c0b7c72a3ee0938b9bf2be4e7",
+  "prompts": {},
+  "sessions": {
+    "s_03d2083b08c8f9": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "cca87754a75843c2b970b9cb405b7d7d",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
