@@ -1,0 +1,40 @@
+.codebuddy/instructions.md
+  s_873b4e44ec23d6::t_238dad9e62bc52 1-94
+.github/copilot-instructions.md
+  s_873b4e44ec23d6::t_24117410b20e12 1-93
+posts/AI/AI编程范式/AI辅助编程范式/09-harness-engineering.md
+  s_873b4e44ec23d6::t_e8faf88f567c3b 3
+  s_873b4e44ec23d6::t_607523ff6fd798 15-64
+  s_873b4e44ec23d6::t_ffdf871d786ee8 4
+  s_873b4e44ec23d6::t_59394a7844b124 65-93
+  s_3c52aea2da2596::t_b23d338a62c64a 1-2,5-14,94-306
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "a1127e45ba61afabd5d9c12f112624b392e61649",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_3c52aea2da2596": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "9ede164d4384481581c3b091a1e1369c",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_873b4e44ec23d6": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "627f96b22674486f86afec0d147e0882",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
