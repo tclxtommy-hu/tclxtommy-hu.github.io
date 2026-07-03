@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "weather": {
+      "type": "stdio",
+      "command": "mcp-weather-server",
+      "args": [],
+      "description": "天气查询 MCP Server - get_weather / get_forecast / list_cities"
+    }
+  }
+}
