@@ -1,0 +1,49 @@
+.codebuddy/mcp.json
+  s_b54cd529f8be13::t_25f7b5a8d98a65 7
+  s_b54cd529f8be13::t_216c26a3a5c60d 1-4,8-10
+  s_b54cd529f8be13::t_60bd300063f642 5-6
+demo/mcp_ts_demo/.gitignore
+  s_b54cd529f8be13::t_9e02534dbf147e 1-3
+demo/mcp_ts_demo/src/config.ts
+  s_b54cd529f8be13::t_cea747ea53d745 1-30
+demo/mcp_ts_demo/src/http.ts
+  s_b54cd529f8be13::t_cf06b3eedd12bd 1-60
+demo/mcp_ts_demo/src/stdio.ts
+  s_b54cd529f8be13::t_a016248a05df6e 1-17
+demo/mcp_ts_demo/tsconfig.json
+  s_b54cd529f8be13::t_88074fe3b53943 1-17
+demo/mcp_ts_demo/scripts/postbuild.mjs
+  s_b54cd529f8be13::t_8776a15b83ce99 1-36
+demo/mcp_ts_demo/src/server.ts
+  s_b54cd529f8be13::t_d44a5bf8a23b72 1-75
+demo/mcp_ts_demo/README.md
+  s_b54cd529f8be13::t_a9bb5bf30c4631 2,4-8,17-19,29,32,58,60,68-70
+  s_b54cd529f8be13::t_349c3e67ddf01d 35,40,42-43,46-47,51,54,57
+  s_b54cd529f8be13::t_071fa729950264 1,3,9-16,20,22,24-28,30,33-34,36-39,41,44-45,48-50,52-53,55,59,61-67,72,74
+  s_b54cd529f8be13::t_b43d846036ddde 21,23,31,56,71,73
+demo/mcp_ts_demo/package.json
+  s_b54cd529f8be13::t_8aae043a835e29 1-41
+demo/mcp_ts_demo/package-lock.json
+  s_b54cd529f8be13::t_fd999fafe1638f 1-2228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "720f4b556bdd867f940a97aabd8c492959f5e2ee",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_b54cd529f8be13": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "a4dbdb8babbc4c318d69a516f9ab4f4d",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
