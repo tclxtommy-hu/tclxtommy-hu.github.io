@@ -6,14 +6,15 @@ ReAct 是 **Reasoning + Acting** 的缩写，由 Google Research 于 2022 年提
 
 ## 原理
 
-```
-┌─────────────────────────────────────────┐
-│              ReAct 循环                   │
-│                                          │
-│  Thought ──→ Action ──→ Observation      │
-│     ↑                          │         │
-│     └──────────────────────────┘         │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Thought["Thought（思考）"]
+    Action["Action（行动）"]
+    Observation["Observation（观察）"]
+
+    Thought --> Action
+    Action --> Observation
+    Observation --> Thought
 ```
 
 1. **Thought（思考）**：Agent 分析当前状态，推理下一步应该做什么

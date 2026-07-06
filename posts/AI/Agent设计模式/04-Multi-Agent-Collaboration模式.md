@@ -6,29 +6,17 @@ Multi-Agent Collaboration 模式将复杂任务分配给**多个专业化的 Age
 
 ## 原理
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  Multi-Agent 系统架构                         │
-│                                                              │
-│                    ┌─────────────┐                           │
-│                    │ Orchestrator│  ← 协调/编排               │
-│                    │   (编排器)   │                           │
-│                    └──┬───┬───┬──┘                           │
-│                       │   │   │                              │
-│              ┌────────┘   │   └────────┐                     │
-│              ▼            ▼            ▼                     │
-│        ┌──────────┐ ┌──────────┐ ┌──────────┐              │
-│        │ Agent A  │ │ Agent B  │ │ Agent C  │              │
-│        │ 角色: 研究员│ │ 角色: 编码员│ │ 角色: 审查员│              │
-│        └──────────┘ └──────────┘ └──────────┘              │
-│              │            │            │                     │
-│              └────────────┼────────────┘                     │
-│                           ▼                                  │
-│                    ┌─────────────┐                           │
-│                    │ Shared      │  ← 共享上下文              │
-│                    │ Memory      │                           │
-│                    └─────────────┘                           │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Orchestrator["Orchestrator<br/>(编排器 / 协调)"]
+
+    Orchestrator --> AgentA["Agent A<br/>角色: 研究员"]
+    Orchestrator --> AgentB["Agent B<br/>角色: 编码员"]
+    Orchestrator --> AgentC["Agent C<br/>角色: 审查员"]
+
+    AgentA --> SharedMemory["Shared Memory<br/>(共享上下文)"]
+    AgentB --> SharedMemory
+    AgentC --> SharedMemory
 ```
 
 两种主流协作模式：
@@ -401,16 +389,35 @@ class ConversationCollaboration:
 
 ## 常见协作拓扑
 
-```
-1. 流水线 (Pipeline)        2. 星型 (Star)          3. 网状 (Mesh)
-   A → B → C → D             Orchestrator            A ↔ B
-                              /  |  \                ↕   ↕
-                             A   B   C               C ↔ D
+```mermaid
+flowchart TD
+    subgraph 流水线["1. 流水线 (Pipeline)"]
+        A1["A"] --> B1["B"] --> C1["C"] --> D1["D"]
+    end
 
-4. 层级 (Hierarchical)      5. 辩论 (Debate)
-   Manager                   Proponent ↔ Opponent
-   /      \                       ↘   ↙
-  TeamA   TeamB                   Judge
+    subgraph 星型["2. 星型 (Star)"]
+        O2["Orchestrator"] --> A2["A"]
+        O2 --> B2["B"]
+        O2 --> C2["C"]
+    end
+
+    subgraph 网状["3. 网状 (Mesh)"]
+        A3["A"] <--> B3["B"]
+        A3 <--> C3["C"]
+        B3 <--> C3["C"]
+        C3 <--> D3["D"]
+    end
+
+    subgraph 层级["4. 层级 (Hierarchical)"]
+        M4["Manager"] --> TeamA4["Team A"]
+        M4 --> TeamB4["Team B"]
+    end
+
+    subgraph 辩论["5. 辩论 (Debate)"]
+        Pro5["Proponent"] <--> Opp5["Opponent"]
+        Pro5 --> Judge5["Judge"]
+        Opp5 --> Judge5
+    end
 ```
 
 ## 优点与局限

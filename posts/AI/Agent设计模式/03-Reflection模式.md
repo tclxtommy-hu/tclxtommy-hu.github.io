@@ -6,19 +6,15 @@ Reflection 模式让 Agent 在生成初始输出后，**对自己的结果进行
 
 ## 原理
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                   Reflection 模式                          │
-│                                                           │
-│   Generate ──→ Reflect ──→ Refine ──→ Generate ──→ ...   │
-│      ↑                                        │           │
-│      └────────────── 迭代改进 ─────────────────┘           │
-│                                                           │
-│   ┌─────────┐    ┌──────────┐    ┌──────────┐           │
-│   │ Actor   │───→│ Evaluator│───→│ Refiner  │           │
-│   │ 执行/生成 │    │ 评估/反思  │    │ 修正/改进  │           │
-│   └─────────┘    └──────────┘    └──────────┘           │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Actor["Actor<br/>(执行/生成)"] --> Evaluator["Evaluator<br/>(评估/反思)"]
+    Evaluator --> Refiner["Refiner<br/>(修正/改进)"]
+    Refiner -->|"迭代改进"| Actor
+
+    Generate["Generate<br/>(生成)"] --> Reflect["Reflect<br/>(反思)"]
+    Reflect --> Refine["Refine<br/>(改进)"]
+    Refine --> Generate
 ```
 
 核心包含三个角色（可以是同一个 LLM 的不同 prompt）：

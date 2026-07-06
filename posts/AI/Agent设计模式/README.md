@@ -23,23 +23,30 @@
 
 ## 模式分类
 
-```
-                          ┌─────────────┐
-                          │   基础能力    │
-                          │  Tool Use    │
-                          └──────┬───────┘
-                                 │
-          ┌──────────────────────┼──────────────────────┐
-          ▼                      ▼                      ▼
-   ┌─────────────┐       ┌─────────────┐        ┌─────────────┐
-   │  推理与决策   │       │  协作与组织   │        │  记忆与优化   │
-   ├─────────────┤       ├─────────────┤        ├─────────────┤
-   │ ReAct       │       │ Multi-Agent │        │ Memory      │
-   │ Plan-Exec   │       │ Router/Sub  │        │ Reflection  │
-   │ Self-Ask    │       │             │        │             │
-   │ Tree of     │       │             │        │             │
-   │   Thoughts  │       │             │        │             │
-   └─────────────┘       └─────────────┘        └─────────────┘
+```mermaid
+flowchart TD
+    基础能力["基础能力<br/>Tool Use"]
+    
+    基础能力 --> 推理与决策
+    基础能力 --> 协作与组织
+    基础能力 --> 记忆与优化
+
+    subgraph 推理与决策
+        ReAct
+        Plan-Exec["Plan-Exec"]
+        Self-Ask["Self-Ask"]
+        Tree-of-Thoughts["Tree of Thoughts"]
+    end
+
+    subgraph 协作与组织
+        Multi-Agent["Multi-Agent"]
+        Router-Sub["Router/Sub"]
+    end
+
+    subgraph 记忆与优化
+        Memory
+        Reflection
+    end
 ```
 
 ## 如何选择
