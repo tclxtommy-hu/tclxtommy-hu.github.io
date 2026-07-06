@@ -1,0 +1,24 @@
+posts/AI/Agent开发知识/10-框架与工具/OpenAI.md
+  s_7211621f6f8721::t_1138a046732198 1-367
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "2058ab79e25e52b7619606e863595665ea1a4cb8",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_7211621f6f8721": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "c761d49335eb4c688852363b9a58a40b",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
