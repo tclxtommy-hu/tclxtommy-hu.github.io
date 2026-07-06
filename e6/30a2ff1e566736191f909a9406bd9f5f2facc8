@@ -1,0 +1,48 @@
+posts/AI/Agent设计模式/02-Plan-and-Execute模式.md
+  s_63fb83b84e7153::t_3dff019e79c852 9-24
+posts/AI/Agent设计模式/01-ReAct模式.md
+  s_63fb83b84e7153::t_7f4565e1e94a3e 9-17
+posts/AI/Agent设计模式/09-Router-Subagent模式.md
+  s_63fb83b84e7153::t_59dedc20dee1b2 9-19
+posts/AI/Agent设计模式/03-Reflection模式.md
+  s_63fb83b84e7153::t_8fd5dce32a009f 9-17
+posts/AI/Agent设计模式/06-Memory-Augmented模式.md
+  s_63fb83b84e7153::t_1064c626e05ce2 9-26
+posts/AI/Agent设计模式/08-Self-Ask模式.md
+  s_63fb83b84e7153::t_df2bd781032907 9-19
+  s_63fb83b84e7153::t_102292e0e2bf67 284-290,295-300,305-312
+posts/AI/Agent设计模式/05-Tool-Use-Function-Calling模式.md
+  s_63fb83b84e7153::t_4163e193d69ed1 9-21
+posts/AI/Agent设计模式/07-Tree-of-Thoughts模式.md
+  s_63fb83b84e7153::t_16c1957d2a7f0d 369-393
+  s_63fb83b84e7153::t_537fb158de4115 9-31
+posts/AI/Agent设计模式/00-总览.md
+  s_63fb83b84e7153::t_a8df2328671871 19-44
+  s_63fb83b84e7153::t_e7227556d542c0 51-56,58-61,63-67,69-71
+posts/AI/Agent设计模式/04-Multi-Agent-Collaboration模式.md
+  s_63fb83b84e7153::t_6e868f9adade8b 392-420
+  s_63fb83b84e7153::t_ad213e6bf57ed6 9-19
+posts/AI/Agent设计模式/README.md
+  s_63fb83b84e7153::t_ced92264a71874 26-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "e630a2ff1e566736191f909a9406bd9f5f2facc8",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_63fb83b84e7153": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "8efa174eb92a47e3968508c6bb7d8dc3",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
