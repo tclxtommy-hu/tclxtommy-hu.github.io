@@ -3,20 +3,40 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 const INFO_CONTENT = {
   about: {
-    title: 'About Me',
-    text: '你好，我是 TommyHu，一个从web1.0时代过来的 IT老登 ，喜欢探索新技术和分享经验，饱藏着对行业的兴趣和热爱。'
+    title: { zh: '关于我', en: 'About Me' },
+    text: {
+      zh: '你好，我是 TommyHu，一个从 web1.0 时代过来的 IT 老登，喜欢探索新技术和分享经验，饱藏着对行业的兴趣和热爱。',
+      en: 'Hi, I\'m TommyHu — an IT veteran from the web 1.0 era. I love exploring new tech and sharing what I learn, always driven by curiosity and passion for the industry.',
+    },
   },
   skills: {
-    title: 'Skills',
-    text: '电视台做过策划，房地产网站里用过frontpage，实业公司里在弱电柜前做个几百个水晶头，玩过域控的网络管理员，外包公司做个千万项目的ERP，玩过data access，也搞过startrocks的亿万数据，工具，是给人用的，善于使用工具的人才不会被时代淘汰，AI时代，一直在路上……',
+    title: { zh: '技能', en: 'Skills' },
+    text: {
+      zh: '电视台做过策划，房地产网站里用过 frontpage，实业公司里在弱电柜前做个几百个水晶头，玩过域控的网络管理员，外包公司做个千万项目的 ERP，玩过 data access，也搞过 startrocks 的亿万数据。工具是给人用的，善于使用工具的人才不会被时代淘汰，AI 时代，一直在路上……',
+      en: 'Planned content at a TV station, built websites with FrontPage at a real estate firm, crimped hundreds of RJ45 connectors in front of weak-current cabinets at an industrial company, managed domain controllers as a sysadmin, delivered a ten-million-RMB ERP project at an outsourcing firm, dabbled in data access and StarRocks with hundreds of millions of records. Tools serve people — those who master their tools won\'t be left behind. In the AI era, the journey continues…',
+    },
   },
   projects: {
-    title: 'Projects',
-    text: '几十年来项目无数，包罗千奇百怪，始终坚持客户第一，老板第一，有价值能变现的产品才是好产品。',
+    title: { zh: '项目', en: 'Projects' },
+    text: {
+      zh: '几十年来项目无数，包罗千奇百怪，始终坚持客户第一，老板第一，有价值能变现的产品才是好产品。',
+      en: 'Countless projects over the decades, spanning all sorts of weird and wonderful things. Always putting clients first, bosses first — a good product is one that creates real value and can be monetized.',
+    },
   },
   contact: {
-    title: 'Contact',
-    text: '邮箱: 258546962@qq.com',
+    title: { zh: '联系方式', en: 'Contact' },
+    text: {
+      zh: '邮箱：258546962@qq.com',
+      en: 'Email: 258546962@qq.com',
+    },
+  },
+};
+
+const DEFAULT_CARD_CONTENT = {
+  title: { zh: '欢迎来到我的 3D 房间', en: 'Welcome to My 3D Room' },
+  text: {
+    zh: '拖拽旋转视角，滚轮缩放，点击发光标签探索我的信息。',
+    en: 'Drag to orbit, scroll to zoom, click glowing tags to explore my info.',
   },
 };
 
@@ -1341,16 +1361,33 @@ export function initHome3DRoom() {
   if (picMeta?.clickable) interactiveTargets.push(picMeta.clickable);
 
   const hotspotButtons = new Map();
+  let currentLang = 'en';
+  let currentKey = null;
+  const langBtn = document.getElementById('room-card-lang');
+
+  function renderCard() {
+    const source = currentKey ? INFO_CONTENT[currentKey] : DEFAULT_CARD_CONTENT;
+    if (!source) return;
+    cardTitle.textContent = source.title[currentLang];
+    cardText.textContent = source.text[currentLang];
+  }
+
+  if (langBtn) {
+    langBtn.addEventListener('click', () => {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      langBtn.textContent = currentLang === 'zh' ? '中/En' : 'En/中';
+      renderCard();
+    });
+  }
+
   hotspotWrap.querySelectorAll('.room-hotspot').forEach((btn) => {
     const key = btn.dataset.hotspot;
     if (key) {
       hotspotButtons.set(key, btn);
       btn.addEventListener('click', () => {
-        const content = INFO_CONTENT[key];
-        if (!content) return;
-
-        cardTitle.textContent = content.title;
-        cardText.textContent = content.text;
+        if (!INFO_CONTENT[key]) return;
+        currentKey = key;
+        renderCard();
 
         hotspotButtons.forEach((el, id) => {
           el.classList.toggle('is-active', id === key);

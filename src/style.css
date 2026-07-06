@@ -789,6 +789,24 @@ body.home-3d {
   display: none;
 }
 
+.room-card-lang {
+  float: right;
+  margin: -2px 0 8px;
+  padding: 2px 9px;
+  border: 1px solid rgba(165, 195, 255, 0.32);
+  border-radius: 10px;
+  background: rgba(35, 47, 102, 0.45);
+  color: #cfddff;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.room-card-lang:hover {
+  background: rgba(76, 105, 188, 0.65);
+  color: #fff;
+}
+
 .room-card-body {
   overflow: hidden;
   transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.35s ease;
