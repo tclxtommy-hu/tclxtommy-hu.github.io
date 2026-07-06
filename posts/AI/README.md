@@ -1,25 +1,27 @@
 # 公众号知识库总索引
 
-> 整理日期：2026-06-27
-> 范围：本仓库收录三大主题知识库——**AI 知识库**、**Agent 开发知识**、**AI 编程范式**，共 60+ 篇系统化笔记
+> 整理日期：2026-07-06
+> 范围：本仓库收录四大主题知识库——**AI 知识库**、**Agent 开发知识**、**Agent 设计模式**、**AI 编程范式**，共 70+ 篇系统化笔记
 > 风格：中文为主，术语保留英文原文；每篇含定义、原理、要点、示例、注意事项
 
 本根 README 是全仓库的**总入口**，按知识库分块索引所有文章。每个子库另有自己的 README，含学习路线与使用建议。
 
-## 三个知识库一览
+## 四个知识库一览
 
 ```mermaid
 flowchart LR
     R[(公众号根目录)]
     R --> A[AI知识库<br/>AI/ML/DL/LLM 全栈]
     R --> B[Agent开发知识<br/>Agent 构建专题]
-    R --> C[AI编程范式<br/>AI 辅助/应用开发范式]
+    R --> C[Agent设计模式<br/>Agent 架构范式]
+    R --> D[AI编程范式<br/>AI 辅助/应用开发范式]
 ```
 
 | 知识库 | 定位 | 篇数 | 入口 |
 |--------|------|------|------|
 | **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，15 个模块 | 35 篇 | [AI知识库/README.md](AI知识库/README.md) |
 | **Agent 开发知识** | Agent 开发专题，12 个模块 | 14 篇 | [Agent开发知识/README.md](Agent开发知识/README.md) |
+| **Agent 设计模式** | Agent 架构设计模式，含原理+场景+示例代码 | 9 篇 | [Agent设计模式/README.md](Agent设计模式/README.md) |
 | **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 16 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
 
 ---
@@ -227,10 +229,29 @@ flowchart LR
 
 ---
 
+## 四、Agent 设计模式（Agent 架构范式）
+
+| 序号 | 模式 | 核心思想 | 适用场景 |
+|------|------|----------|----------|
+| 01 | [ReAct](Agent设计模式/01-ReAct模式.md) | 思考→行动→观察，交替进行 | 需要工具和外部信息的多步任务 |
+| 02 | [Plan-and-Execute](Agent设计模式/02-Plan-and-Execute模式.md) | 先制定完整计划，再逐步执行 | 复杂多步骤任务，可并行子任务 |
+| 03 | [Reflection](Agent设计模式/03-Reflection模式.md) | 生成→反思→改进，迭代优化 | 需要高质量输出的生成任务 |
+| 04 | [Multi-Agent Collaboration](Agent设计模式/04-Multi-Agent-Collaboration模式.md) | 多专业 Agent 协作完成任务 | 需要多领域协作的复杂项目 |
+| 05 | [Tool Use / Function Calling](Agent设计模式/05-Tool-Use-Function-Calling模式.md) | Agent 调用外部工具获取能力 | 所有需要外部数据/操作的场景 |
+| 06 | [Memory-Augmented](Agent设计模式/06-Memory-Augmented模式.md) | 持久化记忆，跨会话保持上下文 | 个性化助手、长期交互 |
+| 07 | [Tree of Thoughts](Agent设计模式/07-Tree-of-Thoughts模式.md) | 探索多条推理路径，选择最优 | 需要创造性或策略性思考的难题 |
+| 08 | [Self-Ask](Agent设计模式/08-Self-Ask模式.md) | 拆解为子问题，逐步自问自答 | 多跳问答、对比分析 |
+| 09 | [Router / Subagent](Agent设计模式/09-Router-Subagent模式.md) | 意图路由到专业子代理处理 | 多功能平台、多领域服务 |
+
+> 每篇含模式原理、使用场景、完整 Python 示例代码、优点与局限。详细选型指南见 [Agent设计模式/README.md](Agent设计模式/README.md)。
+
+---
+
 ## 阅读建议
 
 - **零基础入门 AI**：从 [AI 知识库](AI知识库/README.md) 01→15 顺序通读。
 - **想搭 Agent**：先看 [AI 知识库 12-Agent与工具](AI知识库/12-Agent与工具/) 建立概念，再进 [Agent 开发知识](Agent开发知识/README.md) 系统学习。
+- **想学 Agent 架构**：看 [Agent 设计模式](Agent设计模式/README.md) 了解常见设计范式及选型。
 - **想用 AI 写代码**：看 [AI 编程范式 · 辅助编程](AI编程范式/README.md) 选适合自己的协作姿态。
 - **想构建 AI 应用**：看 [AI 编程范式 · 应用开发](AI编程范式/README.md) 选架构模式（RAG/Agent/MCP 等）。
 - **速查**：直接跳到对应模块，每篇开头有"一句话定义"。
@@ -238,4 +259,4 @@ flowchart LR
 ## 术语约定
 
 - 正文中文为主，专有名词、协议名、模型名保留英文原文（如 LLM、RAG、MCP、ReAct）。
-- 三个知识库主题有交叉（如 RAG、Agent、MCP 在多处出现），各篇会从不同视角展开，可互为补充。
+- 四个知识库主题有交叉（如 RAG、Agent、MCP 在多处出现），各篇会从不同视角展开，可互为补充。
