@@ -1,0 +1,25 @@
+README.md
+  s_50e437c0fdab74::t_63348f33fc1e02 1,3,5,7,9-16,18,20-31,34,37,39-40,42-46
+  s_50e437c0fdab74::t_90dce1d71e97bd 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "1b6140434df252ce90ae2ce7b510e4bdb70aea30",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_50e437c0fdab74": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "58180a08802543198bc0a01fdbc7bc0d",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
