@@ -60,6 +60,11 @@ function attrEscape(str) {
     .replace(/>/g, '&gt;');
 }
 
+// Normalize path to URL-safe format (always use / separator)
+function toUrlPath(relativePath) {
+  return String(relativePath).replace(/\\/g, '/');
+}
+
 function slugifyHeading(text) {
   return text
     .toLowerCase()
@@ -218,7 +223,7 @@ const searchIndex = posts.map(p => ({
   tags: p.tags,
   category: p.category,
   subcategory: p.subcategory,
-  relativeDir: p.relativeDir,
+  relativeDir: toUrlPath(p.relativeDir),
   // Strip HTML tags for plain-text search content
   content: p.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
 }));
@@ -347,8 +352,9 @@ function buildTreeHtml(node, level) {
 
   // Every non-empty node is a collapsible folder
   const open = (level === 0 || level === 1) ? ' open' : '';
-  let html = `${indent}<details class="tree-folder" data-path="${node.path}"${open}>\n`;
-  html += `${indent}  <summary class="tree-node${level === 0 ? ' tree-root' : ''}" data-path="${node.path}">`;
+  const urlPath = toUrlPath(node.path);
+  let html = `${indent}<details class="tree-folder" data-path="${urlPath}"${open}>\n`;
+  html += `${indent}  <summary class="tree-node${level === 0 ? ' tree-root' : ''}" data-path="${urlPath}">`;
   html += level === 0 ? '' : '📁 ';
   html += `${name} <span class="tree-count">${node.totalCount}</span></summary>\n`;
 
@@ -359,9 +365,9 @@ function buildTreeHtml(node, level) {
   // Then individual posts (as links)
   for (const p of node.posts) {
     const postUrl = p.relativeDir
-      ? `/posts-html/${p.relativeDir}/${p.slug}.html`
+      ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
       : `/posts-html/${p.slug}.html`;
-    html += `${indent}  <a href="${postUrl}" class="tree-post" data-slug="${p.slug}" data-path="${p.relativeDir || ''}">📄 ${attrEscape(p.title)}</a>\n`;
+    html += `${indent}  <a href="${postUrl}" class="tree-post" data-slug="${p.slug}" data-path="${toUrlPath(p.relativeDir || '')}">📄 ${attrEscape(p.title)}</a>\n`;
   }
 
   html += `${indent}</details>\n`;
@@ -374,7 +380,7 @@ const treeHtml = `<div class="archive-tree" id="archive-tree">\n${buildTreeHtml(
 function treeToJson(node) {
   return {
     name: node.name,
-    path: node.path,
+    path: toUrlPath(node.path),
     readme: node.readme,
     totalCount: node.totalCount,
     children: node.children.map(treeToJson),
@@ -491,7 +497,7 @@ for (const post of posts) {
 
   // Build post URL preserving directory structure
   const postUrl = post.relativeDir
-    ? `/posts-html/${post.relativeDir}/${post.slug}.html`
+    ? `/posts-html/${toUrlPath(post.relativeDir)}/${post.slug}.html`
     : `/posts-html/${post.slug}.html`;
 
   const ogMeta = buildOgMeta({
@@ -705,10 +711,10 @@ const archiveListHtml = posts.length === 0
   ? '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">还没有文章。</p>'
   : `<ul class="archive-list" id="archive-list">${posts.map(p => {
     const postUrl = p.relativeDir
-      ? `/posts-html/${p.relativeDir}/${p.slug}.html`
+      ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
       : `/posts-html/${p.slug}.html`;
     return `
-    <li class="archive-item" data-path="${p.relativeDir || ''}">
+    <li class="archive-item" data-path="${toUrlPath(p.relativeDir || '')}">
       <a class="archive-item-link" href="${postUrl}">
         ${p.date ? `<span class="archive-date">${p.date}</span>` : ''}
         <div class="archive-info">
@@ -778,7 +784,7 @@ sitemapEntries.push({ loc: '/archive.html', changefreq: 'weekly', priority: '0.8
 // Post pages
 for (const post of posts) {
   const postUrl = post.relativeDir
-    ? `/posts-html/${post.relativeDir}/${post.slug}.html`
+    ? `/posts-html/${toUrlPath(post.relativeDir)}/${post.slug}.html`
     : `/posts-html/${post.slug}.html`;
   sitemapEntries.push({
     loc: postUrl,

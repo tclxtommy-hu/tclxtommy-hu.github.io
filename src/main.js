@@ -245,7 +245,7 @@ function initSearch() {
   function findTreeNode(path) {
     if (!window.__POSTS_TREE__) return null;
     function search(node) {
-      if (node.path === path) return node;
+      if (normalizePath(node.path) === path) return node;
       if (node.children) {
         for (const child of node.children) {
           const found = search(child);
@@ -271,10 +271,10 @@ function initSearch() {
     }
   }
 
-  // Normalize path to use backslash separator (matching tree data-path)
+  // Normalize path to use / separator (tree JSON and data-path are /-based)
   function normalizePath(path) {
     if (!path) return path;
-    return path.replace(/\//g, '\\');
+    return path.replace(/\\/g, '/');
   }
 
   function expandTreeAncestors(path) {
@@ -286,18 +286,18 @@ function initSearch() {
     const rootDetails = treeEl.querySelector('.tree-folder[data-path=""]');
     if (rootDetails) rootDetails.open = true;
 
-    // Build ancestor paths: e.g., "AI\Agent开发知识\02-推理范式" → ["AI", "AI\Agent开发知识", "AI\Agent开发知识\02-推理范式"]
-    const parts = path.split('\\');
+    // Build ancestor paths: e.g., "AI/Agent开发知识/02-推理范式" → ["AI", "AI/Agent开发知识", "AI/Agent开发知识/02-推理范式"]
+    const parts = path.split('/');
     let accumulated = '';
     for (const part of parts) {
-      accumulated = accumulated ? accumulated + '\\' + part : part;
+      accumulated = accumulated ? accumulated + '/' + part : part;
       const details = treeEl.querySelector(`.tree-folder[data-path="${CSS.escape(accumulated)}"]`);
       if (details) details.open = true;
     }
   }
 
   function applyPathFilter(path) {
-    // Normalize: breadcrumb links use '/' but tree uses '\'
+    // Paths use / separator consistently (tree JSON, data-path, URLs)
     path = normalizePath(path);
     currentPath = path;
     const items = listWrap.querySelectorAll('.archive-item');
@@ -326,7 +326,7 @@ function initSearch() {
     items.forEach(el => {
       const itemPath = el.dataset.path || '';
       // Show items whose path matches exactly or is under currentPath
-      el.style.display = (itemPath === path || itemPath.startsWith(path + '\\') || itemPath.startsWith(path + '/')) ? '' : 'none';
+      el.style.display = (itemPath === path || itemPath.startsWith(path + '/')) ? '' : 'none';
     });
 
     // Update URL
