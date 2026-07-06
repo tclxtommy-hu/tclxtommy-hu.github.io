@@ -1,0 +1,30 @@
+src/three-room.js
+  s_802190720d28f5::t_6260d25b4161b7 30-39
+  s_802190720d28f5::t_f7be02a20fb666 6-10,13-17,20-24,27-28
+  s_802190720d28f5::t_b0216f8db015af 29
+index.html
+  s_802190720d28f5::t_40d2d5797392df 50
+  s_802190720d28f5::t_aee25646e34a09 55
+  s_802190720d28f5::t_a806c23a751c7a 52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "72d52a43cb261f26b850e18a40cd6508b9589934",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_802190720d28f5": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "c447223c951b46c58f41133f5e6f92d0",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
