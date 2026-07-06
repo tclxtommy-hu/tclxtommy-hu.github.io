@@ -641,13 +641,17 @@ function addCharacter(parent) {
   );
   chairLegBR.position.set(0.2, 0.12, -0.2);
 
-  group.add(
+  const chairGroup = new THREE.Group();
+  chairGroup.add(
     chair,
     chairBack,
     chairLegFL,
     chairLegFR,
     chairLegBL,
-    chairLegBR,
+    chairLegBR
+  );
+
+  group.add(
     body,
     neck,
     head,
@@ -682,6 +686,13 @@ function addCharacter(parent) {
   return {
     leftUpperArm,
     rightUpperArm,
+    leftThigh,
+    rightThigh,
+    leftCalf,
+    rightCalf,
+    body,
+    hips,
+    chairGroup,
   };
 }
 
@@ -1150,9 +1161,156 @@ export function initHome3DRoom() {
   addPlants(room);
 
   const charWrap = new THREE.Group();
-  charWrap.position.set(1.5, 0, 0.8);
+  // Start position: standing outside the room front, will walk in
+  const CHAR_WALK_STANDING_Y = 0.22; // Raised so feet touch floor when standing
+  const charStartPos = new THREE.Vector3(-0.5, CHAR_WALK_STANDING_Y, 4.4);
+  const charEndPos = new THREE.Vector3(1.5, 0, 0.8);
+  const CHAR_WALK_ROT = 2.6; // Facing walk direction
+  const CHAR_SIT_ROT = 0;    // Facing forward toward camera after sitting
+  charWrap.position.copy(charStartPos);
+  charWrap.rotation.y = CHAR_WALK_ROT;
   const characterRig = addCharacter(charWrap);
   room.add(charWrap);
+
+  // Chair stays at the target position (not inside charWrap)
+  if (characterRig.chairGroup) {
+    characterRig.chairGroup.position.copy(charEndPos);
+    room.add(characterRig.chairGroup);
+  }
+
+  // -- Character walk-in animation state --
+  // Standing pose: thighs vertical (rotation.x = 0) instead of horizontal (-PI/2)
+  if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = 0;
+  if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = 0;
+
+  const CHAR_WALK_DELAY = 500;    // ms delay before character starts walking (after intro begins)
+  const CHAR_WALK_DURATION = 2200; // ms walking duration
+  const CHAR_SIT_DURATION = 600;   // ms sit-down transition
+  let charWalkStartTime = null;
+  let charState = 'idle'; // 'idle' | 'walking' | 'sitting' | 'done'
+
+  function updateCharWalk(now) {
+    if (!introStartTime || charState === 'done') return;
+
+    const elapsed = now - introStartTime - CHAR_WALK_DELAY;
+    if (elapsed < 0) return; // still waiting for delay
+
+    if (charState === 'idle') {
+      charState = 'walking';
+      charWalkStartTime = now;
+    }
+
+    const walkElapsed = now - charWalkStartTime;
+
+    if (charState === 'walking') {
+      let t = Math.min(walkElapsed / CHAR_WALK_DURATION, 1);
+      const eased = easeInOutCubic(t);
+
+      // Move character toward the chair
+      charWrap.position.lerpVectors(charStartPos, charEndPos, eased);
+
+      // Leg swing for walking (alternating left/right)
+      const legFreq = 0.011;
+      const legAngle = Math.sin(walkElapsed * legFreq) * 0.42;
+
+      // Barely-perceptible body rise — real walking keeps head level.
+      // Only a tiny heel-lift when the trailing foot pushes off.
+      const bob = Math.sin(walkElapsed * legFreq * 2 + Math.PI / 2) * 0.012;
+      charWrap.position.y += bob;
+
+      if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = legAngle;
+      if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = -legAngle;
+      // Knee bends when leg swings forward, straightens when pushing back
+      if (characterRig.leftCalf) characterRig.leftCalf.rotation.x = Math.max(0, legAngle) * 0.3;
+      if (characterRig.rightCalf) characterRig.rightCalf.rotation.x = Math.max(0, -legAngle) * 0.3;
+
+      // Arm swing (opposite to legs, like natural walk)
+      if (characterRig.leftUpperArm) characterRig.leftUpperArm.rotation.z = 0.22 - legAngle * 0.18;
+      if (characterRig.rightUpperArm) characterRig.rightUpperArm.rotation.z = -0.19 + legAngle * 0.18;
+
+      if (t >= 1) {
+        charState = 'sitting';
+        charWalkStartTime = now;
+      }
+    }
+
+    if (charState === 'sitting') {
+      let t = Math.min((now - charWalkStartTime) / CHAR_SIT_DURATION, 1);
+      const eased = easeInOutCubic(t);
+
+      // Lower body from standing height to seated height
+      charWrap.position.y = CHAR_WALK_STANDING_Y * (1 - eased);
+      charWrap.position.x = charEndPos.x;
+      charWrap.position.z = charEndPos.z;
+
+      // Rotate to face forward during sit-down
+      charWrap.rotation.y = CHAR_WALK_ROT + (CHAR_SIT_ROT - CHAR_WALK_ROT) * eased;
+
+      // Transition thighs from standing (0) to seated (-PI/2)
+      if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = -Math.PI / 2 * eased;
+      if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = -Math.PI / 2 * eased;
+      // Reset calves
+      if (characterRig.leftCalf) characterRig.leftCalf.rotation.x = 0;
+      if (characterRig.rightCalf) characterRig.rightCalf.rotation.x = 0;
+
+      // Arms return to resting position
+      if (characterRig.leftUpperArm) characterRig.leftUpperArm.rotation.z = 0.22;
+      if (characterRig.rightUpperArm) characterRig.rightUpperArm.rotation.z = -0.19;
+
+      if (t >= 1) {
+        charState = 'waving';
+        charWalkStartTime = now; // reuse for wave timing
+        charWrap.position.copy(charEndPos);
+        charWrap.rotation.y = CHAR_SIT_ROT;
+        if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = -Math.PI / 2;
+        if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = -Math.PI / 2;
+      }
+    }
+
+    if (charState === 'waving') {
+      const waveElapsed = now - charWalkStartTime;
+      const RAISE_MS = 350;
+      const WAVE_MS = 5000;
+
+      if (waveElapsed < RAISE_MS) {
+        // Phase 1: raise arm
+        const raiseT = Math.min(waveElapsed / RAISE_MS, 1);
+        const eased = easeInOutCubic(raiseT);
+        if (characterRig.leftUpperArm) {
+          characterRig.leftUpperArm.rotation.z = 0.22 + (-1.5 - 0.22) * eased;
+          characterRig.leftUpperArm.rotation.x = -0.18 + (-0.35 - (-0.18)) * eased;
+        }
+      } else if (waveElapsed < RAISE_MS + WAVE_MS) {
+        // Phase 2: wave hand (oscillate upper arm side-to-side)
+        const waveTime = waveElapsed - RAISE_MS;
+        if (characterRig.leftUpperArm) {
+          characterRig.leftUpperArm.rotation.z = -1.5 + Math.sin(waveTime * 0.008) * 0.2;
+          characterRig.leftUpperArm.rotation.x = -0.35 + Math.cos(waveTime * 0.006) * 0.05;
+        }
+      } else {
+        // Phase 3: start lowering arm
+        charState = 'lowering_hand';
+        charWalkStartTime = now;
+      }
+    }
+
+    if (charState === 'lowering_hand') {
+      const LOWER_MS = 400;
+      let t = Math.min((now - charWalkStartTime) / LOWER_MS, 1);
+      const eased = easeInOutCubic(t);
+      if (characterRig.leftUpperArm) {
+        characterRig.leftUpperArm.rotation.z = -1.5 + (0.22 - (-1.5)) * eased;
+        characterRig.leftUpperArm.rotation.x = -0.35 + (-0.18 - (-0.35)) * eased;
+      }
+      if (t >= 1) {
+        charState = 'done';
+        if (characterRig.leftUpperArm) {
+          characterRig.leftUpperArm.rotation.z = 0.22;
+          characterRig.leftUpperArm.rotation.x = -0.18;
+        }
+      }
+    }
+  }
 
   room.traverse((obj) => {
     if (obj.isMesh) {
@@ -1284,15 +1442,21 @@ export function initHome3DRoom() {
     stars.rotation.y = t * 0.03;
     stars.rotation.x = Math.sin(t * 0.08) * 0.03;
 
-    if (characterRig) {
-      characterRig.leftUpperArm.rotation.z = 0.22 + Math.sin(t * 1.2) * 0.026;
-      characterRig.leftUpperArm.rotation.x = -0.18 + Math.cos(t * 1.05) * 0.014;
+    // Intro fly-in animation
+    updateIntroAnim(now);
+
+    // Character walk-in animation (only during intro phase)
+    updateCharWalk(now);
+
+    // Subtle resting arm animation (only after walk-in is done, skip left arm during waving)
+    if (characterRig && charState !== 'walking' && charState !== 'sitting') {
+      if (charState !== 'waving' && charState !== 'lowering_hand') {
+        characterRig.leftUpperArm.rotation.z = 0.22 + Math.sin(t * 1.2) * 0.026;
+        characterRig.leftUpperArm.rotation.x = -0.18 + Math.cos(t * 1.05) * 0.014;
+      }
       characterRig.rightUpperArm.rotation.z = -0.19 - Math.sin(t * 1.2 + 0.4) * 0.026;
       characterRig.rightUpperArm.rotation.x = -0.16 + Math.cos(t * 1.05 + 0.32) * 0.014;
     }
-
-    // Intro fly-in animation
-    updateIntroAnim(now);
 
     controls.update();
     updateHotspots();
