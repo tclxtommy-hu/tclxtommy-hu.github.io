@@ -1,0 +1,40 @@
+demo/function_calling/package.json
+  s_7d48c8ea965ba0::t_6a5869c27d5ecb 1-10,13-19
+  s_7d48c8ea965ba0::t_d6fb69dc58f4e0 11-12
+demo/function_calling/src/index.ts
+  s_7d48c8ea965ba0::t_097774aa6814e1 1-124
+demo/function_calling/README.md
+  s_7d48c8ea965ba0::t_529e109e86f180 1-111
+demo/function_calling/.gitignore
+  s_7d48c8ea965ba0::t_71eccff1fb7a4b 1-6
+demo/function_calling/tsconfig.json
+  s_7d48c8ea965ba0::t_4587856409baa2 10
+  s_7d48c8ea965ba0::t_0859be7fdff6f4 1-9,11-19
+demo/function_calling/.env.example
+  s_7d48c8ea965ba0::t_2fa3f6860de490 1-2
+demo/function_calling/src/tools.ts
+  s_7d48c8ea965ba0::t_3fdc01c9bcfb38 1-143
+demo/function_calling/yarn.lock
+  s_7d48c8ea965ba0::t_917563a58a83a1 1-455
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "be516ed2102acb86d0197af7a79d9b0461fd874e",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_7d48c8ea965ba0": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "dfb1648426244b06b837fca930a323fa",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
