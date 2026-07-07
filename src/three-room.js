@@ -489,6 +489,36 @@ function addShelf(parent) {
   parent.add(group);
 }
 
+function createShirtTextTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  // Blue background matching shirtMat color 0x4f64df
+  ctx.fillStyle = '#4f64df';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Vertical white text "刀哥"
+  const chars = ['刀', '哥'];
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 140px "SimHei", "Microsoft YaHei", "Heiti SC", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const spacing = canvas.height / 3;
+  for (let i = 0; i < chars.length; i++) {
+    const y = spacing * (i + 1);
+    ctx.fillText(chars[i], canvas.width / 2, y);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function addCharacter(parent) {
   const group = new THREE.Group();
 
@@ -502,7 +532,19 @@ function addCharacter(parent) {
   const browMat = new THREE.MeshStandardMaterial({ color: 0x2a1f18, roughness: 0.45, metalness: 0.02 });
   const mouthMat = new THREE.MeshStandardMaterial({ color: 0xbe7471, roughness: 0.5, metalness: 0.01 });
 
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.46, 0.3), shirtMat);
+  // Front (+Z) material: blue base + white "刀哥" text; other 5 faces stay plain shirtMat.
+  const shirtFrontMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    map: createShirtTextTexture(),
+    roughness: 0.72,
+    metalness: 0.05,
+    emissive: 0x000000,
+    emissiveIntensity: 0.2,
+  });
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.44, 0.46, 0.3),
+    [shirtMat, shirtMat, shirtMat, shirtMat, shirtFrontMat, shirtMat]
+  );
   // Body sits on top of hips (hips top = 0.41 + 0.09 = 0.50)
   body.position.set(0, 0.73, 0.03);
   body.rotation.z = 0.02;

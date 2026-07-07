@@ -1,0 +1,36 @@
+schema: spec-driven
+
+# Project context (shown to AI when creating artifacts)
+context: |
+  项目：HTTP200 个人技术博客（https://http200.cn）
+  定位：聚焦 AI 技术、大模型、AI 编程范式、Agent 开发的知识库博客。
+
+  技术栈：
+  - 构建：Vite 8 + Vanilla JS（无前端框架）
+  - Markdown：gray-matter（frontmatter）+ marked（渲染）+ Mermaid（图表）
+  - 3D 首页：Three.js
+  - 部署：GitHub Pages + GitHub Actions
+
+  核心构建脚本：scripts/build-posts.js
+  - 递归扫描 posts/**/*.md，生成 posts-html/<dir>/<slug>.html
+  - 跳过以 . 开头的文件和 README.md（README 仅在 archive.html 内联展示）
+  - 同时生成 index.html、archive.html、search-index.json、sitemap.xml、robots.txt
+
+  构建命令：
+  - npm run dev    # 本地开发（含热更新）
+  - npm run build  # 生产构建
+  - npm run new <slug>  # 新建文章脚手架
+
+  【最重要】内部链接规则口诀：README 用 .md，其他用 .html
+  - README.md 内的链接用 .md 扩展名（rewriteReadmeLinks 自动转 .html）
+  - 其他所有 .md 文件内的链接用 .html 扩展名（marked 不转换，写 .md 会 404）
+  - 详见 posts/.build-link-guide.md
+
+  文章 frontmatter 字段：title / date / tags / category / subcategory / image
+
+# Per-artifact rules (optional)
+# rules:
+#   proposal:
+#     - Keep proposals under 500 words
+#   tasks:
+#     - Break tasks into chunks of max 2 hours
