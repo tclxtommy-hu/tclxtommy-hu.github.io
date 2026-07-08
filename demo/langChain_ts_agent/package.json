@@ -9,7 +9,8 @@
     "build": "tsc",
     "chat": "tsx src/chat.ts",
     "agent": "tsx src/agent.ts",
-    "skill": "tsx src/skillAgent.ts"
+    "skill": "tsx src/skillAgent.ts",
+    "sandbox": "tsx src/skillSandboxAgent.ts"
   },
   "dependencies": {
     "@langchain/core": "^0.3.0",

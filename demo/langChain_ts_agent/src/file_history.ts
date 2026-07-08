@@ -13,6 +13,8 @@ import {
  * - 配合 BufferWindowMemory 使用，自动受窗口大小限制
  */
 export class FileChatMessageHistory extends BaseListChatMessageHistory {
+  lc_namespace = ["file_chat_message_history"];
+
   private filePath: string;
 
   constructor(filePath: string = "./data/chat_history.json") {

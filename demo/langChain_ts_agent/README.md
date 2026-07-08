@@ -11,11 +11,18 @@ langChain_ts_agent/
 │   ├── tools.ts           # Agent 工具集（日期、计算器、文本处理）
 │   ├── file_history.ts    # 文件持久化聊天历史
 │   ├── logger.ts          # Agent 执行日志记录器
-│   ├── chat.ts            # 基础多轮对话示例
+│   ├── chat.ts            # 基础多轮对话 + Skill 自动路由（注入，不跑沙盒）
 │   ├── agent.ts           # Agent + 工具调用 + 记忆示例
-│   ├── skills.ts          # Skill 抽象：注册表 + LLM 路由 + 注入
-│   ├── skillAgent.ts      # Skill 演示：大脑选技能、四肢注入/执行
+│   ├── skillLoader.ts     # 动态加载 ./skills 目录 → SkillPackage[]（零硬编码注册表）
+│   ├── skillAgent.ts      # Skill 演示：大脑选技能、四肢注入 + 沙盒执行
+│   ├── sandbox.ts         # 沙盒执行器（子进程 + node:vm 双层隔离）
+│   ├── skillSandboxAgent.ts # 动态技能 + 沙盒 交互 Demo
 │   └── index.ts           # 入口文件
+├── skills/                 # 动态技能包目录（丢一个文件夹 = 新增一个技能）
+│   └── text_stats/         #   示例技能：统计文本字符/词/句 + 词频
+│       ├── skill.md        #   frontmatter(元数据) + SOP 正文
+│       ├── run.js          #   被沙盒执行的 JS 脚本
+│       └── run.py          #   被沙盒执行的 Python 脚本
 ├── data/                  # 聊天历史持久化目录（gitignore）
 ├── logs/                  # 执行日志目录（gitignore）
 ├── .env.example           # 环境变量模板
@@ -49,7 +56,10 @@ DEEPSEEK_MODEL=deepseek-chat
 npm run chat    # 基础多轮对话（已集成 Skill 自动路由）
 npm run agent   # Agent + 工具调用
 npm run skill   # Skill 演示：LLM 大脑选技能 + 运行时注入
+npm run sandbox # 进阶：动态技能包 + 沙盒（技能携带脚本，沙盒执行）
 ```
+
+> 进阶的「动态技能包 + 沙盒」内容较多（技能包格式、双层沙盒设计、恶意脚本拦截演示、如何新增技能），已单独成篇：**[SKILL_SANDBOX.md](SKILL_SANDBOX.md)**。
 
 ## 核心概念
 
@@ -146,7 +156,7 @@ flowchart TD
 > 大脑 = LLM（读 SOP、决策选技能）
 > 四肢 = Agent 运行时（把技能注入 prompt、执行携带的 tools、跑循环）
 
-- **Skill 的选择**由大脑（LLM）推理决定：运行时把技能目录交给 LLM，它返回最匹配的 `name`（见 `skills.ts` 的 `selectSkillByLLM`）。
+- **Skill 的选择**由大脑（LLM）推理决定：运行时把动态扫描出的技能目录交给 LLM，它返回最匹配的 `name`（见 `skillLoader.ts` 的 `loadSkillsFromDir` 与各 demo 内的 `selectSkillByLLM`）。
 - **Skill 的加载 / 注入 / 工具执行**由四肢（运行时）完成：`buildSystemPrompt` 把 `instructions` 拼进 system prompt。
 - **LLM 从不直接接触 `Skill` 对象本身**，它只消费注入后的那段纯文本。
 

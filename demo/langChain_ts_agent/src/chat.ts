@@ -1,14 +1,14 @@
 import * as readline from "node:readline";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { createDeepSeekModel } from "./config.js";
 import { HumanMessage, SystemMessage, AIMessage } from "@langchain/core/messages";
 import { AgentLogger } from "./logger.js";
-import {
-  SKILLS,
-  selectSkillByLLM,
-  getSkill,
-  listSkills,
-  buildSystemPrompt,
-} from "./skills.js";
+import { loadSkillsFromDir, type SkillPackage } from "./skillLoader.js";
+
+// 与其它 demo 共用同一份「动态技能源」：扫 ./skills 目录
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SKILLS_DIR = path.resolve(__dirname, "../skills");
 
 // 基础 system prompt（无技能时的默认人格）
 const BASE_SYSTEM_PROMPT = "你是一个友好的AI助手，请用中文回答，言简意赅。";
@@ -26,9 +26,29 @@ function ask(rl: readline.Interface, question: string): Promise<string> {
   });
 }
 
+/** 路由：让大脑(LLM)决策选哪个 skill。只回复技能的 name（或 none） */
+async function selectSkillByLLM(model: any, skills: SkillPackage[], input: string): Promise<SkillPackage | null> {
+  if (skills.length === 0) return null;
+  const routerPrompt =
+    `你是技能路由器。可用技能：\n` +
+    skills.map((s) => `- ${s.name}: ${s.description}`).join("\n") +
+    `\n只回复最合适技能的 name；没有合适的只回复 none。\n用户需求：` + input;
+  const res = await model.invoke(routerPrompt);
+  const name = String(res.content).trim().toLowerCase();
+  if (name === "none") return null;
+  return skills.find((s) => s.name.toLowerCase() === name) ?? null;
+}
+
+/** 把技能正文注入 system prompt —— Skill 在 LLM 中的核心用法 */
+function buildSystemPrompt(base: string, skill: SkillPackage | null): string {
+  if (!skill) return base;
+  return `${base}\n\n【已加载技能：${skill.name} | runtime=${skill.runtime}】\n${skill.instructions}`;
+}
+
 async function main() {
   console.log("=".repeat(50));
   console.log("💬 LangChain 多轮对话（DeepSeek）— 已集成 Skill 自动路由");
+  console.log("技能源：动态扫描 ./skills 目录（含 text-stats 等）");
   console.log("输入 /skills 查看技能，/skill <name> 手动加载，/clear 清空，/exit 退出");
   console.log("=".repeat(50));
 
@@ -38,8 +58,10 @@ async function main() {
 
   // 对话上下文（仅存 Human/AI 轮次，每轮重新拼 system）
   const messages: (HumanMessage | AIMessage)[] = [];
-  let activeSkill: (typeof SKILLS)[number] | null = null;
+  const skills = loadSkillsFromDir(SKILLS_DIR);
+  let activeSkill: SkillPackage | null = null;
 
+  console.log(`✅ 已动态加载 ${skills.length} 个技能：${skills.map((s) => s.name).join(", ") || "（无）"}`);
   console.log("✅ 开始对话！大脑(LLM)会自动匹配技能。\n");
 
   while (true) {
@@ -57,14 +79,14 @@ async function main() {
       console.log("🗑️  上下文与技能已清空\n");
       continue;
     }
-    if (input === "/skills") {
+    if (input === "/skills" || input.toLowerCase() === "skills") {
       console.log("📚 可用技能：");
-      for (const s of listSkills()) console.log(`  - ${s.name}：${s.description}`);
+      for (const s of skills) console.log(`  - ${s.name} (${s.runtime}, entry=${s.entry})：${s.description}`);
       continue;
     }
     if (input.startsWith("/skill ")) {
       const name = input.slice(7).trim();
-      activeSkill = getSkill(name) ?? null;
+      activeSkill = skills.find((s) => s.name === name) ?? null;
       console.log(
         activeSkill
           ? `🎯 已手动加载技能：${activeSkill.name}`
@@ -75,7 +97,7 @@ async function main() {
 
     // 1) 大脑决策：让 LLM 选技能（可被 /skill 手动覆盖）
     if (!activeSkill) {
-      const picked = await selectSkillByLLM(model, input);
+      const picked = await selectSkillByLLM(model, skills, input);
       if (picked) {
         activeSkill = picked;
         console.log(`🧠 大脑选择技能：${picked.name}`);
