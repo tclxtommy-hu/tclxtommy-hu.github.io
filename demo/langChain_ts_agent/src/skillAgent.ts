@@ -1,6 +1,6 @@
 import * as readline from "node:readline";
 import { createDeepSeekModel } from "./config.js";
-import { HumanMessage, SystemMessage, AIMessage } from "@langchain/core/messages";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AgentLogger } from "./logger.js";
 import {
   SKILLS,
@@ -14,21 +14,16 @@ import {
 const BASE_SYSTEM_PROMPT = "你是一个友好的AI助手，请用中文回答，言简意赅。";
 
 function createReadline() {
-  return readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+  return readline.createInterface({ input: process.stdin, output: process.stdout });
 }
 
-function ask(rl: readline.Interface, question: string): Promise<string> {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => resolve(answer.trim()));
-  });
+function ask(rl: readline.Interface, q: string): Promise<string> {
+  return new Promise((resolve) => rl.question(q, (a) => resolve(a.trim())));
 }
 
 async function main() {
   console.log("=".repeat(50));
-  console.log("💬 LangChain 多轮对话（DeepSeek）— 已集成 Skill 自动路由");
+  console.log("🎯 LangChain Skill 演示（DeepSeek）— 大脑 LLM / 四肢 运行时");
   console.log("输入 /skills 查看技能，/skill <name> 手动加载，/clear 清空，/exit 退出");
   console.log("=".repeat(50));
 
@@ -36,15 +31,13 @@ async function main() {
   const model = createDeepSeekModel({ temperature: 0.7 });
   const logger = new AgentLogger();
 
-  // 对话上下文（仅存 Human/AI 轮次，每轮重新拼 system）
-  const messages: (HumanMessage | AIMessage)[] = [];
   let activeSkill: (typeof SKILLS)[number] | null = null;
+  const messages: any[] = [];
 
   console.log("✅ 开始对话！大脑(LLM)会自动匹配技能。\n");
 
   while (true) {
     const input = await ask(rl, "👤 你：");
-
     if (!input) continue;
     if (input === "/exit") {
       logger.close();
@@ -54,7 +47,7 @@ async function main() {
     if (input === "/clear") {
       messages.length = 0;
       activeSkill = null;
-      console.log("🗑️  上下文与技能已清空\n");
+      console.log("🗑️ 上下文与技能已清空\n");
       continue;
     }
     if (input === "/skills") {
@@ -81,21 +74,18 @@ async function main() {
         console.log(`🧠 大脑选择技能：${picked.name}`);
       }
     }
-    // 2) 四肢执行：把技能正文注入 system prompt
+    // 2) 四肢执行：把技能正文注入 system prompt（Skill 在 LLM 中的核心用法）
     const systemText = buildSystemPrompt(BASE_SYSTEM_PROMPT, activeSkill);
     // 3) 每轮重建 system（含 skill），对话上下文正常保留
     const payload = [new SystemMessage(systemText), ...messages, new HumanMessage(input)];
 
     process.stdout.write("🤖 助手：");
-
     const response = await model.invoke(payload, { callbacks: [logger] });
     messages.push(new HumanMessage(input));
     messages.push(response);
-
     console.log(response.content);
     console.log();
   }
-
   rl.close();
 }
 

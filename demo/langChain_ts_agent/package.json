@@ -8,7 +8,8 @@
     "start": "tsx src/index.ts",
     "build": "tsc",
     "chat": "tsx src/chat.ts",
-    "agent": "tsx src/agent.ts"
+    "agent": "tsx src/agent.ts",
+    "skill": "tsx src/skillAgent.ts"
   },
   "dependencies": {
     "@langchain/core": "^0.3.0",
