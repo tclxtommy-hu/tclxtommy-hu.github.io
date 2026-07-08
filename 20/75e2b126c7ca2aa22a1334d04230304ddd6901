@@ -1,0 +1,73 @@
+demo/langChain_ts_agent/skills/text_stats/skill.md
+  s_297e93c9a2861d::t_b1ea29040ea107 1,3-12
+  s_297e93c9a2861d::t_6de45f1fc164d1 2
+demo/langChain_ts_agent/src/skillLoader.ts
+  s_297e93c9a2861d::t_23f05d6da8b7cc 1-2,5-7,9-10,12,15,17-18,22-23,25-40,43-51,53-54,56-58,61-63,66-74,76
+  s_297e93c9a2861d::t_a60f012c69a0d2 16
+  s_297e93c9a2861d::t_714f7e7c44396b 55,59-60
+demo/langChain_ts_agent/src/file_history.ts
+  s_297e93c9a2861d::t_ac654e9026a5d7 16-17
+demo/langChain_ts_agent/package.json
+  s_297e93c9a2861d::t_23e2f43689e020 12-13
+demo/langChain_ts_agent/src/skillAgent.ts
+  s_297e93c9a2861d::t_3c3246c1e4974d 54
+  s_297e93c9a2861d::t_82b83e0019edab 2-3,7-13,26-49,62-65,84-85,87,92,103,109-124
+  s_297e93c9a2861d::t_b8682a8eb68efe 50
+demo/langChain_ts_agent/src/chat.ts
+  s_297e93c9a2861d::t_f61da4835c48a4 2-3,7-11,29-46,61-62,64,82,84,89,100
+  s_297e93c9a2861d::t_82e31da98b4f63 51
+  s_297e93c9a2861d::t_830319449ee4e4 47
+demo/langChain_ts_agent/src/sandbox.ts
+  s_297e93c9a2861d::t_dd0d4507047254 1-52,62,66,70,77,95,111-121,125-198,207-214
+  s_297e93c9a2861d::t_bcb70278da30ec 73
+  s_297e93c9a2861d::t_b93c6b9c56b0b1 53-61,63-65,67-69,71-72,75-76,78-94,96-110
+  s_297e93c9a2861d::t_8fbf9e3b2bfddc 74
+  s_297e93c9a2861d::t_4f3ecff7cd6aeb 122-124
+  s_297e93c9a2861d::t_fdba5651188c62 199-206
+demo/langChain_ts_agent/skills/text_stats/run.js
+  s_297e93c9a2861d::t_a549037f6a8444 1-23
+demo/langChain_ts_agent/README.md
+  s_297e93c9a2861d::t_f7d8ef92ac32d7 159
+  s_297e93c9a2861d::t_ff82b288392ec3 14,16-19,21-25
+  s_297e93c9a2861d::t_e7d890b402285f 59,62
+  s_297e93c9a2861d::t_59a40097c165fb 63
+demo/langChain_ts_agent/SKILL_SANDBOX.md
+  s_297e93c9a2861d::t_08ec8193286b58 3
+  s_297e93c9a2861d::t_f725ce3a1303bd 40
+  s_297e93c9a2861d::t_421c5ed1f86862 1-2,4-39,41-49,51,53-164
+  s_297e93c9a2861d::t_515833799c94ad 50
+  s_297e93c9a2861d::t_1652d8b005b047 52
+demo/langChain_ts_agent/skills/say_hello/skill.md
+  s_297e93c9a2861d::t_43ca450bbcfebc 2
+  h_63381fac4a1ac5 6
+  s_297e93c9a2861d::t_04eb703b50f4ce 1
+demo/langChain_ts_agent/src/skillSandboxAgent.ts
+  s_297e93c9a2861d::t_57379c5be1421c 109-110
+  s_297e93c9a2861d::t_9a316bea81e5b2 78
+  s_297e93c9a2861d::t_955d97e4daf9d0 152
+  s_297e93c9a2861d::t_2be51d3cfbb312 37-43
+  s_297e93c9a2861d::t_b71d72208639ee 128
+  s_297e93c9a2861d::t_870b8b7706a21f 1-36,44-77,79-108,111-127,129-138,140-151,153-167
+  s_297e93c9a2861d::t_3d9126701c7a48 139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "2075e2b126c7ca2aa22a1334d04230304ddd6901",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_297e93c9a2861d": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "833c9e2ab54e4e3587b2b20c0770aaa5",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
