@@ -1,0 +1,20 @@
+{
+  "name": "playwright-screenshot-demo",
+  "version": "1.0.0",
+  "description": "基于 Playwright 的网页截图工具，TypeScript + pnpm",
+  "type": "module",
+  "scripts": {
+    "shot": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "playwright": "^1.49.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
