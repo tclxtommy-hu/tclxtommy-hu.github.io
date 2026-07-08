@@ -1,0 +1,23 @@
+{
+  "name": "local-embedding-demo",
+  "version": "1.0.0",
+  "description": "基于本地模型（Transformers.js）的文本/图片 Embedding 向量化 Demo，TypeScript + pnpm",
+  "type": "module",
+  "scripts": {
+    "index": "tsx src/index.ts",
+    "search": "tsx src/search.ts",
+    "sim": "tsx src/sim.ts",
+    "demo": "tsx src/demo.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.0.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

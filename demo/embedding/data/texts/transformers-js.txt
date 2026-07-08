@@ -1,0 +1,1 @@
+Transformers.js 是 HuggingFace 推出的 JavaScript 版 Transformers 库，基于 ONNX Runtime，支持在 Node.js 和浏览器中运行超过 1200 种预训练模型。

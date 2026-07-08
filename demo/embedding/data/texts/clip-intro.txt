@@ -1,0 +1,1 @@
+CLIP（Contrastive Language-Image Pre-training）是 OpenAI 提出的跨模态模型，通过对比学习将文本和图片映射到同一个向量空间，从而支持跨模态检索。
