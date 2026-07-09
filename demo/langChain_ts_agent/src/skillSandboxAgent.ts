@@ -118,7 +118,7 @@ async function main() {
   console.log("=".repeat(60));
 
   const rl = createReadline();
-  const logger = new AgentLogger();
+  const logger = new AgentLogger("sandbox");
 
   let skillPackages = loadSkillsFromDir(SKILLS_DIR);
   console.log(
@@ -157,7 +157,7 @@ async function main() {
     }
 
     process.stdout.write("🤖 Agent：");
-    const result = await executor.invoke({ input }, { callbacks: [logger] });
+    const result = await executor.invoke({ input }, { callbacks: [logger], tags: ["agent"] });
     console.log(result.output);
     console.log();
   }

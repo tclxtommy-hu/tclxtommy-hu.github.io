@@ -37,18 +37,25 @@ export class AgentLogger extends BaseCallbackHandler {
   private stepCount = 0;
   private llmCallCount = 0;
   private toolCallCount = 0;
+  private module: string;
 
-  constructor() {
+  /**
+   * @param module 模块名（如 chat / skill / sandbox），用于日志分类：
+   *   - 写入独立文件 `<module>-<timestamp>.log`
+   *   - 每条 LLM 调用带上「方法 tag」（通过 invoke 的 tags 选项传入，如 router / chat）
+   */
+  constructor(module = "agent") {
     super();
+    this.module = module;
     ensureLogDir();
 
     const dateStr = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
     this.sessionId = dateStr;
-    this.logFilePath = path.join(LOGS_DIR, `agent-${this.sessionId}.log`);
+    this.logFilePath = path.join(LOGS_DIR, `${this.module}-${this.sessionId}.log`);
     this.stream = fs.createWriteStream(this.logFilePath, { flags: "a" });
 
     this.log("=".repeat(60));
-    this.log(`📋 Agent 会话开始: ${now()}`);
+    this.log(`📋 会话开始 | 模块=${this.module} | ${now()}`);
     this.log("=".repeat(60));
   }
 
@@ -82,20 +89,21 @@ export class AgentLogger extends BaseCallbackHandler {
     _runId: string,
     _parentRunId?: string,
     _extraParams?: Record<string, unknown>,
-    _tags?: string[],
+    tags?: string[],
     _metadata?: Record<string, unknown>,
     _name?: string
   ) {
     this.llmCallCount++;
     this.stepCount++;
-    this.log(`🤔 [LLM调用 #${this.llmCallCount}] 发送请求...`);
+    // 方法级分类：invoke 时通过 tags 选项传入（如 ["router"] / ["chat"]）
+    const tagStr = tags && tags.length ? ` [${this.module}/${tags.join("/")}]` : ` [${this.module}]`;
+    this.log(`🤔 [LLM调用 #${this.llmCallCount}]${tagStr} 发送请求（完整上下文如下）...`);
 
-    // 记录 prompt 概要
+    // 记录完整 prompt（不截断，便于事后复盘所有喂给大模型的内容）
     for (let i = 0; i < prompts.length; i++) {
-      const preview = prompts[i]
-        .replace(/\n\s*/g, " ")
-        .slice(0, 500);
-      this.log(`   Prompt: ${preview}`);
+      this.log(`   ── Prompt #${i + 1} ───────────────────────────────`);
+      this.log(prompts[i]);
+      this.log(`   ───────────────────────────────────────────────────`);
     }
   }
 
@@ -110,7 +118,7 @@ export class AgentLogger extends BaseCallbackHandler {
       JSON.stringify(gen?.message) ??
       "(无内容)";
 
-    this.log(`💬 [LLM响应 #${this.llmCallCount}] ${truncate(content, 500)}`);
+    this.log(`💬 [LLM响应 #${this.llmCallCount}] ${content}`);
 
     // 分析 LLM 返回中是否包含工具调用
     if (

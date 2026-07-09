@@ -27,13 +27,19 @@ function ask(rl: readline.Interface, question: string): Promise<string> {
 }
 
 /** 路由：让大脑(LLM)决策选哪个 skill。只回复技能的 name（或 none） */
-async function selectSkillByLLM(model: any, skills: SkillPackage[], input: string): Promise<SkillPackage | null> {
+async function selectSkillByLLM(
+  model: any,
+  skills: SkillPackage[],
+  input: string,
+  logger?: AgentLogger
+): Promise<SkillPackage | null> {
   if (skills.length === 0) return null;
   const routerPrompt =
     `你是技能路由器。可用技能：\n` +
     skills.map((s) => `- ${s.name}: ${s.description}`).join("\n") +
     `\n只回复最合适技能的 name；没有合适的只回复 none。\n用户需求：` + input;
-  const res = await model.invoke(routerPrompt);
+  const opts = logger ? { callbacks: [logger], tags: ["router"] } : undefined;
+  const res = await model.invoke(routerPrompt, opts);
   const name = String(res.content).trim().toLowerCase();
   if (name === "none") return null;
   return skills.find((s) => s.name.toLowerCase() === name) ?? null;
@@ -54,7 +60,7 @@ async function main() {
 
   const rl = createReadline();
   const model = createDeepSeekModel({ temperature: 0.7 });
-  const logger = new AgentLogger();
+  const logger = new AgentLogger("chat");
 
   // 对话上下文（仅存 Human/AI 轮次，每轮重新拼 system）
   const messages: (HumanMessage | AIMessage)[] = [];
@@ -97,7 +103,7 @@ async function main() {
 
     // 1) 大脑决策：让 LLM 选技能（可被 /skill 手动覆盖）
     if (!activeSkill) {
-      const picked = await selectSkillByLLM(model, skills, input);
+      const picked = await selectSkillByLLM(model, skills, input, logger);
       if (picked) {
         activeSkill = picked;
         console.log(`🧠 大脑选择技能：${picked.name}`);
@@ -110,7 +116,7 @@ async function main() {
 
     process.stdout.write("🤖 助手：");
 
-    const response = await model.invoke(payload, { callbacks: [logger] });
+    const response = await model.invoke(payload, { callbacks: [logger], tags: ["chat"] });
     messages.push(new HumanMessage(input));
     messages.push(response);
 
