@@ -15,9 +15,27 @@ function ensureLogDir() {
   }
 }
 
-// 获取当前时间字符串
+// 两位补零
+function pad(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+// 获取当前时间字符串（本地时区，非 UTC）：YYYY-MM-DD HH:MM:SS
 function now(): string {
-  return new Date().toISOString().replace("T", " ").slice(0, 19);
+  const d = new Date();
+  return (
+    d.getFullYear() +
+    "-" + pad(d.getMonth() + 1) +
+    "-" + pad(d.getDate()) +
+    " " + pad(d.getHours()) +
+    ":" + pad(d.getMinutes()) +
+    ":" + pad(d.getSeconds())
+  );
+}
+
+// 文件名用的本地时间戳：YYYY-MM-DDTHH-MM-SS（保留 T 分隔符）
+function nowFileStamp(): string {
+  return now().replace(" ", "T").replace(/:/g, "-");
 }
 
 // 截断长文本
@@ -49,7 +67,7 @@ export class AgentLogger extends BaseCallbackHandler {
     this.module = module;
     ensureLogDir();
 
-    const dateStr = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const dateStr = nowFileStamp();
     this.sessionId = dateStr;
     this.logFilePath = path.join(LOGS_DIR, `${this.module}-${this.sessionId}.log`);
     this.stream = fs.createWriteStream(this.logFilePath, { flags: "a" });
