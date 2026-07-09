@@ -1,0 +1,37 @@
+demo/langChain_ts_agent/src/skillSandboxAgent.ts
+  s_297e93c9a2861d::t_9cd84ec0287b41 121
+  s_297e93c9a2861d::t_d067965f2727dc 160
+demo/langChain_ts_agent/src/chat.ts
+  s_297e93c9a2861d::t_82ead09d369dcd 30-35,41-42
+  s_297e93c9a2861d::t_227137f99a4566 106,119
+  s_297e93c9a2861d::t_405ba62b7cbddd 63
+demo/langChain_ts_agent/src/logger.ts
+  s_297e93c9a2861d::t_827668e79f9b7b 92,98-100,102,104-106
+  s_297e93c9a2861d::t_4e10aaa8c681c1 121
+  s_297e93c9a2861d::t_cb2b359c5e021e 40-47,49,54,58
+demo/langChain_ts_agent/src/skillAgent.ts
+  s_297e93c9a2861d::t_cde6e55307ebec 39-44,50-51
+  s_297e93c9a2861d::t_bece23db9d3685 109,134
+  s_297e93c9a2861d::t_22f12b00174810 66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "02a56c2179e0e24882ed3201d976375dd26a40e0",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_297e93c9a2861d": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "833c9e2ab54e4e3587b2b20c0770aaa5",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
