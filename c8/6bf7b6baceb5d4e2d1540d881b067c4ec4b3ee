@@ -1,0 +1,25 @@
+demo/langChain_ts_agent/src/logger.ts
+  s_3ebc3b2fdb853d::t_bbec3f8814b787 18-23,25-38
+  s_3ebc3b2fdb853d::t_d3297bdf5c15cd 70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "c86bf7b6baceb5d4e2d1540d881b067c4ec4b3ee",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_3ebc3b2fdb853d": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "f9ce4468ec7745bba98c03e010ca1ac5",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
