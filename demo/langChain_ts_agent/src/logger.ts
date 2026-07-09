@@ -65,7 +65,12 @@ export class AgentLogger extends BaseCallbackHandler {
     this.stream.write(line + "\n");
 
     // 关键事件也输出到控制台（带缩进，与交互区分）
-    if (message.includes("🔧") || message.includes("🤔") || message.includes("✅")) {
+    if (
+      message.includes("🔧") ||
+      message.includes("🤔") ||
+      message.includes("💬") ||
+      message.includes("✅")
+    ) {
       console.log(`  ${message}`);
     }
   }
@@ -112,25 +117,46 @@ export class AgentLogger extends BaseCallbackHandler {
     _runId: string,
     _parentRunId?: string
   ) {
-    const gen = output.generations?.[0]?.[0] as unknown as Record<string, unknown> | undefined;
-    const content =
-      (gen?.text as string) ??
-      JSON.stringify(gen?.message) ??
-      "(无内容)";
+    const gen = output.generations?.[0]?.[0] as unknown as Record<string, any> | undefined;
+    let content = "";
 
+    // 1) 普通文本响应（chat 等）
+    if (typeof gen?.text === "string" && gen.text.trim()) {
+      content = gen.text;
+    } else {
+      const msg = gen?.message as Record<string, any> | undefined;
+      if (msg) {
+        const mc = msg.content;
+        if (typeof mc === "string" && mc.trim()) {
+          content = mc;
+        } else if (Array.isArray(mc)) {
+          // content 可能是多模态块数组，提取其中的文本
+          content = mc
+            .map((p: any) => (typeof p === "string" ? p : (p?.text ?? "")))
+            .join("");
+        }
+        // 2) 结构化输出 / 工具调用：从 tool_calls 的 args 还原
+        //    （router 选技能用的是 withStructuredOutput，决策就藏在 args 里）
+        const toolCalls = msg.tool_calls ?? (output.llmOutput as any)?.tool_calls;
+        if (!content && Array.isArray(toolCalls) && toolCalls.length) {
+          content = toolCalls
+            .map((tc: any) => {
+              const args = tc?.function?.arguments ?? tc?.args;
+              return typeof args === "string" ? args : JSON.stringify(args);
+            })
+            .join("\n");
+        }
+      }
+    }
+
+    if (!content) content = "(无内容)";
     this.log(`💬 [LLM响应 #${this.llmCallCount}] ${content}`);
 
-    // 分析 LLM 返回中是否包含工具调用
-    if (
-      output.llmOutput &&
-      typeof output.llmOutput === "object" &&
-      "tool_calls" in (output.llmOutput as Record<string, unknown>)
-    ) {
-      const toolCalls = (output.llmOutput as Record<string, unknown>)
-        .tool_calls;
-      this.log(
-        `   📌 LLM 决定调用工具: ${JSON.stringify(toolCalls)}`
-      );
+    // 工具调用明细（结构化输出的决策一目了然）
+    const toolCalls =
+      (gen?.message as any)?.tool_calls ?? (output.llmOutput as any)?.tool_calls;
+    if (Array.isArray(toolCalls) && toolCalls.length) {
+      this.log(`   📌 LLM 决定调用工具/结构化输出: ${JSON.stringify(toolCalls)}`);
     }
   }
 

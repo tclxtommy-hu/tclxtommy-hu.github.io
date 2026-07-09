@@ -1,11 +1,16 @@
 import * as readline from "node:readline";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { z } from "zod";
 import { createDeepSeekModel } from "./config.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AgentLogger } from "./logger.js";
 import { loadSkillsFromDir, type SkillPackage } from "./skillLoader.js";
 import { runSkillScript, SANDBOX_TIMEOUT_MS } from "./sandbox.js";
+
+// 会话级技能缓存开关：默认关闭（每轮重新路由，随话题切换技能），设为 "true" 才启用粘性
+import "dotenv/config"; // 确保 .env 在本模块被直接运行时也已加载
+const STICKY_SESSION = process.env.SKILL_SESSION_CACHE === "true";
 
 // 与 skillSandboxAgent 共用同一份「动态技能源」：扫 ./skills 目录，
 // 做到「新增技能 = 丢一个文件夹进去」，不再有写死的技能表。
@@ -35,7 +40,10 @@ function buildSystemPrompt(base: string, skill: SkillPackage | null, scriptOutpu
   return text;
 }
 
-/** 路由：让大脑(LLM)决策选哪个 skill。只回复技能的 name（或 none） */
+/** 路由：让大脑(LLM)决策选哪个 skill。
+ * 优先用 withStructuredOutput 让模型返回受约束枚举（name | "none"），
+ * 取代脆弱的字符串硬匹配（详见 SKILL_ROUTER.md §3 短板 B）。
+ * 若模型不支持结构化输出，自动回退到关键词提取解析。 */
 async function selectSkillByLLM(
   model: any,
   skills: SkillPackage[],
@@ -43,15 +51,32 @@ async function selectSkillByLLM(
   logger?: AgentLogger
 ): Promise<SkillPackage | null> {
   if (skills.length === 0) return null;
+  const names = skills.map((s) => s.name);
+  // 先把所有技能"name + description"拼成路由提示词，让 LLM 当路由器
   const routerPrompt =
     `你是技能路由器。可用技能：\n` +
     skills.map((s) => `- ${s.name}: ${s.description}`).join("\n") +
     `\n只回复最合适技能的 name；没有合适的只回复 none。\n用户需求：` + input;
   const opts = logger ? { callbacks: [logger], tags: ["router"] } : undefined;
-  const res = await model.invoke(routerPrompt, opts);
-  const name = String(res.content).trim().toLowerCase();
-  if (name === "none") return null;
-  return skills.find((s) => s.name.toLowerCase() === name) ?? null;
+
+  // 1) 优先：结构化输出（受约束枚举，鲁棒性最高）
+  try {
+    const SkillSchema = z.object({
+      skill: z.enum([...names, "none"] as unknown as [string, ...string[]]),
+    });
+    const structured = await model.withStructuredOutput(SkillSchema).invoke(routerPrompt, opts);
+    const picked = structured?.skill;
+    if (!picked || picked === "none") return null;
+    return skills.find((s) => s.name.toLowerCase() === picked.toLowerCase()) ?? null;
+  } catch {
+    // 2) 回退：自由文本解析（兼容不支持 structured output 的模型）
+    const res = await model.invoke(routerPrompt, opts);
+    const raw = String(res.content).trim().toLowerCase();
+    const name =
+      (raw.match(/[a-z0-9_-]+/g) ?? []).find((t) => names.includes(t) || t === "none") ?? raw;
+    if (name === "none") return null;
+    return skills.find((s) => s.name.toLowerCase() === name) ?? null;
+  }
 }
 
 async function main() {
@@ -64,10 +89,10 @@ async function main() {
   const rl = createReadline();
   const model = createDeepSeekModel({ temperature: 0.7 });
   const logger = new AgentLogger("skill");
-
+  // 启动时一次性扫描磁盘，运行时零注册
   const skills = loadSkillsFromDir(SKILLS_DIR);
   console.log(`✅ 已动态加载 ${skills.length} 个技能：${skills.map((s) => s.name).join(", ") || "（无）"}\n`);
-
+  // 会话选中的技能（可被 /skill 手动覆盖），以及对话上下文
   let activeSkill: SkillPackage | null = null;
   const messages: any[] = [];
 
@@ -105,11 +130,14 @@ async function main() {
     }
 
     // 1) 大脑决策：让 LLM 选技能（可被 /skill 手动覆盖）
-    if (!activeSkill) {
+    //    - STICKY_SESSION=true ：仅当未激活时才路由（会话级粘性，原默认行为）
+    //    - STICKY_SESSION=false：每轮都重新路由，话题变了技能也跟着变（避免武断锁定）
+    const shouldRoute = STICKY_SESSION ? !activeSkill : true;
+    if (shouldRoute) {
       const picked = await selectSkillByLLM(model, skills, input, logger);
-      if (picked) {
+      if (picked !== activeSkill) {
         activeSkill = picked;
-        console.log(`🧠 大脑选择技能：${picked.name}`);
+        if (picked) console.log(`🧠 大脑选择技能：${picked.name}`);
       }
     }
 
