@@ -1,0 +1,21 @@
+{
+  "name": "bm25-demo",
+  "version": "1.0.0",
+  "description": "基于 Node.js + TypeScript 的 BM25 稀疏检索示例（bigram 兜底 + jieba 可选增强，JSON 持久化）",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "preindex": "pnpm build",
+    "index": "node dist/index.js",
+    "prequery": "pnpm build",
+    "query": "node dist/search.js",
+    "predemo": "pnpm build",
+    "demo": "node dist/demo.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@node-rs/jieba": "^1.10.4",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
