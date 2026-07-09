@@ -1,0 +1,50 @@
+demo/langChain_ts_agent/src/chat.ts
+  s_2888705e1e9ee7::t_fe7cd03e327403 128-131,133,135
+  s_2888705e1e9ee7::t_ea7e5adc9789c7 10-13
+  s_2888705e1e9ee7::t_681109c1dbcfab 4
+  s_2888705e1e9ee7::t_2770ba4eb5a628 34-36,44,50-68
+demo/langChain_ts_agent/SKILL_ROUTER.md
+  s_2888705e1e9ee7::t_727c70c28097f6 1-120
+demo/langChain_ts_agent/src/logger.ts
+  s_2888705e1e9ee7::t_c5ee79f6d70a77 120-150,152,155-159
+  s_2888705e1e9ee7::t_00d7e3db987808 68-73
+demo/langChain_ts_agent/src/skillAgent.ts
+  s_2888705e1e9ee7::t_95d20dc1142e8d 4
+  s_2888705e1e9ee7::t_b7647c963330da 65
+  s_2888705e1e9ee7::t_d69be5a24bc014 43-46,54,61-64,66-79
+  s_2888705e1e9ee7::t_fdfe4f891d3da2 11-14
+  h_63381fac4a1ac5 55
+  s_2888705e1e9ee7::t_84c4f989cd0aab 133-136,138,140
+  s_b6ea884b650c0f::t_00d38e9c3627a2 95
+"posts/AI/Agent开发知识/12-补充概念/03-关于Agent Skill Router的几点思考.md"
+  h_63381fac4a1ac5 1-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "40437ba6ea4069b4d5d49462f63445e87d4fe6d2",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_2888705e1e9ee7": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "89e3f8c8a39545029e418f02219665f8",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_b6ea884b650c0f": {
+      "agent_id": {
+        "tool": "github-copilot-tab",
+        "id": "ai_tab-1783565613724",
+        "model": "default"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
