@@ -1,0 +1,30 @@
+demo/langChain_ts_agent/src/logger.ts
+  s_9aed80038db3b3::t_0d27a691ea8e25 54-58
+demo/langChain_ts_agent/README.md
+  s_9aed80038db3b3::t_e20952208dc28f 78-83
+  s_9aed80038db3b3::t_9a05b4bc47711c 4-59
+  s_9aed80038db3b3::t_eaf80d7f8d4306 315
+demo/langChain_ts_agent/src/agent.ts
+  s_9aed80038db3b3::t_b2e0fec4c86479 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "aff62cc7a1f28e18e445c2c99fb3ea1d9991e5da",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_9aed80038db3b3": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "01d28ddde17e4a0d8d5473efebe04177",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
