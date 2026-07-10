@@ -1,6 +1,62 @@
 # LangChain TypeScript Agent（DeepSeek）
 
 基于 **LangChain.js** + **TypeScript** 的标准 Agent 项目，使用 **DeepSeek** 作为 LLM。
+演示一个 Agent 从「底座 → 工具 → 记忆 → 技能路由 → 沙盒执行」的完整最小闭环。
+
+## 功能状态总览（TodoList）
+
+> ✅ 已验证可实现 ｜ ⬜ 规划中（通用 Agent 常见能力，本项目尚未实现）
+
+### ✅ 1. 底座集成 LangChain
+- ✅ ChatModel：`@langchain/openai` 的 `ChatOpenAI` 适配 DeepSeek（OpenAI 兼容接口）
+- ✅ Agent 框架：`createToolCallingAgent` + `AgentExecutor` 推理→调用→观察→输出循环
+- ✅ 技术栈：LangChain.js v0.3 + TypeScript + tsx 热重载
+
+### ✅ 2. 工具 Tool
+- ✅ 工具定义：`tool()` + `zod` schema 校验
+- ✅ 内置工具：`get_current_datetime` / `calculator` / `count_words` / `reverse_text`
+- ✅ 工具调用：Agent 自动 Function Calling，工具结果作为「唯一权威数据源」原样引用
+
+### ✅ 3. 记忆 Memory
+- ✅ 会话记忆：`BufferWindowMemory` 滑动窗口（k=10 轮，控 token）
+- ✅ 持久化：`FileChatMessageHistory` 基于 JSON 文件，进程重启不丢失（跨会话）
+- ✅ 会话命令：`/memory` 查看状态、`/clear` 清空
+- ✅ 执行日志：`AgentLogger` 全链路 trace（LLM 调用 / 工具调用 / Agent 决策）
+- ⬜ 长期记忆（向量库 / 语义检索，跨会话沉淀知识）
+- ⬜ 摘要记忆（`ConversationSummaryMemory` / `SummaryBuffer`，省 token）
+- ⬜ 用户画像 / 跨用户记忆
+
+### ✅ 4. 技能 Skill（含 Skill Router 已完成）
+- ✅ 动态加载：`loadSkillsFromDir` 扫描 `./skills` 目录（零硬编码注册表，丢文件夹=新技能）
+- ✅ 技能数据模型：`SkillPackage{name,description,instructions,entry,runtime}`，对齐 MCP Prompt / `agents.md`
+- ✅ **技能路由 Skill Router**：
+  - ✅ LLM 决策选技能（`description` 驱动，业界基线范式）
+  - ✅ 结构化输出路由（`withStructuredOutput` + Zod 枚举），消除字符串硬匹配脆弱性
+  - ✅ 关键词解析回退（兼容不支持结构化输出的模型）
+  - ✅ 渐进式披露（只注入被选技能的 SOP，控 token）
+  - ✅ 两段式分离调用（先路由再生成，小技能集更省 token）
+  - ✅ 手动 `/skill <name>` 覆盖、会话粘性 `STICKY_SESSION` 开关
+- ✅ 技能注入：`buildSystemPrompt` 把 SOP 注入 system prompt（上下文增强）
+- ✅ 大脑/四肢分工：LLM 决策选技能与遵循 SOP，运行时负责加载/注入/执行
+- ✅ 沙盒执行 Sandbox：
+  - ✅ 双层隔离（子进程 `execFile` 防跑飞 + `node:vm` 防碰宿主）
+  - ✅ JS / Python 双运行时（Python 仅子进程隔离）
+  - ✅ 安全默认值（超时 3s / 1MB buffer / `env:{}`）
+  - ✅ 恶意脚本拦截（碰宿主拒、死循环强杀）
+  - ✅ `/reload` 热加载新技能
+- ✅ 内置示例技能：`text_stats`（携带脚本，走沙盒）、`say_hello`（纯指令型）
+
+### ⬜ 5. 未完成 / 通用 Agent 能力（Roadmap）
+- ⬜ **MCP 集成**：当前仅给出「升级为 MCP Server 的最小改造」方案，未引入 `@modelcontextprotocol/sdk`
+- ⬜ 多智能体协作：Supervisor / Handoff 编排（当前仅以 Skill 模型化「委派」概念）
+- ⬜ 规划与反思：显式 Planning、ReAct 规划步、Self-Reflection 自我修正
+- ⬜ RAG / 知识库检索：向量库召回注入上下文
+- ⬜ 流式输出（Streaming）：当前全部 `await invoke` 同步取全量
+- ⬜ Human-in-the-loop：人工确认 / 敏感操作审批
+- ⬜ 第三方工具生态：联网搜索、HTTP、数据库、文件操作
+- ⬜ 安全护栏：输入校验、内容审核、输出过滤
+- ⬜ 评测与可观测：LangSmith tracing、token / 成本核算
+- ⬜ 服务化：并发会话、多用户
 
 ## 项目结构
 
@@ -19,10 +75,12 @@ langChain_ts_agent/
 │   ├── skillSandboxAgent.ts # 动态技能 + 沙盒 交互 Demo
 │   └── index.ts           # 入口文件
 ├── skills/                 # 动态技能包目录（丢一个文件夹 = 新增一个技能）
-│   └── text_stats/         #   示例技能：统计文本字符/词/句 + 词频
-│       ├── skill.md        #   frontmatter(元数据) + SOP 正文
-│       ├── run.js          #   被沙盒执行的 JS 脚本
-│       └── run.py          #   被沙盒执行的 Python 脚本
+│   ├── text_stats/         #   示例技能：统计文本字符/词/句 + 词频（携带脚本，走沙盒）
+│   │   ├── skill.md        #   frontmatter(元数据) + SOP 正文
+│   │   ├── run.js          #   被沙盒执行的 JS 脚本
+│   │   └── run.py          #   被沙盒执行的 Python 脚本
+│   └── say_hello/          #   示例技能：纯指令型（仅 SOP 注入，不携带脚本）
+│       └── skill.md        #   frontmatter(元数据) + SOP 正文
 ├── data/                  # 聊天历史持久化目录（gitignore）
 ├── logs/                  # 执行日志目录（gitignore）
 ├── .env.example           # 环境变量模板
@@ -254,7 +312,7 @@ const myTool = tool(
 const MEMORY_WINDOW_SIZE = 10; // 保留最近 10 轮对话
 ```
 
-替换记忆类型（按需选择）：
+替换记忆类型（以下为**可选方案，当前未默认启用**，本项目默认使用 `BufferWindowMemory`）：
 
 ```ts
 // 方案 A：摘要记忆（全部历史压缩为一段摘要，最省 token）

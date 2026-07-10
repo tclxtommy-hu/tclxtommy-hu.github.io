@@ -34,7 +34,7 @@ async function main() {
 
   // 创建日志记录器
   const logger = new AgentLogger();
-  console.log(`📁 日志记录中 → logs/${logger["sessionId"] || "session"}.log\n`);
+  console.log(`📁 日志记录中 → logs/${logger.id || "session"}.log\n`);
 
   // 创建模型
   const model = createDeepSeekModel({ temperature: 0 });

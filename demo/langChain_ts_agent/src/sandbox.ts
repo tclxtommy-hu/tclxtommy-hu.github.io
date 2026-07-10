@@ -72,8 +72,6 @@ function readStdin() {
   let input = null;
   try { if (raw.trim()) input = JSON.parse(raw); }
   catch (e) { /* 无/非 JSON 输入时按 null 处理 */ }
-  try { if (raw.trim()) input = JSON.parse(raw); }
-  catch (e) { /* 无/非 JSON 输入时按 null 处理 */ }
 
   // 只暴露安全的内置对象；刻意不挂 fs / process / require / global
   const moduleShim = { exports: {} };

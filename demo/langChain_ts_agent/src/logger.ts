@@ -51,6 +51,11 @@ export class AgentLogger extends BaseCallbackHandler {
   name = "AgentLogger";
   private sessionId: string;
   private logFilePath: string;
+
+  /** 暴露 sessionId 供上层生成日志路径等用途（避免直接访问私有字段） */
+  get id(): string {
+    return this.sessionId;
+  }
   private stream: fs.WriteStream;
   private stepCount = 0;
   private llmCallCount = 0;
