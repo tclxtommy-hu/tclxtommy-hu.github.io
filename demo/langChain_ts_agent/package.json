@@ -10,16 +10,19 @@
     "chat": "tsx src/chat.ts",
     "agent": "tsx src/agent.ts",
     "skill": "tsx src/skillAgent.ts",
-    "sandbox": "tsx src/skillSandboxAgent.ts"
+    "sandbox": "tsx src/skillSandboxAgent.ts",
+    "plan": "tsx src/planningAgent.ts"
   },
   "dependencies": {
     "@langchain/core": "^0.3.0",
+    "@langchain/langgraph": "^0.3.12",
     "@langchain/openai": "^0.3.0",
-    "langchain": "^0.3.0",
     "dotenv": "^16.4.0",
+    "langchain": "^0.3.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/node": "^26.1.0",
     "tsx": "^4.7.0",
     "typescript": "^5.4.0"
   }
