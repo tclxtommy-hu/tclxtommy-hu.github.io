@@ -98,6 +98,15 @@ export class AgentLogger extends BaseCallbackHandler {
     }
   }
 
+  /**
+   * 手动写入一条日志（仅文件，不输出到控制台）。
+   * 供图节点级事件使用，如「进入 planner 节点」「路由到 executor」「interrupt 暂停」等。
+   */
+  writeLog(message: string) {
+    const line = `[${now()}] ${message}`;
+    this.stream.write(line + "\n");
+  }
+
   /** 关闭日志流 */
   close() {
     this.log("=".repeat(60));
