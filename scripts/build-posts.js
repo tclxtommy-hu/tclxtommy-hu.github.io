@@ -662,32 +662,32 @@ const indexHtml = `<!DOCTYPE html>
   </div>
   <script type="module" src="/src/main.js"></script>
   <!-- Background Music -->
-   <!-- <audio id="bgm" src="/assets/yesterdayOnceMore.mp3" loop preload="auto" muted autoplay></audio> -->
-  <button type="button" id="bgm-btn" class="bgm-btn" aria-label="背景音乐">🎵</button>
+  <!-- <audio id="bgm" src="/assets/yesterdayOnceMore.mp3" loop preload="auto" muted autoplay></audio> -->
+  <!-- <button type="button" id="bgm-btn" class="bgm-btn" aria-label="背景音乐">🎵</button> -->
   <script>
-    (function() {
-      var btn = document.getElementById('bgm-btn');
-      var bgm = document.getElementById('bgm');
-      var playing = true;
-      function setPlaying(state) {
-        playing = state;
-        if (state) { btn.classList.add('playing'); btn.textContent = '🎵'; }
-        else { btn.classList.remove('playing'); btn.textContent = '🔇'; }
-      }
-      setPlaying(true);
-      bgm.muted = false;
-      bgm.play().then(function() {
-        setPlaying(true);
-      }).catch(function(err) {
-        setPlaying(false);
-        console.log('浏览器阻止播放', err);
-      });
+    // (function() {
+    //   var btn = document.getElementById('bgm-btn');
+    //   var bgm = document.getElementById('bgm');
+    //   var playing = true;
+    //   function setPlaying(state) {
+    //     playing = state;
+    //     if (state) { btn.classList.add('playing'); btn.textContent = '🎵'; }
+    //     else { btn.classList.remove('playing'); btn.textContent = '🔇'; }
+    //   }
+    //   setPlaying(true);
+    //   bgm.muted = false;
+    //   bgm.play().then(function() {
+    //     setPlaying(true);
+    //   }).catch(function(err) {
+    //     setPlaying(false);
+    //     console.log('浏览器阻止播放', err);
+    //   });
 
-      btn.addEventListener('click', function() {
-        if (playing) { bgm.pause(); setPlaying(false); }
-        else { bgm.play().then(function(){ setPlaying(true); }).catch(function(){}); }
-      });
-    })();
+    //   btn.addEventListener('click', function() {
+    //     if (playing) { bgm.pause(); setPlaying(false); }
+    //     else { bgm.play().then(function(){ setPlaying(true); }).catch(function(){}); }
+    //   });
+    // })();
   </script>
   <script>
     (function() {
