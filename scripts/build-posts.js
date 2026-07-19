@@ -413,7 +413,6 @@ const headExtra = `
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  <link rel="preload" href="/assets/yesterdayOnceMore.mp3" as="fetch" crossorigin>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -663,7 +662,7 @@ const indexHtml = `<!DOCTYPE html>
   </div>
   <script type="module" src="/src/main.js"></script>
   <!-- Background Music -->
-  <audio id="bgm" src="/assets/yesterdayOnceMore.mp3" loop preload="auto" muted autoplay></audio>
+   <!-- <audio id="bgm" src="/assets/yesterdayOnceMore.mp3" loop preload="auto" muted autoplay></audio> -->
   <button type="button" id="bgm-btn" class="bgm-btn" aria-label="背景音乐">🎵</button>
   <script>
     (function() {

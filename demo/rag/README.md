@@ -1,6 +1,6 @@
 # DeepSeek RAG 示例（Node.js + TypeScript + Yarn）
 
-一个最小可运行的 **RAG（检索增强生成）** 示例，基于：
+一个最小可运行的 **RAG（检索增强生成）**（Retrieval-Augmented Generation，检索增强生成） 示例，基于：
 
 - **Node.js**（原生 `fetch`，零第三方 LLM 框架）
 - **DeepSeek Chat API**（语义向量化 + 生成回答）

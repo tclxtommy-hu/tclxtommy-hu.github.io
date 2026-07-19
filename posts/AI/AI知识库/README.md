@@ -71,6 +71,7 @@ flowchart LR
 | [03-Embedding与表示.md](06-大语言模型LLM/03-Embedding与表示.md) | 词向量、嵌入空间、语义相似 |
 | [04-上下文窗口.md](06-大语言模型LLM/04-上下文窗口.md) | 上下文长度、长上下文、Lost in Middle |
 | [05-Scaling-Laws.md](06-大语言模型LLM/05-Scaling-Laws.md) | 缩放定律、Chinchilla、计算最优 |
+| [06-模型参数规模.md](06-大语言模型LLM/06-模型参数规模.md) | 7B 是什么、参数怎么算、稠密 vs MoE、各家区别 |
 
 ### 07 训练范式
 | 文件 | 主题 |
@@ -85,6 +86,7 @@ flowchart LR
 |------|------|
 | [01-提示工程基础.md](08-提示工程/01-提示工程基础.md) | 角色、Few-shot、格式约束 |
 | [02-高级提示技术.md](08-提示工程/02-高级提示技术.md) | CoT、Self-Consistency、Prompt Chaining |
+| [03-生成参数.md](08-提示工程/03-生成参数.md) | temperature、top_p、top_k、max_tokens、stop、seed |
 
 ### 09 RAG 与上下文
 | 文件 | 主题 |
