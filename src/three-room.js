@@ -752,6 +752,8 @@ function addCharacter(parent) {
     rightThigh,
     leftCalf,
     rightCalf,
+    leftShoe,
+    rightShoe,
     body,
     hips,
     chairGroup,
@@ -1271,24 +1273,52 @@ export function initHome3DRoom() {
       // Move character toward the chair
       charWrap.position.lerpVectors(charStartPos, charEndPos, eased);
 
-      // Leg swing for walking (alternating left/right)
-      const legFreq = 0.011;
-      const legAngle = Math.sin(walkElapsed * legFreq) * 0.42;
+      // --- Walking gait ---
+      // The whole leg swings from the hip so the foot actually moves forward/back
+      // (instead of both feet planted while the body bounces — the old "hop in place").
+      // A phased vertical lift raises ONE shoe at a time (during its forward swing)
+      // so it reads as a real alternating step.
+      const gait = walkElapsed * 0.011;
+      const swing = Math.sin(gait);
+      const a = eased;                 // ramp the gait in/out smoothly from standing
+      const SWING_AMP = 0.45;
+      const thetaL = swing * SWING_AMP * a;
+      const thetaR = -swing * SWING_AMP * a;
 
-      // Barely-perceptible body rise — real walking keeps head level.
-      // Only a tiny heel-lift when the trailing foot pushes off.
-      const bob = Math.sin(walkElapsed * legFreq * 2 + Math.PI / 2) * 0.012;
-      charWrap.position.y += bob;
+      // Phased foot lift: left lifts while cos(gait) > 0, right while < 0 (opposite phase)
+      const liftL = Math.max(0, Math.cos(gait)) * 0.08 * a;
+      const liftR = Math.max(0, -Math.cos(gait)) * 0.08 * a;
 
-      if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = legAngle;
-      if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = -legAngle;
-      // Knee bends when leg swings forward, straightens when pushing back
-      if (characterRig.leftCalf) characterRig.leftCalf.rotation.x = Math.max(0, legAngle) * 0.3;
-      if (characterRig.rightCalf) characterRig.rightCalf.rotation.x = Math.max(0, -legAngle) * 0.3;
+      const legs = [
+        { calf: characterRig.leftCalf, shoe: characterRig.leftShoe, x: -0.085, theta: thetaL, lift: liftL },
+        { calf: characterRig.rightCalf, shoe: characterRig.rightShoe, x: 0.085, theta: thetaR, lift: liftR },
+      ];
+      for (const leg of legs) {
+        if (!leg.calf) continue;
+        // Calf is hinged at the thigh center and swings with the thigh (keeps the
+        // standing pose intact at theta = 0), so the lower leg follows the knee.
+        const cy = 0.32 - 0.15 * Math.cos(leg.theta);
+        const cz = 0.14 - 0.15 * Math.sin(leg.theta);
+        leg.calf.rotation.x = leg.theta;
+        leg.calf.position.set(leg.x, cy, cz);
+        if (leg.shoe) {
+          // Shoe sits at the calf's lower end; lifts a little during its swing phase.
+          const sy = cy - 0.15 * Math.cos(leg.theta) + 0.01 + leg.lift;
+          const sz = cz - 0.15 * Math.sin(leg.theta) + 0.06;
+          leg.shoe.rotation.x = leg.theta;
+          leg.shoe.position.set(leg.x, sy, sz);
+        }
+      }
 
-      // Arm swing (opposite to legs, like natural walk)
-      if (characterRig.leftUpperArm) characterRig.leftUpperArm.rotation.z = 0.22 - legAngle * 0.18;
-      if (characterRig.rightUpperArm) characterRig.rightUpperArm.rotation.z = -0.19 + legAngle * 0.18;
+      if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = thetaL;
+      if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = thetaR;
+
+      // Arms swing opposite to the legs (natural walk)
+      if (characterRig.leftUpperArm) characterRig.leftUpperArm.rotation.z = 0.22 - thetaL * 0.4;
+      if (characterRig.rightUpperArm) characterRig.rightUpperArm.rotation.z = -0.19 + thetaL * 0.4;
+
+      // Subtle body bob (twice per gait cycle, like a real walk)
+      charWrap.position.y += Math.cos(gait * 2) * 0.008;
 
       if (t >= 1) {
         charState = 'sitting';
@@ -1308,12 +1338,40 @@ export function initHome3DRoom() {
       // Rotate to face forward during sit-down
       charWrap.rotation.y = CHAR_WALK_ROT + (CHAR_SIT_ROT - CHAR_WALK_ROT) * eased;
 
-      // Transition thighs from standing (0) to seated (-PI/2)
-      if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = -Math.PI / 2 * eased;
-      if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = -Math.PI / 2 * eased;
-      // Reset calves
-      if (characterRig.leftCalf) characterRig.leftCalf.rotation.x = 0;
-      if (characterRig.rightCalf) characterRig.rightCalf.rotation.x = 0;
+      // Seated layout targets (only the sitting scene is affected; the walking
+      // pose keeps its original positions). Butt slides back toward the backrest,
+      // thighs slide forward and flatten, calves/shoes move in FRONT of the seat
+      // front edge so they don't intersect the seat board.
+      const SIT_HIPS_Z = -0.05, SIT_THIGH_Z = 0.21, SIT_CALF_Z = 0.38, SIT_SHOE_Z = 0.40;
+
+      if (characterRig.leftThigh) {
+        characterRig.leftThigh.rotation.x = -Math.PI / 2 * eased;
+        characterRig.leftThigh.position.z = 0.14 + (SIT_THIGH_Z - 0.14) * eased;
+      }
+      if (characterRig.rightThigh) {
+        characterRig.rightThigh.rotation.x = -Math.PI / 2 * eased;
+        characterRig.rightThigh.position.z = 0.14 + (SIT_THIGH_Z - 0.14) * eased;
+      }
+      // Calves hang vertically in front of the seat
+      if (characterRig.leftCalf) {
+        characterRig.leftCalf.rotation.x = 0;
+        characterRig.leftCalf.position.set(-0.085, 0.17, 0.14 + (SIT_CALF_Z - 0.14) * eased);
+      }
+      if (characterRig.rightCalf) {
+        characterRig.rightCalf.rotation.x = 0;
+        characterRig.rightCalf.position.set(0.085, 0.17, 0.14 + (SIT_CALF_Z - 0.14) * eased);
+      }
+      // Shoes follow the calves forward
+      if (characterRig.leftShoe) {
+        characterRig.leftShoe.rotation.x = 0;
+        characterRig.leftShoe.position.set(-0.085, 0.03, 0.20 + (SIT_SHOE_Z - 0.20) * eased);
+      }
+      if (characterRig.rightShoe) {
+        characterRig.rightShoe.rotation.x = 0;
+        characterRig.rightShoe.position.set(0.085, 0.03, 0.20 + (SIT_SHOE_Z - 0.20) * eased);
+      }
+      // Hips slide back toward the chair backrest
+      if (characterRig.hips) characterRig.hips.position.z = 0.02 + (SIT_HIPS_Z - 0.02) * eased;
 
       // Arms return to resting position
       if (characterRig.leftUpperArm) characterRig.leftUpperArm.rotation.z = 0.22;
@@ -1324,8 +1382,14 @@ export function initHome3DRoom() {
         charWalkStartTime = now; // reuse for wave timing
         charWrap.position.copy(charEndPos);
         charWrap.rotation.y = CHAR_SIT_ROT;
-        if (characterRig.leftThigh) characterRig.leftThigh.rotation.x = -Math.PI / 2;
-        if (characterRig.rightThigh) characterRig.rightThigh.rotation.x = -Math.PI / 2;
+        // Lock the seated layout so it persists through the waving/done states.
+        if (characterRig.leftThigh) { characterRig.leftThigh.rotation.x = -Math.PI / 2; characterRig.leftThigh.position.z = SIT_THIGH_Z; }
+        if (characterRig.rightThigh) { characterRig.rightThigh.rotation.x = -Math.PI / 2; characterRig.rightThigh.position.z = SIT_THIGH_Z; }
+        if (characterRig.leftCalf) { characterRig.leftCalf.rotation.x = 0; characterRig.leftCalf.position.set(-0.085, 0.17, SIT_CALF_Z); }
+        if (characterRig.rightCalf) { characterRig.rightCalf.rotation.x = 0; characterRig.rightCalf.position.set(0.085, 0.17, SIT_CALF_Z); }
+        if (characterRig.leftShoe) { characterRig.leftShoe.rotation.x = 0; characterRig.leftShoe.position.set(-0.085, 0.03, SIT_SHOE_Z); }
+        if (characterRig.rightShoe) { characterRig.rightShoe.rotation.x = 0; characterRig.rightShoe.position.set(0.085, 0.03, SIT_SHOE_Z); }
+        if (characterRig.hips) characterRig.hips.position.z = SIT_HIPS_Z;
       }
     }
 
