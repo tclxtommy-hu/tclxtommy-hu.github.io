@@ -11,7 +11,8 @@
     "agent": "tsx src/agent.ts",
     "skill": "tsx src/skillAgent.ts",
     "sandbox": "tsx src/skillSandboxAgent.ts",
-    "plan": "tsx src/planningAgent.ts"
+    "plan": "tsx src/planningAgent.ts",
+    "multi": "tsx src/multiAgent.ts"
   },
   "dependencies": {
     "@langchain/core": "^0.3.0",
