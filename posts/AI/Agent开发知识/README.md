@@ -65,6 +65,9 @@ flowchart LR
 | 文件 | 主题 |
 |------|------|
 | [01-RAG与知识集成.md](07-RAG与知识集成/01-RAG与知识集成.md) | 检索增强生成、知识库、与 Agent 结合 |
+| [02-RAG 核心概念与原理…](07-RAG与知识集成/02-RAG%20核心概念与原理：Chunking、Embedding、相似度、HNSW%20与多路召回.md) | Chunking、Embedding、HNSW、多路召回与 Rerank |
+| [03-主流 RAG 开源项目.md](07-RAG与知识集成/03-主流%20RAG%20开源项目.md) | 框架/向量库/GraphRAG 等开源选型 |
+| [04-Graph-Recall.md](07-RAG与知识集成/04-Graph-Recall.md) | Graph Recall：实体图谱召回原理与实现 |
 
 ### 08 评估与调试
 | 文件 | 主题 |

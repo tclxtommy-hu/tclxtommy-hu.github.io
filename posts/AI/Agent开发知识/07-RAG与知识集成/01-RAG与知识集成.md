@@ -105,7 +105,12 @@ flowchart TD
 - Agentic RAG 比固定 pipeline 更灵活。
 - 检索质量决定 Agent 知识类任务的上限。
 
-## 9. 参考资料
+## 9. 本目录延伸阅读
+- [02-RAG 核心概念与原理](02-RAG%20核心概念与原理：Chunking、Embedding、相似度、HNSW%20与多路召回.md)：切块、向量检索、多路召回
+- [03-主流 RAG 开源项目](03-主流%20RAG%20开源项目.md)：框架与 GraphRAG 选型
+- [04-Graph-Recall](04-Graph-Recall.md)：实体图谱召回（多跳关联 / 影响面）
+
+## 10. 参考资料
 - "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection"
 - GraphRAG（Microsoft）
 - LlamaIndex / LangChain RAG + Agent 文档

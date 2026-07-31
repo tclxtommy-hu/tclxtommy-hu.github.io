@@ -1,12 +1,12 @@
 # 公众号知识库总索引
 
-> 整理日期：2026-07-06
-> 范围：本仓库收录四大主题知识库——**AI 知识库**、**Agent 开发知识**、**Agent 设计模式**、**AI 编程范式**，共 70+ 篇系统化笔记
+> 整理日期：2026-07-31
+> 范围：本仓库收录六大主题知识库—— **AI 知识库** 、 **Agent 开发知识** 、 **Agent 设计模式** 、 **AI 编程范式** 、 **WorkFlow** 、 **ChatFlow**
 > 风格：中文为主，术语保留英文原文；每篇含定义、原理、要点、示例、注意事项
 
-本根 README 是全仓库的**总入口**，按知识库分块索引所有文章。每个子库另有自己的 README，含学习路线与使用建议。
+本根 README 是全仓库的 **总入口** ，按知识库分块索引所有文章。每个子库另有自己的 README，含学习路线与使用建议。
 
-## 四个知识库一览
+## 六个知识库一览
 
 ```mermaid
 flowchart LR
@@ -15,6 +15,8 @@ flowchart LR
     R --> B[Agent开发知识<br/>Agent 构建专题]
     R --> C[Agent设计模式<br/>Agent 架构范式]
     R --> D[AI编程范式<br/>AI 辅助/应用开发范式]
+    R --> E[WorkFlow<br/>AI 工作流与自动化]
+    R --> F[ChatFlow<br/>AI 对话流与机器人]
 ```
 
 | 知识库 | 定位 | 篇数 | 入口 |
@@ -23,6 +25,8 @@ flowchart LR
 | **Agent 开发知识** | Agent 开发专题，12 个模块 | 14 篇 | [Agent开发知识/README.md](Agent开发知识/README.md) |
 | **Agent 设计模式** | Agent 架构设计模式，含原理+场景+示例代码 | 9 篇 | [Agent设计模式/README.md](Agent设计模式/README.md) |
 | **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 16 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
+| **WorkFlow** | AI 工作流定义与主流编排/自动化工具 | 初始化 | [WorkFlow/README.md](WorkFlow/README.md) |
+| **ChatFlow** | AI 对话流定义与主流 Bot/对话编排工具 | 初始化 | [ChatFlow/README.md](ChatFlow/README.md) |
 
 ---
 
@@ -247,16 +251,40 @@ flowchart LR
 
 ---
 
+## 五、WorkFlow（AI 工作流与自动化）
+
+| 文件 | 主题 |
+|------|------|
+| [00-什么是WorkFlow.md](WorkFlow/00-什么是WorkFlow.md) | 定义、核心组件、与 Agent/ChatFlow 边界 |
+| [01-主流工具全景.md](WorkFlow/01-主流工具全景.md) | n8n、Dify Workflow、Make、Zapier、Flowise、Langflow 等 |
+
+> 侧重触发式流水线与后台编排。入口见 [WorkFlow/README.md](WorkFlow/README.md)。
+
+---
+
+## 六、ChatFlow（AI 对话流与机器人）
+
+| 文件 | 主题 |
+|------|------|
+| [00-什么是ChatFlow.md](ChatFlow/00-什么是ChatFlow.md) | 定义、核心组件、与 WorkFlow/Agent 边界 |
+| [01-主流工具全景.md](ChatFlow/01-主流工具全景.md) | Dify Chatflow、Coze、FastGPT、Botpress、MaxKB 等 |
+
+> 侧重多轮会话与对话编排。入口见 [ChatFlow/README.md](ChatFlow/README.md)。
+
+---
+
 ## 阅读建议
 
-- **零基础入门 AI**：从 [AI 知识库](AI知识库/README.md) 01→15 顺序通读。
-- **想搭 Agent**：先看 [AI 知识库 12-Agent与工具](AI知识库/12-Agent与工具/) 建立概念，再进 [Agent 开发知识](Agent开发知识/README.md) 系统学习。
-- **想学 Agent 架构**：看 [Agent 设计模式](Agent设计模式/README.md) 了解常见设计范式及选型。
-- **想用 AI 写代码**：看 [AI 编程范式 · 辅助编程](AI编程范式/README.md) 选适合自己的协作姿态。
-- **想构建 AI 应用**：看 [AI 编程范式 · 应用开发](AI编程范式/README.md) 选架构模式（RAG/Agent/MCP 等）。
-- **速查**：直接跳到对应模块，每篇开头有"一句话定义"。
+- **零基础入门 AI** ：从 [AI 知识库](AI知识库/README.md) 01→15 顺序通读。
+- **想搭 Agent** ：先看 [AI 知识库 12-Agent与工具](AI知识库/12-Agent与工具/) 建立概念，再进 [Agent 开发知识](Agent开发知识/README.md) 系统学习。
+- **想学 Agent 架构** ：看 [Agent 设计模式](Agent设计模式/README.md) 了解常见设计范式及选型。
+- **想用 AI 写代码** ：看 [AI 编程范式 · 辅助编程](AI编程范式/README.md) 选适合自己的协作姿态。
+- **想构建 AI 应用** ：看 [AI 编程范式 · 应用开发](AI编程范式/README.md) 选架构模式（RAG/Agent/MCP 等）。
+- **想做后台自动化 / 编排** ：看 [WorkFlow](WorkFlow/README.md)（n8n、Dify Workflow 等）。
+- **想做对话机器人 / 知识助手** ：看 [ChatFlow](ChatFlow/README.md)（Dify Chatflow、Coze、FastGPT 等）。
+- **速查** ：直接跳到对应模块，每篇开头有"一句话定义"。
 
 ## 术语约定
 
 - 正文中文为主，专有名词、协议名、模型名保留英文原文（如 LLM、RAG、MCP、ReAct）。
-- 四个知识库主题有交叉（如 RAG、Agent、MCP 在多处出现），各篇会从不同视角展开，可互为补充。
+- 各知识库主题有交叉（如 RAG、Agent、MCP、WorkFlow/ChatFlow 在多处出现），各篇会从不同视角展开，可互为补充。

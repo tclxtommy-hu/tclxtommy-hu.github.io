@@ -18,18 +18,20 @@ LLM API 是大语言模型厂商对外提供的** HTTP/SDK 编程接口**，让�
 
 ## 主流厂商 API 速览
 
-| 厂商 | 基座模型 | 端点风格 | SDK | 备注 |
-|------|----------|----------|-----|------|
-| OpenAI | GPT-4o / o系列 | `/v1/chat/completions` | openai（Py/JS） | 事实标准 |
-| Anthropic | Claude Opus/Sonnet | `/v1/messages` | anthropic（Py/JS） | 自有协议，非完全兼容 |
-| Google | Gemini 2.x | `/v1beta/models/generateContent` | google-genai | 自有协议 |
-| DeepSeek | DeepSeek-V3/R1 | OpenAI 兼容 | openai（改 base_url） | 国产高性价比 |
-| 阿里通义 | Qwen 系列 | OpenAI 兼容（DashScope） | openai / dashscope | 兼容模式 |
-| 月之暗面 | Kimi K2 | OpenAI 兼容 | openai（改 base_url） | 长上下文 |
-| 智谱 | GLM-4.6 | OpenAI 兼容 | openai / zhipuai | 兼容模式 |
-| 开源自部署 | Llama/Qwen via vLLM | OpenAI 兼容 | openai（改 base_url） | 私有化 |
+| 厂商 | 基座模型 | 端点风格 | SDK | 代表产品（编程 Agent） | 备注 |
+|------|----------|----------|-----|------------------------|------|
+| OpenAI | GPT-4o / o系列 | `/v1/chat/completions` + `/v1/responses` | openai（Py/JS） | Codex（CLI / IDE / Cloud） | Chat Completions 事实标准；Responses 为新推荐 |
+| Anthropic | Claude Opus/Sonnet | `/v1/messages` | anthropic（Py/JS） | Claude Code（CLI / IDE / Desktop） | 自有协议，非完全兼容 |
+| Google | Gemini 2.x | `/v1beta/models/generateContent` | google-genai | — | 自有协议 |
+| DeepSeek | DeepSeek-V3/R1 | OpenAI 兼容 | openai（改 base_url） | — | 国产高性价比 |
+| 阿里通义 | Qwen 系列 | OpenAI 兼容（DashScope） | openai / dashscope | — | 兼容模式 |
+| 月之暗面 | Kimi K2 | OpenAI 兼容 | openai（改 base_url） | — | 长上下文 |
+| 智谱 | GLM-4.6 | OpenAI 兼容 | openai / zhipuai | — | 兼容模式 |
+| 开源自部署 | Llama/Qwen via vLLM | OpenAI 兼容 | openai（改 base_url） | — | 私有化 |
 
-> 关键洞察：除 Anthropic 与 Google 外，多数厂商提供 OpenAI 兼容端点，**用 OpenAI SDK 改 `base_url` + `api_key` 即可切换模型**，无需改业务代码。
+> 关键洞察：除 Anthropic 与 Google 外，多数厂商提供 OpenAI 兼容端点， **用 OpenAI SDK 改 `base_url` + `api_key` 即可切换模型** ，无需改业务代码。
+
+> **API vs 产品**：本篇主体是「你去调厂商 API」； **Codex** （OpenAI）与 **Claude Code** （Anthropic）是厂商自己做的编程 Agent 产品——它们底层消费自家模型 API，但提供终端/IDE 里的读改代码、跑命令、开 PR 等完整 Agent 体验。做应用集成用 API/SDK；做日常写代码可直接用这些产品。
 
 ## 工作流程
 
@@ -52,7 +54,16 @@ flowchart TD
 
 ## 一、OpenAI API
 
-### 1.1 端点与参数
+OpenAI 目前有两套主流生成端点：
+
+| 端点 | 路径 | 定位 |
+|------|------|------|
+| Chat Completions | `/v1/chat/completions` | 经典对话补全，生态兼容面最广 |
+| Responses API | `/v1/responses` | 官方推荐新端点，面向 Agent / 工具 / 推理；Codex 等产品底层也走这套 |
+
+> Chat Completions 仍长期支持； **新项目优先用 Responses** 。多数国产/开源兼容层目前仍以 Chat Completions 为主。
+
+### 1.1 Chat Completions：端点与参数
 
 ```
 POST https://api.openai.com/v1/chat/completions
@@ -75,7 +86,7 @@ Content-Type: application/json
 }
 ```
 
-### 1.2 Python 调用实例
+### 1.2 Chat Completions：Python 调用实例
 
 **安装**：`pip install openai`
 
@@ -126,7 +137,7 @@ city = resp.choices[0].message.parsed  # City 实例
 print(city.name, city.population)
 ```
 
-### 1.3 Node.js 调用实例
+### 1.3 Chat Completions：Node.js 调用实例
 
 **安装**：`npm install openai`
 
@@ -159,6 +170,111 @@ for await (const chunk of stream) {
   if (delta) process.stdout.write(delta);
 }
 ```
+
+### 1.4 Responses API（推荐）
+
+Responses 是 Chat Completions 的演进形态：输入用 `input`（可传字符串或消息列表），系统指引用 `instructions`，输出是类型化的 `output[]` Items（`message` / `function_call` / `reasoning` 等），可用 `previous_response_id` 做服务端状态链式续写。内置工具（web search、file search、code interpreter、MCP 等）也在这套 API 上原生支持。
+
+#### 端点与参数
+
+```
+POST https://api.openai.com/v1/responses
+Authorization: Bearer $OPENAI_API_KEY
+Content-Type: application/json
+```
+
+核心请求体：
+```json
+{
+  "model": "gpt-4o",
+  "instructions": "你是简洁的技术助手",
+  "input": "用一句话解释 RAG",
+  "store": true
+}
+```
+
+与 Chat Completions 的关键差异：
+
+| 维度 | Chat Completions | Responses |
+|------|------------------|-----------|
+| 输入 | `messages` | `input`（字符串或 Items）+ 可选 `instructions` |
+| 输出 | `choices[0].message.content` | `output[]`；SDK 可用 `output_text` |
+| 状态 | 客户端自行拼历史 | `previous_response_id` / Conversations |
+| 结构化输出 | `response_format` | `text.format` |
+| 工具形态 | `tools[].function` 嵌套 | 扁平 function 定义 + 内置工具 |
+| 默认存储 | 视账户策略 | 默认 `store: true`（可显式 `false`） |
+
+#### Python 调用实例
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+resp = client.responses.create(
+    model="gpt-4o",
+    instructions="你是简洁的技术助手",
+    input="用一句话解释 RAG",
+)
+print(resp.output_text)
+
+# 用 previous_response_id 续写多轮（无需重传完整历史）
+resp2 = client.responses.create(
+    model="gpt-4o",
+    previous_response_id=resp.id,
+    input="再给一个更偏工程落地的版本",
+)
+print(resp2.output_text)
+```
+
+流式（事件流，按类型处理文本增量）：
+```python
+stream = client.responses.create(
+    model="gpt-4o",
+    input="写一首关于秋天的诗",
+    stream=True,
+)
+for event in stream:
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="", flush=True)
+```
+
+#### Node.js 调用实例
+
+```javascript
+import OpenAI from "openai";
+
+const client = new OpenAI();
+
+const resp = await client.responses.create({
+  model: "gpt-4o",
+  instructions: "你是简洁的技术助手",
+  input: "用一句话解释 RAG",
+});
+console.log(resp.output_text);
+
+const resp2 = await client.responses.create({
+  model: "gpt-4o",
+  previous_response_id: resp.id,
+  input: "再给一个更偏工程落地的版本",
+});
+console.log(resp2.output_text);
+```
+
+> 说明：应用侧直接集成时用上面的 SDK 即可；不必单独对接「Codex API」。
+
+### 1.5 厂商产品：Codex
+
+**Codex** 是 OpenAI 的编程 Agent 产品（CLI / IDE 插件 / Cloud），面向「在仓库里写代码、跑命令、改多文件」的工作流，而不是让你手写 HTTP 调模型。
+
+| 维度 | 说明 |
+|------|------|
+| 定位 | 官方 Coding Agent，封装工具循环、沙箱、会话与审批 |
+| 底层 API | 默认走 **Responses API** （含 WebSocket 长连接，降低多轮工具调用延迟） |
+| 与 API 关系 | 产品消费 API；你的业务系统仍应直接调 `/v1/responses` 或 Chat Completions |
+| 典型形态 | `codex` CLI、IDE 扩展、云端任务 |
+| 何时用产品 | 日常开发、本地/云端 Agent 协作 |
+| 何时用 API | 把模型能力嵌进自有应用、后端服务、自定义 Agent 框架 |
 
 ## 二、Anthropic Claude API
 
@@ -231,6 +347,19 @@ const resp = await client.messages.create({
 });
 console.log(resp.content[0].text);
 ```
+
+### 2.4 厂商产品：Claude Code
+
+**Claude Code** 是 Anthropic 的编程 Agent 产品（终端 / IDE / Desktop / Web），在本地或云端读代码库、改文件、跑命令，并与 GitHub/GitLab 等开发工具联动。
+
+| 维度 | 说明 |
+|------|------|
+| 定位 | 官方 Agentic Coding 工具，封装工具使用、子 Agent、权限与项目配置（如 `CLAUDE.md`） |
+| 底层能力 | 基于 Claude 模型；应用集成侧对应的是 **Messages API** （`/v1/messages`） |
+| 与 API 关系 | 产品 ≠ API。自建应用用 Messages SDK；要把 Claude Code 同款 Agent 能力嵌进自己的程序，可看 Anthropic 的 Agent SDK（以 Claude Code 的工具环为库） |
+| 典型形态 | `claude` CLI、VS Code / JetBrains 扩展、Desktop、Web |
+| 何时用产品 | 日常写代码、排查、开 PR、多 Agent 并行任务 |
+| 何时用 API | 把 Claude 嵌进自有 Chat/Agent/后端；完全自定义工具循环 |
 
 ## 三、Google Gemini API
 
@@ -513,15 +642,18 @@ console.log(resp.choices[0].message.content);
 | 范式 | 关系 |
 |------|------|
 | Function Calling | LLM API 的 `tools` 参数是其实现基础 |
-| RAG | 检索结果通过 LLM API 的 messages 注入 |
-| Agent | Agent 循环每步调用 LLM API 决策 |
+| RAG | 检索结果通过 LLM API 的 messages / input 注入 |
+| Agent | Agent 循环每步调用 LLM API 决策；厂商产品如 Codex / Claude Code 是开箱即用的编程 Agent |
 | MCP | MCP Server 暴露的工具最终经 LLM API 的 tools 调用 |
 | Fine-tuning | 微调后的模型仍通过相同 API 调用 |
 
 ## 参考资料
 
 - OpenAI API 文档：https://platform.openai.com/docs/api-reference
+- OpenAI Responses API / 迁移指南：https://developers.openai.com/api/docs/guides/migrate-to-responses
+- OpenAI Codex：https://openai.com/codex/
 - Anthropic API 文档：https://docs.anthropic.com/en/api
+- Claude Code 文档：https://code.claude.com/docs/en
 - Google Gemini API：https://ai.google.dev/gemini-api/docs
 - DeepSeek API 文档：https://api-docs.deepseek.com/
 - 通义 DashScope 兼容模式：https://help.aliyun.com/zh/model-studio/developer-reference
