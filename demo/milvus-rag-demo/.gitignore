@@ -1,0 +1,13 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+# Milvus Lite 3.x 本地库可能是文件或目录
+data/milvus.db
+data/milvus.db/
+data/*.db
+data/*.db/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
