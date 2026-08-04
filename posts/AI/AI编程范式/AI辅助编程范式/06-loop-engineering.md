@@ -25,9 +25,10 @@ Loop Engineering（循环工程）指**把 AI Agent 的"思考-行动-观察"循
 | Prompt Engineering | 措辞 | 怎么对模型说 |
 | Context Engineering | 信息 | 给模型看什么 |
 | **Loop Engineering** | **迭代过程** | **模型怎么一圈圈转下去** |
+| Graph Engineering | 多节点编排 | 多个循环/步骤如何连成系统 |
 | Spec-Driven | 契约 | 模型按什么标准收敛 |
 
-三者叠加而非替代：好的 Agent 系统同时做提示、上下文、循环三层工程。Loop Engineering 是 Agentic Coding 从"能用"到"可靠"的关键跃迁。
+提示、上下文、循环三层叠加而非替代；Loop Engineering 是 Agentic Coding 从"能用"到"可靠"的关键跃迁。当单循环不够、需要多角色交接与并行时，再叠加 [Graph Engineering](10-graph-engineering.md)。
 
 ## 工作流程
 

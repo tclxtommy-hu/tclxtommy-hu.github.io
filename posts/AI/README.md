@@ -218,6 +218,8 @@ flowchart LR
 | [06-loop-engineering.md](AI编程范式/AI辅助编程范式/06-loop-engineering.md) | Loop Engineering（循环工程） | 把 Agent 的 think-act-observe 循环本身作为工程对象 |
 | [07-openspec.md](AI编程范式/AI辅助编程范式/07-openspec.md) | OpenSpec（开放规格驱动开发） | 轻量级 SDD 落地框架，以"变更制品"驱动 explore→propose→apply→archive 闭环 |
 | [08-superpowers.md](AI编程范式/AI辅助编程范式/08-superpowers.md) | Superpowers（超能力技能驱动开发） | 以可组合"技能"自动触发 brainstorming→planning→TDD→review 工作流 |
+| [09-harness-engineering.md](AI编程范式/AI辅助编程范式/09-harness-engineering.md) | Harness Engineering（外壳工程） | 把包裹 LLM 的运行外壳（工具/沙箱/编排）作为一等工程对象 |
+| [10-graph-engineering.md](AI编程范式/AI辅助编程范式/10-graph-engineering.md) | Graph Engineering（图工程） | 把多 Agent/多步骤显式建模为节点-边-状态图来编排 |
 
 ### 二、AI 应用开发范式
 | 文件 | 范式 | 一句话定位 |

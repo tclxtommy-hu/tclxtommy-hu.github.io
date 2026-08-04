@@ -265,6 +265,7 @@ flowchart TD
 | OpenSpec | 规格制品工具 | 互补：Superpowers 管流程，OpenSpec 管制品 |
 | Agentic Coding | Agent 自主执行 | Superpowers 给 Agent 装上"方法论技能包" |
 | Loop Engineering | 循环工程 | Superpowers 的子 Agent 驱动是循环工程的具体实践 |
+| Graph Engineering | 图工程 | 多技能/多子 Agent 交接可进一步显式成图拓扑 |
 | Vibe Coding | 自由发挥 | Superpowers 用强制工作流补其不可控性 |
 
 ## 参考资料

@@ -109,10 +109,11 @@ CodeBuddy、Cursor、Cline、Aider——这些**产品本身就是 harness**：
 | Prompt Engineering | 措辞 | 怎么对模型说 |
 | Context Engineering | 信息 | 给模型看什么 |
 | Loop Engineering | 迭代过程 | 模型怎么一圈圈转下去 |
+| Graph Engineering | 多节点编排 | 多个循环/步骤如何连成系统 |
 | **Harness Engineering** | **运行外壳** | **模型外面那层软件怎么造** |
 | Spec-Driven | 契约 | 模型按什么标准收敛 |
 
-四者叠加而非替代：Prompt/Context/Loop 描述"如何与模型交互"，Harness Engineering 描述"承载这些交互的运行时软件如何构建"。前者是方法论，后者是工程实现——没有好的 harness，再好的提示/上下文/循环设计都落不了地。可以把 Claude Code、Cursor、Codex CLI、Cline、Aider 这类产品本身视为"harness 工程"的产物。
+五者叠加而非替代：Prompt/Context/Loop 描述"如何与模型交互"，Harness Engineering 描述"承载这些交互的运行时软件如何构建"，Graph Engineering 描述"多个循环如何编排"。没有好的 harness，再好的提示/上下文/循环/图设计都落不了地。可以把 Claude Code、Cursor、Codex CLI、Cline、Aider 这类产品本身视为"harness 工程"的产物。图级编排（见 [Graph Engineering](10-graph-engineering.md)）最终也要由 harness / 编排运行时落地。
 
 ## Harness 的组成
 
@@ -291,9 +292,10 @@ Harness Engineering 的设计要点：
 - 长任务/大仓库：叠加 Context Engineering 保证信息正确。
 - 多步自循环需稳定收敛：叠加 Loop Engineering。
 - 要做**产品级、可部署、可多用户复用**的 Agent：必须做 Harness Engineering——它是前三者的落地载体，也是安全与可生产的底线。
+- 多角色交接、扇出并行、可审计长链路：再叠加 [Graph Engineering](10-graph-engineering.md)；图里的每个节点仍依赖好的 harness 与 loop。
 - 用现成 harness（Claude Code、Cursor、Cline 等）时，理解其 harness 设计能帮你更好配置工具、权限与审批，而非把它当黑盒。
 
-四者是 Agentic Coding 从"能演示"到"能生产"的完整栈：Prompt 与 Context 决定单次推理质量，Loop 决定多步收敛性，Harness 决定能否工程化落地与安全运行。
+完整栈：Prompt 与 Context 决定单次推理质量，Loop 决定多步收敛性，Harness 决定能否工程化落地与安全运行，Graph 决定多个循环如何协调成系统。
 
 ## 参考资料
 
