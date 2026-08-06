@@ -6,6 +6,8 @@
 
 本根 README 是全仓库的 **总入口** ，按知识库分块索引所有文章。每个子库另有自己的 README，含学习路线与使用建议。
 
+> **AI 工程师学习路线**（已有地图 + 缺口占位 + 学习清单）：[AI工程师学习路线/README.md](AI工程师学习路线/README.md) · [学习清单-TODO.md](AI工程师学习路线/学习清单-TODO.md)
+
 ## 六个知识库一览
 
 ```mermaid
@@ -21,12 +23,13 @@ flowchart LR
 
 | 知识库 | 定位 | 篇数 | 入口 |
 |--------|------|------|------|
-| **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，15 个模块 | 35 篇 | [AI知识库/README.md](AI知识库/README.md) |
-| **Agent 开发知识** | Agent 开发专题，12 个模块 | 14 篇 | [Agent开发知识/README.md](Agent开发知识/README.md) |
+| **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，15 个模块 | ~45 篇 | [AI知识库/README.md](AI知识库/README.md) |
+| **Agent 开发知识** | Agent 开发专题，01–12 + 13 工程化补遗 | ~40 篇 | [Agent开发知识/README.md](Agent开发知识/README.md) |
 | **Agent 设计模式** | Agent 架构设计模式，含原理+场景+示例代码 | 9 篇 | [Agent设计模式/README.md](Agent设计模式/README.md) |
-| **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 16 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
-| **WorkFlow** | AI 工作流定义与主流编排/自动化工具 | 初始化 | [WorkFlow/README.md](WorkFlow/README.md) |
-| **ChatFlow** | AI 对话流定义与主流 Bot/对话编排工具 | 初始化 | [ChatFlow/README.md](ChatFlow/README.md) |
+| **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 18 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
+| **WorkFlow** | AI 工作流定义与主流编排/自动化工具 | 概念+全景 | [WorkFlow/README.md](WorkFlow/README.md) |
+| **ChatFlow** | AI 对话流定义与主流 Bot/对话编排工具 | 概念+全景 | [ChatFlow/README.md](ChatFlow/README.md) |
+| **AI 工程师学习路线** | 能力模型 + 缺口占位（待补正文） | 38 占位 | [AI工程师学习路线/README.md](AI工程师学习路线/README.md) |
 
 ---
 
@@ -277,6 +280,7 @@ flowchart LR
 
 ## 阅读建议
 
+- **按 AI 工程师目标补齐** ：走 [AI工程师学习路线](AI工程师学习路线/README.md)，用 [学习清单](AI工程师学习路线/学习清单-TODO.md) 勾选。
 - **零基础入门 AI** ：从 [AI 知识库](AI知识库/README.md) 01→15 顺序通读。
 - **想搭 Agent** ：先看 [AI 知识库 12-Agent与工具](AI知识库/12-Agent与工具/) 建立概念，再进 [Agent 开发知识](Agent开发知识/README.md) 系统学习。
 - **想学 Agent 架构** ：看 [Agent 设计模式](Agent设计模式/README.md) 了解常见设计范式及选型。
