@@ -1,6 +1,6 @@
 # RAG 权限管控：谁能搜到什么、晋升后如何立刻变多
 
-> 一句话定义：企业 RAG 的权限不是「让模型少说话」，而是 **检索进上下文之前** 就按用户身份过滤文档——文档侧存「需要什么权限」，身份侧存「人现在有什么权限」，查询瞬间做交集。
+> 一句话定义：企业 **RAG** /ˌɑːr eɪ ˈdʒiː/ （ **Retrieval-Augmented Generation** /rɪˈtriːvəl ˈɔːɡmentɪd ˌdʒenəˈreɪʃn/ ，检索增强生成）的权限不是「让模型少说话」，而是 **检索进上下文之前** 就按用户身份过滤文档——文档侧存「需要什么权限」，身份侧存「人现在有什么权限」，查询瞬间做交集。
 
 > 前置阅读：[RAG 与知识集成](01-RAG与知识集成.md)、[RAG 核心概念与原理](02-RAG%20核心概念与原理：Chunking、Embedding、相似度、HNSW%20与多路召回.md)。
 
@@ -21,9 +21,9 @@
 
 1. **模型不可靠** ：相关段落已经进了上下文，模型仍可能复述、摘要、侧面暗示。
 2. **不可审计** ：出了事无法证明「系统从未把该文档交给模型」。
-3. **权限变更难对齐** ：人晋升了，prompt 角色不好精确映射到「突然能看的那 200 份 PDF」。
+3. **权限变更难对齐** ：人晋升了，prompt 角色不好精确映射到「突然能看的那 200 份 **PDF** /ˌpiː diː ˈef/ （ **Portable Document Format** /ˈpɔːtəbl ˈdɒkjʊmənt ˈfɔːmæt/ ，便携式文档格式）」。
 
-正确原则是 **defense in depth** /dɪˈfens ɪn depθ/ （纵深防御）：检索过滤是主控，生成侧提示与审计是辅控；绝不能只靠后者。
+正确原则是 **defense in depth** /dɪˈfens ɪn depθ/ （纵深防御）：检索过滤是主控，生成侧提示与审计是辅控；绝不能只靠后者。下文生成侧指 **LLM** /ˌel el ˈem/ （ **Large Language Model** /lɑːdʒ ˈlæŋɡwɪdʒ ˈmɒdl/ ，大语言模型）。
 
 ```text
 ❌ 先召回全库 Top-K → 塞进 Prompt → 指望模型「守口如瓶」
@@ -34,12 +34,14 @@
 
 ## 2. 核心模型：文档 ACL × 用户属性
 
+本节的 **ACL** /ˌeɪ siː ˈel/ （ **Access Control List** /ˈækses kənˈtrəʊl lɪst/ ，访问控制列表）指挂在文档或分块上的权限标签（谁可读、何密级、何部门等）。
+
 把权限拆成两边，查询时求交：
 
 | 存什么 | 存在哪 | 何时变 |
 |--------|--------|--------|
 | **文档需要什么权限** （密级、角色、部门、项目…） | 每个 Chunk 的 **metadata** /ˈmetəˌdeɪtə/ （元数据，随文档入库） | 文档改密、改可见范围时更新 |
-| **人现在有什么权限** | **IdP** /ˌaɪ diː ˈpiː/ （身份提供者）/ 权限中心 / HR（JWT 里的 **claims** /kleɪmz/ ） | 入职、调岗、晋升、离职时更新 |
+| **人现在有什么权限** | **IdP** /ˌaɪ diː ˈpiː/ （ **Identity Provider** /aɪˈdentəti prəˈvaɪdə/ ，身份提供者）/ 权限中心 / **HR** /ˌeɪtʃ ˈɑː/ （ **Human Resources** /ˈhjuːmən rɪˈzɔːsɪz/ ，人力资源）（ **JWT** /ˌdʒeɪ ˈdʌbljuː tiː/ （ **JSON Web Token** /ˈdʒeɪsən web ˈtəʊkən/ ）里的 **claims** /kleɪmz/ ） | 入职、调岗、晋升、离职时更新 |
 
 **晋升、调岗改的是「人」** ，不是整库重做 **Embedding** /ɪmˈbedɪŋ/ 。下次请求带着新 claims 去 filter，立刻能召回更高密级文档。
 
@@ -55,9 +57,9 @@ flowchart LR
 
 业界常见权限范式（RAG 侧通常 **消费** 它们，而不是另起炉灶）：
 
-- **RBAC** /ˌɑːr biː eɪ ˈsiː/ （基于角色）：`employee` / `manager` / `executive`
-- **ABAC** /ˌeɪ biː eɪ ˈsiː/ （基于属性）：部门、职级、项目成员、数据密级
-- **ACL** /ˌeɪ siː ˈel/ （显式名单）：`allowed_users`、`allowed_groups`
+- **RBAC** /ˌɑːr biː eɪ ˈsiː/ （ **Role-Based Access Control** /rəʊl beɪst ˈækses kənˈtrəʊl/ ，基于角色的访问控制）：`employee` / `manager` / `executive`
+- **ABAC** /ˌeɪ biː eɪ ˈsiː/ （ **Attribute-Based Access Control** /ˈætrɪbjuːt beɪst ˈækses kənˈtrəʊl/ ，基于属性的访问控制）：部门、职级、项目成员、数据密级
+- ACL（显式名单形态）：`allowed_users`、`allowed_groups`
 
 生产里往往是 **RBAC + ABAC 混合** ：角色定大框，属性定细粒度（「同是 manager，只能看自己部门」）。
 
@@ -193,7 +195,7 @@ T2  张三再次提问（新 JWT）：
 
 ## 5. 过滤条件怎么落到向量库
 
-以常见向量库的「标量过滤 + 向量检索」为例（语义示意，API 各异）：
+以常见向量库的「标量过滤 + 向量检索」为例（语义示意， **API** /ˌeɪ piː ˈaɪ/ （ **Application Programming Interface** /ˌæplɪˈkeɪʃn ˈprəʊɡræmɪŋ ˈɪntəfeɪs/ ，应用程序接口）各异）：
 
 **Qdrant 风格** ：
 
@@ -222,12 +224,12 @@ T2  张三再次提问（新 JWT）：
 }
 ```
 
-**pgvector + 行级思路** ：向量表带 ACL 列，用 SQL `WHERE` 与 `ORDER BY embedding <-> query` 一起查；或结合 PostgreSQL 的 **row-level security** /ˈrəʊ ˈlevl sɪˈkjʊərəti/ （RLS，行级安全）把 `current_setting('app.user_level')` 写进策略。
+**pgvector + 行级思路** ：向量表带 ACL 列，用 **SQL** /ˌes kjuː ˈel/ （ **Structured Query Language** /ˈstrʌktʃəd ˈkwɪəri ˈlæŋɡwɪdʒ/ ，结构化查询语言）`WHERE` 与 `ORDER BY embedding <-> query` 一起查；或结合 PostgreSQL 的 **RLS** /ˌɑːr el ˈes/ （ **Row-Level Security** /ˈrəʊ ˈlevl sɪˈkjʊərəti/ ，行级安全）把 `current_setting('app.user_level')` 写进策略。
 
 **按「可见文档集合」两段查（权限很复杂时）** ：
 
 1. 权限服务：`allowed_doc_ids = acl.resolve(user)`（可缓存数分钟）
-2. 向量检索：`doc_id IN allowed_doc_ids` + ANN
+2. 向量检索：`doc_id IN allowed_doc_ids` + **ANN** /ˌeɪ en ˈen/ （ **Approximate Nearest Neighbor** /əˈprɒksɪmət ˈnɪərɪst ˈneɪbə/ ，近似最近邻）
 
 适合「权限规则极复杂、已有成熟权限中台」的企业；代价是 `allowed_doc_ids` 很大时要用倒排/分区优化，避免 `IN` 百万级拖垮查询。
 
@@ -294,7 +296,7 @@ RAG 只是 Agent 的一个 Tool。权限漏洞经常出在「旁路」：
 1. 网关把 **用户身份** 注入 Agent 运行时上下文（不可由模型伪造）。  
 2. 每个数据 Tool 的实现里 **强制** 使用该身份做鉴权，禁止默认服务账号读业务数据。  
 3. 多跳检索、子 Agent 委托时， **向下传递同一 claims** （可收窄，不可放大）。  
-4. 引用与「打开原文」链接走带鉴权的代理，避免把内网未鉴权 URL 直接给前端。
+4. 引用与「打开原文」链接走带鉴权的代理，避免把内网未鉴权 **URL** /ˌjuː ɑːr ˈel/ （ **Uniform Resource Locator** /ˈjuːnɪfɔːm rɪˈsɔːs ləʊˈkeɪtə/ ，统一资源定位符）直接给前端。
 
 ---
 
@@ -315,7 +317,7 @@ RAG 只是 Agent 的一个 Tool。权限漏洞经常出在「旁路」：
 2. **把用户 ID 写进 Embedding 文本** ：权限一变就要重嵌入；应放 metadata。  
 3. **会话缓存未按用户隔离** ：A 的检索结果被 B 的会话复用。语义缓存的 key 必须包含 `user` 或 `authz_version`。  
 4. **只控「搜」，不控「聊」** ：历史消息里已有机密摘要，换人共用会话会泄露——会话要按人隔离。  
-5. **权限模型与公司真源不一致** ：RAG 自建角色表，和 HR/AD 双轨，晋升对不齐。  
+5. **权限模型与公司真源不一致** ：RAG 自建角色表，和 HR/ **AD** /ˌeɪ ˈdiː/ （ **Active Directory** /ˈæktɪv dəˈrektəri/ ，活动目录）双轨，晋升对不齐。  
 6. **忽略租户字段** ：过滤条件 OR 写错导致跨公司命中。  
 7. **调试环境打印全文** ：日志里 dump 无权限 Chunk，等于权限形同虚设。
 
@@ -323,7 +325,7 @@ RAG 只是 Agent 的一个 Tool。权限漏洞经常出在「旁路」：
 
 ## 11. 最小可行设计（MVP）建议
 
-若从零做企业内部文 AI，建议按这个顺序：
+**MVP** /ˌem viː ˈpiː/ （ **Minimum Viable Product** /ˈmɪnɪməm ˈvaɪəbl ˈprɒdʌkt/ ，最小可行产品）：若从零做企业内部文 AI，建议按这个顺序：
 
 1. **统一登录** ，JWT 带 `tenant_id / roles / dept / level / projects`。  
 2. **入库强制打标** ：没有 ACL 的文档默认「仅管理员可见」，禁止默认公开。  
@@ -344,3 +346,26 @@ RAG 只是 Agent 的一个 Tool。权限漏洞经常出在「旁路」：
 | 模型提示还要吗？ | 要，但是辅控；主控永远在检索与 Tool 鉴权 |
 
 一句话： **RAG 权限 = 带身份的检索，而不是懂礼貌的模型。**
+
+---
+
+## 本文缩写
+
+| 缩写 | 音标 | 全拼 | 中文 |
+|------|------|------|------|
+| **RAG** | /ˌɑːr eɪ ˈdʒiː/ | Retrieval-Augmented Generation | 检索增强生成 |
+| **LLM** | /ˌel el ˈem/ | Large Language Model | 大语言模型 |
+| **ACL** | /ˌeɪ siː ˈel/ | Access Control List | 访问控制列表 |
+| **RBAC** | /ˌɑːr biː eɪ ˈsiː/ | Role-Based Access Control | 基于角色的访问控制 |
+| **ABAC** | /ˌeɪ biː eɪ ˈsiː/ | Attribute-Based Access Control | 基于属性的访问控制 |
+| **IdP** | /ˌaɪ diː ˈpiː/ | Identity Provider | 身份提供者 |
+| **JWT** | /ˌdʒeɪ ˈdʌbljuː tiː/ | JSON Web Token | JSON Web 令牌 |
+| **HR** | /ˌeɪtʃ ˈɑː/ | Human Resources | 人力资源 |
+| **AD** | /ˌeɪ ˈdiː/ | Active Directory | 活动目录 |
+| **ANN** | /ˌeɪ en ˈen/ | Approximate Nearest Neighbor | 近似最近邻 |
+| **API** | /ˌeɪ piː ˈaɪ/ | Application Programming Interface | 应用程序接口 |
+| **SQL** | /ˌes kjuː ˈel/ | Structured Query Language | 结构化查询语言 |
+| **RLS** | /ˌɑːr el ˈes/ | Row-Level Security | 行级安全 |
+| **URL** | /ˌjuː ɑːr ˈel/ | Uniform Resource Locator | 统一资源定位符 |
+| **PDF** | /ˌpiː diː ˈef/ | Portable Document Format | 便携式文档格式 |
+| **MVP** | /ˌem viː ˈpiː/ | Minimum Viable Product | 最小可行产品 |
