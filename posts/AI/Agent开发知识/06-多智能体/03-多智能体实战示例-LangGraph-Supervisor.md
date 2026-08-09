@@ -2,7 +2,7 @@
 
 > ⚠️ **本文档是示例代码 `demo/langChain_ts_agent/src/multiAgent.ts` 的配套说明文档。**
 > 代码与本文档同步维护；代码以 `demo/.../src/multiAgent.ts` 为准，本文做概念与运行说明。
-> 关联阅读：`01-多智能体协作.md`（入门）、`02-多智能体概念体系与学习要点.md`（概念全景+学习路线）。
+> 关联阅读：`01-多智能体协作.md`（入门）、`02-多智能体概念体系与学习要点.md`（概念全景+学习路线）、`04-跨Agent通信.md`（消息契约与跨系统 A2A）。
 
 ---
 
@@ -100,7 +100,7 @@ npm run multi       # 等价于 tsx src/multiAgent.ts
 | P1 | **worker 独立记忆** | 状态/记忆 | 给每个 worker 挂 `BufferWindowMemory` |
 | P2 | **更多专家角色** | 角色粒度 | 加 `researcher` / `critic` 等，更新 supervisor 的枚举 |
 | P2 | **辩论/投票** | Debate/Voting | 多 worker 对同一问题作答后投票 |
-| P3 | **跨进程 A2A** | A2A 协议 | 不同 worker 跑独立进程，用 A2A 通信 |
+| P3 | **跨进程 A2A** | A2A 协议 | 不同 worker 跑独立进程，用 A2A 通信（概念与选型见 `04-跨Agent通信.md`） |
 
 ## 7. 与 `planningAgent` 的对比（同一仓库的两个示例）
 

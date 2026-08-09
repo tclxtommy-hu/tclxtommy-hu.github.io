@@ -10,6 +10,7 @@
   - 与 MCP 互补：**MCP 连工具，A2A 连 Agent**。
 - **ANP（Agent Network Protocol）** 等也在探索去中心化 Agent 网络。
 - 关联：12 模块 Skill Router 是"单系统内的调度"，A2A 是"跨系统的调度"。
+- 工程选型与进程内通信对照：见 `06-多智能体/04-跨Agent通信.md`。
 
 ---
 
