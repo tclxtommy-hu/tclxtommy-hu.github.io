@@ -277,12 +277,12 @@ function initSearch() {
     return path.replace(/\\/g, '/');
   }
 
-  function expandTreeAncestors(path) {
+  function expandTreeAncestors(path, { includeSelf = true } = {}) {
     if (!path) return;
     const treeEl = document.getElementById('archive-tree');
     if (!treeEl) return;
 
-    // Ensure root is always open
+    // Ensure root is always open so the selected path stays visible
     const rootDetails = treeEl.querySelector('.tree-folder[data-path=""]');
     if (rootDetails) rootDetails.open = true;
 
@@ -291,19 +291,21 @@ function initSearch() {
     let accumulated = '';
     for (const part of parts) {
       accumulated = accumulated ? accumulated + '/' + part : part;
+      // When collapsing via click, skip the target node so native close sticks
+      if (!includeSelf && accumulated === path) continue;
       const details = treeEl.querySelector(`.tree-folder[data-path="${CSS.escape(accumulated)}"]`);
       if (details) details.open = true;
     }
   }
 
-  function applyPathFilter(path) {
+  function applyPathFilter(path, options = {}) {
     // Paths use / separator consistently (tree JSON, data-path, URLs)
     path = normalizePath(path);
     currentPath = path;
     const items = listWrap.querySelectorAll('.archive-item');
 
     // Expand tree ancestors along the path
-    expandTreeAncestors(path);
+    expandTreeAncestors(path, options);
 
     // Highlight active tree node
     treeFolders.forEach(n => {
@@ -340,13 +342,15 @@ function initSearch() {
   }
 
   treeFolders.forEach(node => {
-    node.addEventListener('click', (e) => {
+    node.addEventListener('click', () => {
       // Don't interfere with native <details> toggle or <a> links
       const path = node.dataset.path;
       const details = node.closest('details');
       if (details && node.tagName === 'SUMMARY') {
-        // Let native toggle happen, then apply filter
-        setTimeout(() => applyPathFilter(path), 10);
+        // Let native toggle finish, then filter; if user collapsed, don't force-reopen
+        setTimeout(() => {
+          applyPathFilter(path, { includeSelf: details.open });
+        }, 10);
       }
     });
   });
