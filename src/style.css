@@ -477,6 +477,63 @@ a:hover { color: var(--accent3); }
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
+.archive-recent {
+  margin-bottom: 20px;
+}
+.archive-recent > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.archive-recent > summary::-webkit-details-marker { display: none; }
+.archive-recent > summary::marker { display: none; }
+.archive-recent > summary::before {
+  content: '▸';
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  transition: transform 0.15s;
+}
+.archive-recent[open] > summary::before {
+  transform: rotate(90deg);
+}
+.archive-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin-top: 8px;
+}
+.archive-recent-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.archive-recent-item:hover {
+  background: rgba(0, 240, 255, 0.06);
+  color: var(--accent);
+}
+.archive-recent-title {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.archive-recent-date {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  opacity: 0.55;
+}
 .archive-tree {
   font-size: 0.88rem;
   line-height: 1.6;

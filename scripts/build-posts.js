@@ -166,6 +166,8 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
 
   // Format date nicely
   const formatDate = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const stat = fs.statSync(fullPath);
+  const mtime = stat.mtime || stat.birthtime || new Date(0);
   let dateStr;
   let sortDate;
 
@@ -185,8 +187,7 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
       dateStr = formatDate(d);
       sortDate = d;
     } else {
-      const stat = fs.statSync(fullPath);
-      sortDate = stat.mtime || stat.birthtime || new Date(0);
+      sortDate = mtime;
       dateStr = formatDate(sortDate);
     }
   }
@@ -200,6 +201,7 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
     title: data.title || slug,
     date: dateStr,
     sortDate,
+    mtime,
     tags: data.tags || [],
     category,
     subcategory,
@@ -725,6 +727,30 @@ const archiveListHtml = posts.length === 0
     </li>`}).join('')}
   </ul>`;
 
+// Recent posts by file mtime (top of archive sidebar)
+const RECENT_LIMIT = 10;
+const formatMtime = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+const recentPosts = [...posts]
+  .sort((a, b) => (b.mtime > a.mtime ? 1 : -1))
+  .slice(0, RECENT_LIMIT);
+
+const recentPostsHtml = recentPosts.length === 0
+  ? ''
+  : `<details class="archive-recent">
+        <summary class="archive-tree-header archive-recent-toggle">🕒 最近修改 <span class="tree-count">${recentPosts.length}</span></summary>
+        <div class="archive-recent-list">
+${recentPosts.map(p => {
+    const postUrl = p.relativeDir
+      ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
+      : `/posts-html/${p.slug}.html`;
+    return `          <a href="${postUrl}" class="archive-recent-item" title="${attrEscape(p.title)}">
+            <span class="archive-recent-title">📄 ${attrEscape(p.title)}</span>
+            <span class="archive-recent-date">${formatMtime(p.mtime)}</span>
+          </a>`;
+  }).join('\n')}
+        </div>
+      </details>`;
+
 const archiveHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -748,6 +774,7 @@ const archiveHtml = `<!DOCTYPE html>
     </div>
     <div class="archive-layout">
       <aside class="archive-sidebar">
+        ${recentPostsHtml}
         <div class="archive-tree-header">📂 目录结构</div>
         ${treeHtml}
       </aside>
