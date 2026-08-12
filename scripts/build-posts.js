@@ -9,6 +9,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
@@ -21,6 +22,58 @@ const POSTS_HTML_DIR = path.join(ROOT, 'posts-html');
 // Ensure directories exist
 if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
 if (!fs.existsSync(POSTS_HTML_DIR)) fs.mkdirSync(POSTS_HTML_DIR, { recursive: true });
+
+/**
+ * Last commit time per file under posts/ (reliable in CI; fs mtime is reset on checkout).
+ * Paths are repo-relative with / separators.
+ */
+function loadGitLastModifiedMap() {
+  const map = new Map();
+  try {
+    const output = execSync(
+      'git -c core.quotepath=false log --pretty=format:%cI --name-only --diff-filter=ACMR -- posts',
+      { cwd: ROOT, encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 }
+    );
+    let currentDate = null;
+    for (const line of output.split(/\r?\n/)) {
+      if (!line) continue;
+      if (/^\d{4}-\d{2}-\d{2}T/.test(line)) {
+        currentDate = new Date(line);
+        continue;
+      }
+      if (!currentDate || Number.isNaN(currentDate.getTime())) continue;
+      const rel = line.replace(/\\/g, '/');
+      if (!map.has(rel)) map.set(rel, currentDate);
+    }
+  } catch {
+    // Not a git repo or git unavailable — callers fall back to fs mtime
+  }
+  return map;
+}
+
+/** Working-tree dirty paths (modified/added), repo-relative with / */
+function loadDirtyPostPaths() {
+  const dirty = new Set();
+  try {
+    const output = execSync('git -c core.quotepath=false status --porcelain -- posts', {
+      cwd: ROOT,
+      encoding: 'utf-8',
+    });
+    for (const line of output.split(/\r?\n/)) {
+      if (!line || line.length < 4) continue;
+      // " M path" / "?? path" / "R  old -> new"
+      const rest = line.slice(3);
+      const target = rest.includes(' -> ') ? rest.split(' -> ').pop() : rest;
+      dirty.add(String(target).replace(/\\/g, '/'));
+    }
+  } catch {
+    // ignore
+  }
+  return dirty;
+}
+
+const gitLastModified = loadGitLastModifiedMap();
+const dirtyPostPaths = loadDirtyPostPaths();
 
 // ====== Utility: recursive directory scan for .md files ======
 function findMdFiles(dir, baseDir) {
@@ -168,6 +221,10 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
   const formatDate = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
   const stat = fs.statSync(fullPath);
   const mtime = stat.mtime || stat.birthtime || new Date(0);
+  // Prefer git last-commit time (CI-safe). Dirty local files keep fs mtime so uncommitted edits still surface.
+  const repoRel = toUrlPath(path.relative(ROOT, fullPath));
+  const gitMtime = gitLastModified.get(repoRel);
+  const lastModified = (dirtyPostPaths.has(repoRel) || !gitMtime) ? mtime : gitMtime;
   let dateStr;
   let sortDate;
 
@@ -187,7 +244,7 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
       dateStr = formatDate(d);
       sortDate = d;
     } else {
-      sortDate = mtime;
+      sortDate = lastModified;
       dateStr = formatDate(sortDate);
     }
   }
@@ -201,7 +258,7 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
     title: data.title || slug,
     date: dateStr,
     sortDate,
-    mtime,
+    lastModified,
     tags: data.tags || [],
     category,
     subcategory,
@@ -727,11 +784,11 @@ const archiveListHtml = posts.length === 0
     </li>`}).join('')}
   </ul>`;
 
-// Recent posts by file mtime (top of archive sidebar)
+// Recent posts by git last-commit time (fs mtime is unreliable after CI checkout)
 const RECENT_LIMIT = 10;
 const formatMtime = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
 const recentPosts = [...posts]
-  .sort((a, b) => (b.mtime > a.mtime ? 1 : -1))
+  .sort((a, b) => (b.lastModified > a.lastModified ? 1 : -1))
   .slice(0, RECENT_LIMIT);
 
 const recentPostsHtml = recentPosts.length === 0
@@ -745,7 +802,7 @@ ${recentPosts.map(p => {
       : `/posts-html/${p.slug}.html`;
     return `          <a href="${postUrl}" class="archive-recent-item" title="${attrEscape(p.title)}">
             <span class="archive-recent-title">📄 ${attrEscape(p.title)}</span>
-            <span class="archive-recent-date">${formatMtime(p.mtime)}</span>
+            <span class="archive-recent-date">${formatMtime(p.lastModified)}</span>
           </a>`;
   }).join('\n')}
         </div>

@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Need full history so "最近修改" can use each file's last git commit time
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
