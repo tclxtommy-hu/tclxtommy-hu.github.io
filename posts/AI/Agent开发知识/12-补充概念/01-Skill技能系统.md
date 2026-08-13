@@ -1,13 +1,13 @@
 # Skill 技能系统
 
-> 一句话定义：Skill 是封装好的、可复用的 Agent 能力模块（含指令、工具、知识、示例），让 Agent 按需调用以完成特定领域任务——是 Agent 能力的"插件化"组织方式。
+> 一句话定义： **Skill** /skɪl/ （技能）是封装好的、可复用的 Agent 能力模块（含指令、工具、知识、示例），让 Agent 按需调用以完成特定领域任务——是 Agent 能力的"插件化"组织方式。
 
 ---
 
 ## 1. 定义
-Skill（技能）指把完成某类任务所需的**指令、工具、知识、示例**打包成一个可复用模块，Agent 在需要时加载/调用该 Skill 即可获得对应能力。
+Skill（技能）指把完成某类任务所需的 **指令、工具、知识、示例** 打包成一个可复用模块，Agent 在需要时加载/调用该 Skill 即可获得对应能力。
 
-类比：人学了一项技能（如"做菜"），需要时调用；Agent 的 Skill 即"可调用的能力包"。区别于一次性 Tool 调用，Skill 是**完成一类任务的完整能力包**，包含"怎么做"的指令，而非仅"能做什么"的接口。
+类比：人学了一项技能（如"做菜"），需要时调用；Agent 的 Skill 即"可调用的能力包"。区别于一次性 Tool 调用，Skill 是 **完成一类任务的完整能力包** ，包含"怎么做"的指令，而非仅"能做什么"的接口。
 
 ## 2. 为什么需要 Skill
 - **复用**：同一能力多处调用，避免重复写提示。
@@ -116,15 +116,34 @@ skills/
     eval/             # 回归评测用例
 ```
 
-## 9. 学习要点
+## 9. 生命周期与可观测（调用链路）
+
+Skill 从被发现到结束，建议按阶段埋点，并挂到同一条 `trace_id` 下：
+
+| 阶段 | 含义 | 最少要记 |
+|------|------|---------|
+| Discover | 注册/索引元数据 | name、version、triggers |
+| Select | Router / LLM 选型 | candidates、chosen、reason |
+| Load | 加载指令/工具/知识 | version、tools[]、prompt token |
+| Execute | 执行循环（可含多轮 LLM） | 步数、子调用、终止原因 |
+| Tool / MCP | 内部工具或协议调用 | 每次独立子 span |
+| Complete / Fail / Escalate | 终态 | 状态码、是否人审、错误摘要 |
+
+编排多个 Skill（如 `debug` → `write-test`）时：共享 `trace_id`，每个 Skill 各自 `skill.execute` span；串联再用 `skill.pipeline` 包一层。
+
+完整的 Span 树、Metric 与验收清单见 [可观测性与 LLMOps · §3 Skill 生命周期](../13-进阶与工程化/04-可观测性与LLMOps.md)。
+
+## 10. 学习要点
 - Skill 是 Agent 能力的插件化组织，提升复用与可维护性。
 - 介于 Tool 与 Agent 之间，是"能力包"粒度。
 - 清晰描述、单一职责、示例驱动、最小授权是设计关键。
 - 工程化要点：目录约定、版本化、评测集、PR 评审。
+- 可观测要点：覆盖 Select → Load → Execute → 终态，且 `name+version` 必进 trace。
 - 与 MCP 互补：MCP 标准化工具暴露，Skill 组织"如何用这些工具完成任务"。
 
-## 10. 参考资料
+## 11. 参考资料
 - VS Code Copilot Skills / Chat Participants 设计
 - "Cognitive Architectures for Language Agents"（技能/工具章节）
 - MCP 中 Prompts 与 Skills 的关系
 - 插件化架构设计原则（单一职责、显式依赖、可组合）
+- [可观测性与 LLMOps](../13-进阶与工程化/04-可观测性与LLMOps.md)

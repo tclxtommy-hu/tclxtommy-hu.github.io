@@ -118,9 +118,11 @@
 | 概念 / 关键词 | 极简说明 |
 |------|------|
 | **LLMOps** | 面向 LLM/Agent 的运维体系。 |
-| **可观测性（Observability）** | 通过 Trace/Span/Metric 看清内部运行状态。 |
+| **可观测性（Observability）** | 通过 Trace/Span/Metric 看清内部运行状态。详见 `13-进阶/04-可观测性与LLMOps`。 |
 | **Trace / Span** | 一次运行的完整链路 / 链路中的一段。 |
-| **日志（Logging）** | 记录运行过程的文本。 |
+| **Skill 生命周期埋点** | Discover→Select→Load→Execute→终态，挂同一 `trace_id`。 |
+| **MCP 链路追踪** | Client→Server→下游跨进程传播 trace context。 |
+| **日志（Logging）** | 记录运行过程的文本；用 `trace_id` 关联 Span，不替代 Span。 |
 | **评估（Evaluation）** | 量化 Agent 表现的过程。 |
 | **基准（Benchmark）** | 标准化测试集（如 WebArena、τ-bench）。 |
 | **回归测试** | 改动后验证不退化。 |

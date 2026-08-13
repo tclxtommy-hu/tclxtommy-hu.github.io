@@ -3,15 +3,27 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://http200.cn/</loc>
-    <lastmod>2026-08-12</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://http200.cn/archive.html</loc>
-    <lastmod>2026-08-12</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/02-PydanticAI详解.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/04-vLLM.html</loc>
@@ -604,12 +616,6 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/Agent设计模式/00-总览.html</loc>
     <lastmod>2026-07-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</loc>
-    <lastmod>2026-06-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

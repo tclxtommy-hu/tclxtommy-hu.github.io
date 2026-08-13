@@ -203,6 +203,7 @@ flowchart LR
 | 文件 | 主题 |
 |------|------|
 | [01-主流框架对比.md](Agent开发知识/10-框架与工具/01-主流框架对比.md) | LangChain/LangGraph/AutoGen/CrewAI 等对比 |
+| [02-PydanticAI详解.md](Agent开发知识/10-框架与工具/02-PydanticAI详解.md) | PydanticAI 详解，并与 LangChain / LangGraph 对比 |
 
 ### 11 工程实践
 | 文件 | 主题 |
@@ -214,6 +215,22 @@ flowchart LR
 |------|------|
 | [01-Skill技能系统.md](Agent开发知识/12-补充概念/01-Skill技能系统.md) | Skill 技能包：封装指令+工具+知识的可复用能力模块 |
 | [02-Agent.md与Memory.md规范.md](Agent开发知识/12-补充概念/02-Agent.md与Memory.md规范.md) | Agent.md 配置文件与 Memory.md 持久化记忆的 Markdown 实践 |
+| [03-关于Agent Skill Router的几点思考.md](Agent开发知识/12-补充概念/03-关于Agent%20Skill%20Router的几点思考.md) | Skill Router：意图匹配、编排与降级 |
+
+### 13 进阶与工程化
+| 文件 | 主题 |
+|------|------|
+| [00-知识体系全景与补遗地图.md](Agent开发知识/13-进阶与工程化/00-知识体系全景与补遗地图.md) | 01–12 覆盖评估与补项导航 |
+| [01-Agent设计模式与工作流.md](Agent开发知识/13-进阶与工程化/01-Agent设计模式与工作流.md) | Workflow vs Agent、常见编排模式 |
+| [02-上下文工程.md](Agent开发知识/13-进阶与工程化/02-上下文工程.md) | 上下文构造、压缩与管理 |
+| [03-高级提示工程.md](Agent开发知识/13-进阶与工程化/03-高级提示工程.md) | 系统提示、few-shot、约束生成 |
+| [04-可观测性与LLMOps.md](Agent开发知识/13-进阶与工程化/04-可观测性与LLMOps.md) | 三支柱 Trace/Span/Metric；Skill 生命周期与 MCP 链路追踪 |
+| [05-可靠性与成本工程.md](Agent开发知识/13-进阶与工程化/05-可靠性与成本工程.md) | 重试/降级/熔断；token 与模型路由 |
+| [06-多智能体进阶.md](Agent开发知识/13-进阶与工程化/06-多智能体进阶.md) | 通信、共识与框架实战补强 |
+| [07-RAG工程化与GraphRAG.md](Agent开发知识/13-进阶与工程化/07-RAG工程化与GraphRAG.md) | 切分、混合检索、GraphRAG、评测 |
+| [08-评测框架与基准详解.md](Agent开发知识/13-进阶与工程化/08-评测框架与基准详解.md) | Ragas/DeepEval 与主流 Agent 基准 |
+| [09-安全实战OWASP与防护.md](Agent开发知识/13-进阶与工程化/09-安全实战OWASP与防护.md) | OWASP LLM Top 10 与防护落地 |
+| [10-Agent协议与形态前沿.md](Agent开发知识/13-进阶与工程化/10-Agent协议与形态前沿.md) | A2A、Computer Use、语音 Agent 等 |
 
 ---
 
