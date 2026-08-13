@@ -240,7 +240,24 @@ function initSearch() {
   // ====== Tree-based filter ======
   const readmeEl = document.getElementById('archive-readme');
   const treeFolders = document.querySelectorAll('.archive-tree .tree-node');
+  const recentToggle = document.getElementById('archive-recent-toggle');
+  const recentDetails = document.getElementById('archive-recent');
+  const recentHint = document.getElementById('archive-recent-hint');
+  const archiveListEl = document.getElementById('archive-list');
+  const desktopRecentMq = window.matchMedia('(min-width: 901px)');
   let currentPath = '';
+  let viewMode = 'path';
+  let syncingRecent = false;
+
+  function isDesktopArchive() {
+    return desktopRecentMq.matches;
+  }
+
+  if (archiveListEl) {
+    archiveListEl.querySelectorAll('.archive-item').forEach((el, i) => {
+      el.dataset.index = String(i);
+    });
+  }
 
   function findTreeNode(path) {
     if (!window.__POSTS_TREE__) return null;
@@ -298,11 +315,81 @@ function initSearch() {
     }
   }
 
+  function getArchiveItems() {
+    return listWrap ? [...listWrap.querySelectorAll('.archive-item')] : [];
+  }
+
+  function setDateLabels(mode) {
+    getArchiveItems().forEach((el) => {
+      const dateEl = el.querySelector('.archive-date');
+      if (!dateEl) return;
+      const label = mode === 'recent' ? dateEl.dataset.mtimeLabel : dateEl.dataset.pubDate;
+      if (label) dateEl.textContent = label;
+    });
+  }
+
+  function restoreListOrder() {
+    if (!archiveListEl) return;
+    getArchiveItems()
+      .sort((a, b) => Number(a.dataset.index) - Number(b.dataset.index))
+      .forEach((el) => archiveListEl.appendChild(el));
+  }
+
+  function setRecentOpen(open) {
+    if (!recentDetails || recentDetails.open === open) return;
+    syncingRecent = true;
+    recentDetails.open = open;
+    syncingRecent = false;
+  }
+
+  function setRecentToggleActive(active) {
+    if (!recentToggle) return;
+    recentToggle.classList.toggle('is-active', active);
+  }
+
+  function applyRecentFilter() {
+    viewMode = 'recent';
+    currentPath = '';
+    setRecentToggleActive(true);
+    setRecentOpen(true);
+    treeFolders.forEach((n) => n.classList.remove('is-active'));
+    if (readmeEl) readmeEl.style.display = 'none';
+    if (recentHint) recentHint.hidden = false;
+    if (archiveListEl) archiveListEl.classList.add('is-recent-view');
+    if (listWrap) listWrap.style.display = '';
+    if (resultsEl) resultsEl.style.display = 'none';
+
+    const items = getArchiveItems();
+    items.forEach((el) => {
+      el.style.display = el.dataset.recent === '1' ? '' : 'none';
+    });
+    if (archiveListEl) {
+      items
+        .filter((el) => el.dataset.recent === '1')
+        .sort((a, b) => String(b.dataset.mtime || '').localeCompare(String(a.dataset.mtime || '')))
+        .forEach((el) => archiveListEl.appendChild(el));
+    }
+    setDateLabels('recent');
+
+    const url = new URL(window.location);
+    url.searchParams.set('recent', '1');
+    url.searchParams.delete('path');
+    window.history.replaceState({}, '', url);
+  }
+
   function applyPathFilter(path, options = {}) {
     // Paths use / separator consistently (tree JSON, data-path, URLs)
     path = normalizePath(path);
+    viewMode = 'path';
     currentPath = path;
-    const items = listWrap.querySelectorAll('.archive-item');
+    setRecentToggleActive(false);
+    if (isDesktopArchive()) setRecentOpen(false);
+    if (recentHint) recentHint.hidden = true;
+    if (archiveListEl) archiveListEl.classList.remove('is-recent-view');
+    restoreListOrder();
+    setDateLabels('path');
+
+    const items = getArchiveItems();
 
     // Expand tree ancestors along the path
     expandTreeAncestors(path, options);
@@ -322,23 +409,40 @@ function initSearch() {
 
     if (!path) {
       items.forEach(el => el.style.display = '');
-      return;
+    } else {
+      items.forEach(el => {
+        const itemPath = el.dataset.path || '';
+        // Show items whose path matches exactly or is under currentPath
+        el.style.display = (itemPath === path || itemPath.startsWith(path + '/')) ? '' : 'none';
+      });
     }
-
-    items.forEach(el => {
-      const itemPath = el.dataset.path || '';
-      // Show items whose path matches exactly or is under currentPath
-      el.style.display = (itemPath === path || itemPath.startsWith(path + '/')) ? '' : 'none';
-    });
 
     // Update URL
     const url = new URL(window.location);
+    url.searchParams.delete('recent');
     if (path) {
       url.searchParams.set('path', path);
     } else {
       url.searchParams.delete('path');
     }
     window.history.replaceState({}, '', url);
+  }
+
+  if (recentDetails) {
+    recentDetails.addEventListener('toggle', () => {
+      if (syncingRecent) return;
+      if (!isDesktopArchive()) {
+        // Mobile: only expand/collapse the sidebar list; keep the main list as-is.
+        setRecentToggleActive(recentDetails.open);
+        return;
+      }
+      if (recentDetails.open) {
+        if (input) input.value = '';
+        applyRecentFilter();
+      } else if (viewMode === 'recent') {
+        applyPathFilter('');
+      }
+    });
   }
 
   treeFolders.forEach(node => {
@@ -358,6 +462,11 @@ function initSearch() {
   // Init from URL on load
   function initPathFromUrl() {
     const params = new URLSearchParams(window.location.search);
+    if (params.get('recent') === '1') {
+      if (isDesktopArchive()) applyRecentFilter();
+      else setRecentOpen(true);
+      return;
+    }
     const path = params.get('path');
     if (path) {
       applyPathFilter(path);
@@ -369,8 +478,9 @@ function initSearch() {
     if (!query) {
       resultsEl.style.display = 'none';
       listWrap.style.display = '';
-      // Restore tree filter
-      applyPathFilter(currentPath);
+      // Restore tree / recent filter
+      if (viewMode === 'recent') applyRecentFilter();
+      else applyPathFilter(currentPath);
       return;
     }
 
@@ -387,6 +497,7 @@ function initSearch() {
     listWrap.style.display = 'none';
     resultsEl.style.display = '';
     if (readmeEl) readmeEl.style.display = 'none';
+    if (recentHint) recentHint.hidden = true;
 
     if (matches.length === 0) {
       resultsEl.innerHTML = '<p class="search-empty">没有找到匹配的文章</p>';

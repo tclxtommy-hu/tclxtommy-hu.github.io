@@ -500,6 +500,9 @@ a:hover { color: var(--accent3); }
 .archive-recent[open] > summary::before {
   transform: rotate(90deg);
 }
+.archive-recent[open] > summary {
+  color: var(--accent);
+}
 .archive-recent-list {
   display: flex;
   flex-direction: column;
@@ -510,9 +513,9 @@ a:hover { color: var(--accent3); }
 }
 .archive-recent-item {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 4px 8px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
   border-radius: 6px;
   color: var(--text-muted);
   text-decoration: none;
@@ -523,16 +526,45 @@ a:hover { color: var(--accent3); }
   color: var(--accent);
 }
 .archive-recent-title {
-  flex: 1;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.archive-recent-title .archive-badge-new {
+  margin-left: 4px;
+  padding: 0 4px;
+  font-size: 0.6rem;
+  vertical-align: middle;
+}
 .archive-recent-date {
   flex-shrink: 0;
   font-size: 0.7rem;
   opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+  padding-left: 1.35em;
+}
+.archive-recent-hint {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+.archive-badge-new {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: #0a0a0f;
+  background: linear-gradient(90deg, var(--accent), var(--accent3));
+  vertical-align: middle;
+}
+.archive-list.is-recent-view .archive-date {
+  min-width: 138px;
+  font-variant-numeric: tabular-nums;
 }
 .archive-tree {
   font-size: 0.88rem;
@@ -722,7 +754,8 @@ a:hover { color: var(--accent3); }
     flex-direction: column;
     gap: 4px;
   }
-  .archive-date {
+  .archive-date,
+  .archive-list.is-recent-view .archive-date {
     min-width: auto;
   }
 }

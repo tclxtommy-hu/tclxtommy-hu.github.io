@@ -14,6 +14,30 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/08-评测框架与基准详解.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/04-可观测性与LLMOps.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/00-知识体系全景与补遗地图.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/12-补充概念/01-Skill技能系统.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/02-PydanticAI详解.html</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -21,6 +45,24 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/08-评估与调试/01-评估与调试.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/03-工具调用/02-MCP协议.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/01-基础概念/03-Agent概念与关键词大全一览表.html</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -440,12 +482,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/08-评估与调试/01-评估与调试.html</loc>
-    <lastmod>2026-07-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/08-提示工程/03-生成参数.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>weekly</changefreq>
@@ -464,19 +500,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/08-评测框架与基准详解.html</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/05-可靠性与成本工程.html</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/04-可观测性与LLMOps.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -500,12 +524,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/00-知识体系全景与补遗地图.html</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/06-多智能体/01-多智能体协作.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>weekly</changefreq>
@@ -519,12 +537,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/05-规划与任务分解/02-LangChain核心API参考.html</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/01-基础概念/03-Agent概念与关键词大全一览表.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1004,19 +1016,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/12-补充概念/01-Skill技能系统.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/11-工程实践/01-工程实践.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/03-工具调用/02-MCP协议.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

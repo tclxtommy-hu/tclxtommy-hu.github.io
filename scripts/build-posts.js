@@ -24,11 +24,14 @@ if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
 if (!fs.existsSync(POSTS_HTML_DIR)) fs.mkdirSync(POSTS_HTML_DIR, { recursive: true });
 
 /**
- * Last commit time per file under posts/ (reliable in CI; fs mtime is reset on checkout).
+ * Last commit time and first-seen time per file under posts/
+ * (reliable in CI; fs mtime is reset on checkout).
  * Paths are repo-relative with / separators.
+ * git log is newest-first: first hit = lastModified, last hit = firstAdded.
  */
-function loadGitLastModifiedMap() {
-  const map = new Map();
+function loadGitFileTimes() {
+  const lastModified = new Map();
+  const firstAdded = new Map();
   try {
     const output = execSync(
       'git -c core.quotepath=false log --pretty=format:%cI --name-only --diff-filter=ACMR -- posts',
@@ -43,17 +46,19 @@ function loadGitLastModifiedMap() {
       }
       if (!currentDate || Number.isNaN(currentDate.getTime())) continue;
       const rel = line.replace(/\\/g, '/');
-      if (!map.has(rel)) map.set(rel, currentDate);
+      if (!lastModified.has(rel)) lastModified.set(rel, currentDate);
+      firstAdded.set(rel, currentDate);
     }
   } catch {
     // Not a git repo or git unavailable — callers fall back to fs mtime
   }
-  return map;
+  return { lastModified, firstAdded };
 }
 
-/** Working-tree dirty paths (modified/added), repo-relative with / */
+/** Working-tree dirty / newly-added paths, repo-relative with / */
 function loadDirtyPostPaths() {
   const dirty = new Set();
+  const added = new Set();
   try {
     const output = execSync('git -c core.quotepath=false status --porcelain -- posts', {
       cwd: ROOT,
@@ -61,19 +66,41 @@ function loadDirtyPostPaths() {
     });
     for (const line of output.split(/\r?\n/)) {
       if (!line || line.length < 4) continue;
-      // " M path" / "?? path" / "R  old -> new"
+      // " M path" / "?? path" / "A  path" / "R  old -> new"
+      const xy = line.slice(0, 2);
       const rest = line.slice(3);
       const target = rest.includes(' -> ') ? rest.split(' -> ').pop() : rest;
-      dirty.add(String(target).replace(/\\/g, '/'));
+      const rel = String(target).replace(/\\/g, '/');
+      dirty.add(rel);
+      if (xy === '??' || xy[0] === 'A' || xy[1] === 'A') added.add(rel);
     }
   } catch {
     // ignore
   }
-  return dirty;
+  return { dirty, added };
 }
 
-const gitLastModified = loadGitLastModifiedMap();
-const dirtyPostPaths = loadDirtyPostPaths();
+const gitFileTimes = loadGitFileTimes();
+const gitLastModified = gitFileTimes.lastModified;
+const gitFirstAdded = gitFileTimes.firstAdded;
+const dirtyPostInfo = loadDirtyPostPaths();
+const dirtyPostPaths = dirtyPostInfo.dirty;
+const dirtyAddedPaths = dirtyPostInfo.added;
+const NEW_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+function formatMtime(d) {
+  const parts = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+  const get = (type) => parts.find((p) => p.type === type)?.value || '';
+  return `${get('year')}/${get('month')}/${get('day')} ${get('hour')}:${get('minute')}`;
+}
 
 // ====== Utility: recursive directory scan for .md files ======
 function findMdFiles(dir, baseDir) {
@@ -225,6 +252,11 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
   const repoRel = toUrlPath(path.relative(ROOT, fullPath));
   const gitMtime = gitLastModified.get(repoRel);
   const lastModified = (dirtyPostPaths.has(repoRel) || !gitMtime) ? mtime : gitMtime;
+  const firstAdded = gitFirstAdded.get(repoRel);
+  const isNew = dirtyAddedPaths.has(repoRel) || (
+    firstAdded instanceof Date && !Number.isNaN(firstAdded.getTime())
+    && (Date.now() - firstAdded.getTime()) < NEW_WINDOW_MS
+  );
   let dateStr;
   let sortDate;
 
@@ -259,6 +291,7 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
     date: dateStr,
     sortDate,
     lastModified,
+    isNew,
     tags: data.tags || [],
     category,
     subcategory,
@@ -766,42 +799,47 @@ const indexHtml = `<!DOCTYPE html>
 fs.writeFileSync(path.join(ROOT, 'index.html'), indexHtml, 'utf-8');
 
 // ====== Generate archive.html ======
+// Recent posts by git last-commit time (fs mtime is unreliable after CI checkout)
+const RECENT_LIMIT = 10;
+const recentPosts = [...posts]
+  .sort((a, b) => (b.lastModified > a.lastModified ? 1 : -1))
+  .slice(0, RECENT_LIMIT);
+const recentKeySet = new Set(recentPosts.map((p) => `${toUrlPath(p.relativeDir || '')}\0${p.slug}`));
+
 const archiveListHtml = posts.length === 0
   ? '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">还没有文章。</p>'
   : `<ul class="archive-list" id="archive-list">${posts.map(p => {
     const postUrl = p.relativeDir
       ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
       : `/posts-html/${p.slug}.html`;
+    const pathKey = toUrlPath(p.relativeDir || '');
+    const isRecent = recentKeySet.has(`${pathKey}\0${p.slug}`);
+    const mtimeLabel = formatMtime(p.lastModified);
+    const newBadge = p.isNew ? '<span class="archive-badge-new">新增</span>' : '';
     return `
-    <li class="archive-item" data-path="${toUrlPath(p.relativeDir || '')}">
+    <li class="archive-item" data-path="${pathKey}" data-slug="${attrEscape(p.slug)}" data-mtime="${p.lastModified.toISOString()}" data-recent="${isRecent ? '1' : '0'}">
       <a class="archive-item-link" href="${postUrl}">
-        ${p.date ? `<span class="archive-date">${p.date}</span>` : ''}
+        ${p.date ? `<span class="archive-date" data-pub-date="${attrEscape(p.date)}" data-mtime-label="${attrEscape(mtimeLabel)}" title="最后修改 ${attrEscape(mtimeLabel)}">${p.date}</span>` : ''}
         <div class="archive-info">
-          <span class="archive-title">${p.title}</span>
+          <span class="archive-title">${p.title}${newBadge}</span>
           ${p.relativeDir ? `<span class="archive-category">${p.relativeDir.replace(/\\/g, ' › ')}</span>` : ''}
         </div>
       </a>
     </li>`}).join('')}
   </ul>`;
 
-// Recent posts by git last-commit time (fs mtime is unreliable after CI checkout)
-const RECENT_LIMIT = 10;
-const formatMtime = (d) => d.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-const recentPosts = [...posts]
-  .sort((a, b) => (b.lastModified > a.lastModified ? 1 : -1))
-  .slice(0, RECENT_LIMIT);
-
 const recentPostsHtml = recentPosts.length === 0
   ? ''
-  : `<details class="archive-recent">
-        <summary class="archive-tree-header archive-recent-toggle">🕒 最近修改 <span class="tree-count">${recentPosts.length}</span></summary>
+  : `<details class="archive-recent" id="archive-recent">
+        <summary class="archive-tree-header archive-recent-toggle" id="archive-recent-toggle">🕒 最近修改 <span class="tree-count">${recentPosts.length}</span></summary>
         <div class="archive-recent-list">
 ${recentPosts.map(p => {
     const postUrl = p.relativeDir
       ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
       : `/posts-html/${p.slug}.html`;
+    const newBadge = p.isNew ? '<span class="archive-badge-new">新增</span>' : '';
     return `          <a href="${postUrl}" class="archive-recent-item" title="${attrEscape(p.title)}">
-            <span class="archive-recent-title">📄 ${attrEscape(p.title)}</span>
+            <span class="archive-recent-title">📄 ${attrEscape(p.title)}${newBadge}</span>
             <span class="archive-recent-date">${formatMtime(p.lastModified)}</span>
           </a>`;
   }).join('\n')}
@@ -837,6 +875,7 @@ const archiveHtml = `<!DOCTYPE html>
       </aside>
       <div class="archive-main">
         <div id="archive-readme" class="archive-readme" style="display:none;"></div>
+        <p id="archive-recent-hint" class="archive-recent-hint" hidden>按最后修改时间排序</p>
         <div id="search-results" style="display:none;"></div>
         <div id="post-list-wrap">
           ${archiveListHtml}
