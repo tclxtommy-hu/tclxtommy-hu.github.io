@@ -29,7 +29,7 @@ flowchart LR
 | **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 18 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
 | **WorkFlow** | AI 工作流定义与主流编排/自动化工具 | 概念+全景 | [WorkFlow/README.md](WorkFlow/README.md) |
 | **ChatFlow** | AI 对话流定义与主流 Bot/对话编排工具 | 概念+全景 | [ChatFlow/README.md](ChatFlow/README.md) |
-| **AI 工程师学习路线** | 能力模型 + 缺口占位（待补正文） | 38 占位 | [AI工程师学习路线/README.md](AI工程师学习路线/README.md) |
+| **AI 工程师学习路线** | 能力模型 + 缺口占位（待补正文） | 39 占位 | [AI工程师学习路线/README.md](AI工程师学习路线/README.md) |
 
 ---
 

@@ -14,6 +14,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/08-评测框架与基准详解.html</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -142,12 +154,6 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/AI实践/AI开发项目知识库.html</loc>
     <lastmod>2026-08-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</loc>
-    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

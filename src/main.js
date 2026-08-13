@@ -171,10 +171,11 @@ function initParticles() {
 }
 
 // ====== Mermaid diagram rendering ======
-async function initMermaid() {
-  const blocks = document.querySelectorAll('pre code.language-mermaid');
-  if (blocks.length === 0) return;
+let mermaidApi = null;
+let mermaidLightbox = null;
 
+async function getMermaidApi() {
+  if (mermaidApi) return mermaidApi;
   const mermaid = await import('mermaid');
   mermaid.default.initialize({
     startOnLoad: false,
@@ -185,16 +186,281 @@ async function initMermaid() {
       lineColor: '#00f0ff',
     },
   });
+  mermaidApi = mermaid.default;
+  return mermaidApi;
+}
 
-  for (const block of blocks) {
-    const pre = block.parentElement;
-    const code = block.textContent;
-    const div = document.createElement('div');
-    div.className = 'mermaid';
-    div.textContent = code;
-    pre.replaceWith(div);
+async function initMermaid() {
+  const blocks = document.querySelectorAll('pre code.language-mermaid');
+  if (blocks.length > 0) {
+    const mermaid = await getMermaidApi();
+    const created = [];
+    for (const block of blocks) {
+      const pre = block.parentElement;
+      const div = document.createElement('div');
+      div.className = 'mermaid';
+      div.textContent = block.textContent;
+      pre.replaceWith(div);
+      created.push(div);
+    }
+    await mermaid.run({ nodes: created });
   }
-  await mermaid.default.run();
+  enhanceMermaidZoom();
+}
+
+function enhanceMermaidZoom() {
+  document.querySelectorAll('.mermaid').forEach((diagram) => {
+    if (diagram.closest('.mermaid-wrap')) return;
+    if (!diagram.querySelector('svg')) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'mermaid-wrap';
+    diagram.replaceWith(wrap);
+    wrap.appendChild(diagram);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mermaid-zoom-btn';
+    btn.title = '放大查看';
+    btn.setAttribute('aria-label', '放大查看流程图');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`;
+    wrap.appendChild(btn);
+
+    const open = () => openMermaidLightbox(diagram);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      open();
+    });
+    diagram.addEventListener('click', open);
+    diagram.setAttribute('role', 'button');
+    diagram.setAttribute('tabindex', '0');
+    diagram.setAttribute('aria-label', '点击放大查看流程图');
+    diagram.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open();
+      }
+    });
+  });
+}
+
+function getMermaidLightbox() {
+  if (mermaidLightbox) return mermaidLightbox;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mermaid-lightbox';
+  overlay.hidden = true;
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', '流程图放大查看');
+  overlay.innerHTML = `
+    <div class="mermaid-lightbox-bar">
+      <span class="mermaid-lightbox-hint">拖动平移 · 滚轮缩放 · Esc 关闭</span>
+      <div class="mermaid-lightbox-actions">
+        <button type="button" data-action="out" aria-label="缩小">−</button>
+        <span data-zoom-label>100%</span>
+        <button type="button" data-action="in" aria-label="放大">+</button>
+        <button type="button" data-action="fit" aria-label="适应窗口">适应</button>
+        <button type="button" data-action="close" aria-label="关闭">关闭</button>
+      </div>
+    </div>
+    <div class="mermaid-lightbox-viewport">
+      <div class="mermaid-lightbox-world"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const viewport = overlay.querySelector('.mermaid-lightbox-viewport');
+  const world = overlay.querySelector('.mermaid-lightbox-world');
+  const label = overlay.querySelector('[data-zoom-label]');
+  const pointers = new Map();
+  let scale = 1;
+  let tx = 0;
+  let ty = 0;
+  let pinchStart = null;
+  let svgEl = null;
+  let placeholder = null;
+  let svgStyle = null;
+
+  function applyTransform() {
+    world.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    label.textContent = `${Math.round(scale * 100)}%`;
+  }
+
+  function getSvgSize() {
+    if (!svgEl) return { width: 1, height: 1 };
+    const box = svgEl.viewBox?.baseVal;
+    if (box && box.width && box.height) return { width: box.width, height: box.height };
+    const widthAttr = svgEl.getAttribute('width') || '';
+    const heightAttr = svgEl.getAttribute('height') || '';
+    const attrW = parseFloat(widthAttr);
+    const attrH = parseFloat(heightAttr);
+    if (attrW && attrH && !widthAttr.includes('%') && !heightAttr.includes('%')) {
+      return { width: attrW, height: attrH };
+    }
+    const bbox = svgEl.getBBox();
+    return { width: bbox.width || 1, height: bbox.height || 1 };
+  }
+
+  function fitToView() {
+    if (!svgEl) return;
+    const { width, height } = getSvgSize();
+    const pad = 48;
+    const next = Math.min(
+      (viewport.clientWidth - pad) / width,
+      (viewport.clientHeight - pad) / height,
+      1.25
+    );
+    scale = Math.max(next, 0.15);
+    tx = (viewport.clientWidth - width * scale) / 2;
+    ty = (viewport.clientHeight - height * scale) / 2;
+    applyTransform();
+  }
+
+  function zoomAt(clientX, clientY, nextScale) {
+    const rect = viewport.getBoundingClientRect();
+    const cx = clientX - rect.left;
+    const cy = clientY - rect.top;
+    const clamped = Math.min(8, Math.max(0.15, nextScale));
+    const k = clamped / scale;
+    tx = cx - k * (cx - tx);
+    ty = cy - k * (cy - ty);
+    scale = clamped;
+    applyTransform();
+  }
+
+  function zoomCenter(nextScale) {
+    const rect = viewport.getBoundingClientRect();
+    zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, nextScale);
+  }
+
+  function close() {
+    if (overlay.hidden) return;
+    overlay.hidden = true;
+    document.body.classList.remove('is-mermaid-zoomed');
+    if (svgEl && placeholder) {
+      if (svgStyle) {
+        svgEl.style.maxWidth = svgStyle.maxWidth;
+        svgEl.style.width = svgStyle.width;
+        svgEl.style.height = svgStyle.height;
+      }
+      placeholder.replaceWith(svgEl);
+    }
+    world.replaceChildren();
+    svgEl = null;
+    placeholder = null;
+    svgStyle = null;
+    pointers.clear();
+    pinchStart = null;
+  }
+
+  overlay.addEventListener('click', (e) => {
+    const action = e.target.closest('[data-action]')?.dataset.action;
+    if (!action) return;
+    if (action === 'close') close();
+    else if (action === 'in') zoomCenter(scale * 1.25);
+    else if (action === 'out') zoomCenter(scale / 1.25);
+    else if (action === 'fit') fitToView();
+  });
+
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, scale * (e.deltaY < 0 ? 1.12 : 1 / 1.12));
+  }, { passive: false });
+
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    viewport.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinchStart = {
+        dist: Math.hypot(a.x - b.x, a.y - b.y),
+        scale,
+        midX: (a.x + b.x) / 2,
+        midY: (a.y + b.y) / 2,
+      };
+    }
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (!pointers.has(e.pointerId)) return;
+    const prev = pointers.get(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 1) {
+      tx += e.clientX - prev.x;
+      ty += e.clientY - prev.y;
+      applyTransform();
+      return;
+    }
+
+    if (pointers.size === 2 && pinchStart) {
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinchStart.dist > 0) {
+        zoomAt(pinchStart.midX, pinchStart.midY, pinchStart.scale * (dist / pinchStart.dist));
+      }
+    }
+  });
+
+  function endPointer(e) {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchStart = null;
+  }
+  viewport.addEventListener('pointerup', endPointer);
+  viewport.addEventListener('pointercancel', endPointer);
+
+  window.addEventListener('keydown', (e) => {
+    if (overlay.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      zoomCenter(scale * 1.25);
+    } else if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      zoomCenter(scale / 1.25);
+    } else if (e.key === '0') {
+      e.preventDefault();
+      fitToView();
+    }
+  });
+
+  mermaidLightbox = {
+    overlay,
+    world,
+    open(diagram) {
+      const svg = diagram.querySelector('svg');
+      if (!svg) return;
+      placeholder = document.createComment('mermaid-svg');
+      svgStyle = {
+        maxWidth: svg.style.maxWidth,
+        width: svg.style.width,
+        height: svg.style.height,
+      };
+      svg.replaceWith(placeholder);
+      svg.style.maxWidth = 'none';
+      const box = svg.viewBox?.baseVal;
+      if (box && box.width && box.height) {
+        svg.style.width = `${box.width}px`;
+        svg.style.height = `${box.height}px`;
+      } else {
+        svg.style.width = svg.getAttribute('width') || '';
+        svg.style.height = svg.getAttribute('height') || '';
+      }
+      world.replaceChildren(svg);
+      svgEl = svg;
+      overlay.hidden = false;
+      document.body.classList.add('is-mermaid-zoomed');
+      requestAnimationFrame(fitToView);
+    },
+    close,
+  };
+  return mermaidLightbox;
+}
+
+function openMermaidLightbox(diagram) {
+  getMermaidLightbox().open(diagram);
 }
 
 // ====== PWA Service Worker ======
@@ -279,6 +545,7 @@ function initSearch() {
     if (node && node.readme) {
       readmeEl.innerHTML = node.readme;
       readmeEl.style.display = '';
+      initMermaid();
     } else if (node && node.children && node.children.length > 0) {
       // Folder has subfolders but no README
       readmeEl.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px 0;font-size:0.95rem;">📂 请点击具体文档查看内容</p>';
