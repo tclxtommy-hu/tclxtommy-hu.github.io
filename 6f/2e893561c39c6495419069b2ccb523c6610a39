@@ -1,0 +1,26 @@
+"posts/AI/Harness/harness 框架/AgentScope/得物知识问答：复合检索AGENT的系统设计实践.md"
+  s_3500f05e7c50d8::t_284e2fd963da4d 6
+scripts/build-posts.js
+  s_3500f05e7c50d8::t_5cac50eca5a18f 265,269,271-272
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "6f2e893561c39c6495419069b2ccb523c6610a39",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_3500f05e7c50d8": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "eb1faefc04844c0da676c797296af5cb",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
