@@ -3,7 +3,7 @@ title: 得物知识问答：复合检索 AGENT 的系统设计实践
 author: 莲舟（得物技术）
 source: 微信公众号「得物技术」
 original_url: https://mp.weixin.qq.com/s/EIXbIqUYcnFHpwAiPsJDEg
-date: 未注明（原文仅提及"每周三更新技术干货"）
+date: 2026-08-12
 ---
 
 # 得物知识问答：复合检索 AGENT 的系统设计实践

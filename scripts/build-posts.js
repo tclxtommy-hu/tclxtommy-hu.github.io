@@ -262,12 +262,14 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
 
   if (data.date) {
     const d = data.date instanceof Date ? data.date : new Date(data.date);
-    if (d instanceof Date && !isNaN(d)) {
+    if (d instanceof Date && !isNaN(d.getTime())) {
       dateStr = formatDate(d);
       sortDate = d;
     } else {
+      // Unparseable date (e.g. free text) — fall back to slug/mtime, keep date label as-is.
       dateStr = String(data.date);
-      sortDate = new Date(data.date);
+      const m = slug.match(/(\d{4}-\d{2}-\d{2})/);
+      sortDate = m ? new Date(m[1]) : lastModified;
     }
   } else {
     const m = slug.match(/(\d{4}-\d{2}-\d{2})/);
