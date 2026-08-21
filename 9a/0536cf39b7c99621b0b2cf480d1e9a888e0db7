@@ -1,0 +1,30 @@
+posts/AI/Harness/cleanup.ps1
+  s_3500f05e7c50d8::t_ecc3884da41a9e 1-10
+posts/AI/AI编程范式/AI辅助编程范式/09-harness-engineering.md
+  h_63381fac4a1ac5 70
+"posts/AI/Harness/harness 框架/AgentScope/得物知识问答：复合检索AGENT的系统设计实践.md"
+  s_3500f05e7c50d8::t_485c5b7b692d60 1-359
+raw.html
+  s_3500f05e7c50d8::t_b70cd9b762bb4b 1-46986
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "9a0536cf39b7c99621b0b2cf480d1e9a888e0db7",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_3500f05e7c50d8": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "eb1faefc04844c0da676c797296af5cb",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
