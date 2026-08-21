@@ -384,8 +384,12 @@ function buildPostsTree(baseDir) {
         const childRelPath = path.relative(baseDir, fullPath);
         const child = { name: entry.name, path: childRelPath, children: [], posts: [], readme: null, totalCount: 0 };
         walk(fullPath, child, childRelPath);
-        // Include if it has children or any .md files (we count posts later)
-        const hasContent = child.children.length > 0 || fs.readdirSync(fullPath).some(f => f.endsWith('.md') && f !== 'README.md');
+        // Keep folders that have nested content, a README, or any other .md
+        // (README-only dirs still appear in the archive tree; README stays inline-only)
+        const hasContent =
+          child.children.length > 0 ||
+          !!child.readme ||
+          fs.readdirSync(fullPath).some((f) => f.endsWith('.md'));
         if (hasContent) {
           node.children.push(child);
         }
@@ -441,8 +445,10 @@ function buildTreeHtml(node, level) {
   const indent = '  '.repeat(level);
   const hasChildren = node.children.length > 0;
   const hasPosts = node.posts.length > 0;
+  const hasReadme = !!node.readme;
 
-  if (!hasChildren && !hasPosts) return '';
+  // Include README-only folders (no posts / no children) so they stay navigable
+  if (!hasChildren && !hasPosts && !hasReadme) return '';
 
   // Every non-empty node is a collapsible folder
   const open = (level === 0 || level === 1) ? ' open' : '';
@@ -450,7 +456,12 @@ function buildTreeHtml(node, level) {
   let html = `${indent}<details class="tree-folder" data-path="${urlPath}"${open}>\n`;
   html += `${indent}  <summary class="tree-node${level === 0 ? ' tree-root' : ''}" data-path="${urlPath}">`;
   html += level === 0 ? '' : '📁 ';
-  html += `${name} <span class="tree-count">${node.totalCount}</span></summary>\n`;
+  html += name;
+  // Article count only; README-only folders omit the badge instead of showing 0
+  if (node.totalCount > 0) {
+    html += ` <span class="tree-count">${node.totalCount}</span>`;
+  }
+  html += `</summary>\n`;
 
   // Sub-folders first
   for (const child of node.children) {

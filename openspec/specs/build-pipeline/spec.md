@@ -16,6 +16,12 @@
 - **THEN** 该文件不生成独立 HTML 页面（`build-posts.js:30`）
 - **AND** 其内容被提取到 `archive.html` 内联展示（`build-posts.js:298-306`）
 
+#### Scenario: 仅 README 的目录仍出现在归档树
+
+- **WHEN** 某目录下只有 `README.md`（无其它 `.md` 正文）
+- **THEN** 该目录仍出现在 `archive.html` 目录树与 `__POSTS_TREE__` 中
+- **AND** 点击该目录时在归档页内联展示其 README（仍不生成独立 HTML 页面）
+
 #### Scenario: 跳过 dot 文件
 
 - **WHEN** 构建扫描到以 `.` 开头的文件（如 `.build-link-guide.md`）
