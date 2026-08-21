@@ -66,9 +66,9 @@ CodeBuddy、Cursor、Cline、Aider——这些**产品本身就是 harness**：
 
 上面提到的 Claude Code、Cursor、Cline、Aider 是**成品 harness**——开箱即用的运行时，面向终端用户。但还有一类是**harness 框架**：提供积木让你组装自己的 harness。两者都是 harness，只是交付形态不同。
 
-| 类型 | 性质 | 举例 | 你拿到后 |
-|------|------|------|----------|
-| **成品 harness** | 开箱即用的运行时，面向终端用户 | Claude Code、Cursor、Cline、Aider | 直接用，已是 Agent 产品 |
+| 类型　　　　　　 | 性质　　　　　　　　　　　　　 | 举例　　　　　　　　　　　　　　　　　　　　　　　　　　　| 你拿到后　　　　　　　　　　　|
+| ------------------| --------------------------------| -----------------------------------------------------------| -------------------------------|
+| **成品 harness** | 开箱即用的运行时，面向终端用户 | Claude Code、Cursor、Cline、Aider　　　　　　　　　　　　 | 直接用，已是 Agent 产品　　　 |
 | **harness 框架** | 提供积木让你组装自己的 harness | AgentScope、LangChain、AutoGen、CrewAI、LlamaIndex Agents | 还要写代码拼出一个 agent 应用 |
 
 一个是盖好的房子，一个是乐高积木。用框架搭出来的那个具体多 Agent 应用，才是真正承载 LLM 运行的 harness；框架本身是造 harness 的脚手架。
