@@ -1,0 +1,66 @@
+demo/jsonl-zstd/tsconfig.json
+  s_b64d9dc9d45123::t_95972b61e134bf 1-15
+demo/jsonl-zstd/.gitignore
+  s_b64d9dc9d45123::t_6c66a0626812ae 1-5
+demo/jsonl-zstd/src/decompress.ts
+  s_b64d9dc9d45123::t_181df6ddd2f390 1-32
+demo/jsonl-zstd/package.json
+  s_b64d9dc9d45123::t_5c0079fe60b542 1-20,22-29
+  s_b64d9dc9d45123::t_82a9c81f77dd38 21
+demo/jsonl-zstd/src/lz-string-demo.ts
+  h_63381fac4a1ac5 1-46
+demo/jsonl-zstd/src/types.ts
+  s_b64d9dc9d45123::t_eb0aa39aad3eb9 1-10
+demo/jsonl-zstd/README.md
+  s_b64d9dc9d45123::t_49576777d0993d 1-7,9-10,12-38,40-57,59-75,77-87,91-101
+  s_b64d9dc9d45123::t_f8fa3a519dee49 8,11,39,58,76,88-90
+posts/AI/AI实践/日志处理-JSONL-zstd.md
+  s_fe0f0dc2661e1a::t_23dfc3b1fdd5c2 3,109-152
+demo/jsonl-zstd/src/config.ts
+  s_b64d9dc9d45123::t_c1f1c218b43ee4 1-32
+demo/jsonl-zstd/src/stream.ts
+  s_b64d9dc9d45123::t_10fec014bca5f1 1-48
+demo/jsonl-zstd/.npmrc
+  s_b64d9dc9d45123::t_90611494df6c6d 1
+demo/jsonl-zstd/src/jsonl-zstd.ts
+  s_b64d9dc9d45123::t_add57b4967aca1 4,11-21,25,29,44,47,64,66
+  s_b64d9dc9d45123::t_78adeed957105d 109,135
+  s_b64d9dc9d45123::t_c2ce86cae7a67f 1-3,5-10,22-24,26-28,30-43,45-46,48-63,65,67-108,110-134,136-182
+demo/jsonl-zstd/src/index.ts
+  s_b64d9dc9d45123::t_e999d03d95b019 1-60
+.github/copilot-instructions.md
+  s_b64d9dc9d45123::t_800908c3c5c9a7 89-100
+demo/jsonl-zstd/src/compress.ts
+  s_b64d9dc9d45123::t_7e7556e2b3ba21 1-65
+demo/jsonl-zstd/pnpm-lock.yaml
+  s_b64d9dc9d45123::t_7f6029fa7e2266 1-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "cc2ecb3d5adb3a2c3ce399b4639eebbf8bc5472d",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_b64d9dc9d45123": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "4369a5b3-8d01-4f65-b392-d328c836ba72",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_fe0f0dc2661e1a": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "7fbe32ea-707f-4beb-978c-0e6968f2c1ea",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
