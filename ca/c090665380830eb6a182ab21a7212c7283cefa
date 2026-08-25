@@ -1,0 +1,28 @@
+posts/AI/AI实践/日志处理-JSONL-zstd.md
+  s_3a311b2c2895b7::t_12b7ec99234044 16-32
+  s_3a311b2c2895b7::t_4f5fb357e0cfcc 1-2,4-15,33-456,507-574
+  s_3a311b2c2895b7::t_6b5d09fa76d3f9 3,457-506
+posts/AI/AI知识库/14-评估与安全/01-模型评估.md
+  h_63381fac4a1ac5 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "cac090665380830eb6a182ab21a7212c7283cefa",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_3a311b2c2895b7": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "416c3cd4-775f-4a7e-96bc-029fb0616352",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
