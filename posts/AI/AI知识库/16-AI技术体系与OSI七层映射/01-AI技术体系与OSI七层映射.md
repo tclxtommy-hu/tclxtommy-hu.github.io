@@ -42,6 +42,8 @@ AI 技术栈同样可以这么看：底层是算力与模型权重，往上是�
 
 > 类比：就像网卡把比特流送上线路， **LLM** 把张量运算"送上"概率分布。
 
+> **硬件是 L1 的物理实体，值得单独一篇** ：上面对"算力"的阐述偏向"权重 + 推理框架"的软件视角，真正的芯片、显存、卡间互联、服务器与集群被一笔带过。详见姊妹篇 → [02-物理层硬件：芯片与算力底座](02-物理层硬件：芯片与算力底座.md) ，把 L1 落到硅与电：为什么是 GPU 不是 CPU、HBM 带宽为何比峰值算力更关键、NVLink/PCIe/IB 如何决定并行效率、集群与 PUE 如何决定真成本。
+
 ### L2 数据链路层 → 上下文与检索层
 
 网络的数据链路层负责"相邻节点之间可靠地传一帧"。在 AI 栈里，这一步对应 **把外部知识可靠地接进模型可理解的表示** —— 也就是 RAG 的底层。
@@ -155,3 +157,13 @@ L1 物理层     : LLM 在 GPU 上完成 token 生成，vLLM 返回结果
 | **Rerank** | /ˌriːˈræŋk/ | Re-rank | 重排序 |
 | **Chunking** | /ˈtʃʌŋkɪŋ/ | Chunking | 文本分块 |
 | **Transformer** | /trænsˈfɔːmə/ | Transformer | 变换器（注意力架构） |
+| **GPU** | /ˌdʒiː piː ˈjuː/ | Graphics Processing Unit | 图形处理器 |
+| **TPU** | /ˌtiː piː ˈjuː/ | Tensor Processing Unit | 张量处理单元 |
+| **NPU** | /ˌɛn piː ˈjuː/ | Neural Processing Unit | 神经网络处理器 |
+| **VRAM** | /vɪ ˈræm/ | Video Random Access Memory | 显存 |
+| **HBM** | /ˌeɪtʃ biː ˈem/ | High Bandwidth Memory | 高带宽内存 |
+| **FLOPS** | /ˈflɒps/ | Floating Point Operations Per Second | 每秒浮点运算数 |
+| **NVLink** | /ˌɛn viː lɪŋk/ | （NVIDIA 高速 GPU 互联） | NVIDIA 高速互联 |
+| **PCIe** | /ˌpiː siː ˈaɪ iː/ | Peripheral Component Interconnect Express | 高速外设总线 |
+| **IB** | /ˌaɪ ˈbiː/ | InfiniBand | 无限带宽网络 |
+| **PUE** | /ˌpiː juː ˈiː/ | Power Usage Effectiveness | 电源使用效率 |
