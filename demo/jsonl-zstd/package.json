@@ -1,0 +1,29 @@
+{
+  "name": "jsonl-zstd-demo",
+  "version": "1.0.0",
+  "description": "基于 Node.js + TypeScript 的 JSONL + zstd 日志压缩/解压/流式处理示例（@mongodb-js/zstd 原生绑定 + simple-zstd 流式 + lz-string 对照）",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "precompress": "pnpm build",
+    "compress": "node dist/compress.js",
+    "predecompress": "pnpm build",
+    "decompress": "node dist/decompress.js",
+    "prestream": "pnpm build",
+    "stream": "node dist/stream.js",
+    "prelz": "pnpm build",
+    "lz": "node dist/lz-string-demo.js",
+    "predemo": "pnpm build",
+    "demo": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bokuweb/zstd-wasm": "^0.0.27",
+    "lz-string": "^1.5.0",
+    "simple-zstd": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

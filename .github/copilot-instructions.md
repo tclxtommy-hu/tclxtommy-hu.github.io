@@ -86,6 +86,18 @@ tags: [日志]
 这是第一篇文章。
 ```
 
+## npm 镜像约定（强制）
+
+当在 `demo/` 下创建或初始化任何 Node.js 子项目（含 `package.json` 的目录）时，**必须**在项目根目录创建 `.npmrc` 文件，写入淘宝 npm 镜像源：
+
+```ini
+registry=https://registry.npmmirror.com/
+```
+
+- 该约定适用于 `pnpm` / `npm` / `yarn`，统一走淘宝镜像加速依赖安装。
+- 若项目已有 `.npmrc`，检查是否已配置淘宝源；未配置则补充，已配置则不重复添加。
+- 安装依赖时优先使用 `pnpm install`。
+
 ## 其他约定
 
 - 中文文档，请使用中文回复与注释。
