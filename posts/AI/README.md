@@ -23,7 +23,7 @@ flowchart LR
 
 | 知识库 | 定位 | 篇数 | 入口 |
 |--------|------|------|------|
-| **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，15 个模块 | ~45 篇 | [AI知识库/README.md](AI知识库/README.md) |
+| **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，16 个模块 | ~46 篇 | [AI知识库/README.md](AI知识库/README.md) |
 | **Agent 开发知识** | Agent 开发专题，01–12 + 13 工程化补遗 | ~40 篇 | [Agent开发知识/README.md](Agent开发知识/README.md) |
 | **Agent 设计模式** | Agent 架构设计模式，含原理+场景+示例代码 | 9 篇 | [Agent设计模式/README.md](Agent设计模式/README.md) |
 | **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 18 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
@@ -139,6 +139,11 @@ flowchart LR
 |------|------|
 | [01-推理模型.md](AI知识库/15-前沿与趋势/01-推理模型.md) | o1/R1、Test-time 计算、思维链训练 |
 | [02-AGI路径与未来.md](AI知识库/15-前沿与趋势/02-AGI路径与未来.md) | AGI、超级对齐、未来展望 |
+
+### 16 AI 技术体系横向映射（OSI 七层）
+| 文件 | 主题 |
+|------|------|
+| [01-AI技术体系与OSI七层映射.md](AI知识库/16-AI技术体系与OSI七层映射/01-AI技术体系与OSI七层映射.md) | 用 OSI 七层模型给 LLM/Agent/RAG/MCP 等做分层归位的心智模型 |
 
 ---
 

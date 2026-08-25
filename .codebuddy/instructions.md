@@ -117,6 +117,18 @@ tags: [日志]
 - [ ] 普通 post 中所有内部链接是否用了 `.html`？
 - [ ] 相对路径是否正确（`../` 可安全使用）？
 
+## 代码示例语言约定（强制）
+
+在本仓库文章（`.md`）中编写代码示例时，**语言选择顺序固定**：
+
+1. **首选 Node.js + TypeScript（Node.js + TS）**：所有 SDK 调用、脚本、工具函数示例，默认用 TS 写成，尽量带类型标注。
+2. **次选 Python**：仅当 TS 示例不足以说明（如某 SDK 无 TS 类型）时，再补 Python 版本；**不要以 Python 作为唯一示例**。
+3. **其他语言**（Go / Java / Bash 等）：仅作必要补充，不作为主示例。
+
+同一概念有多语言示例时，用注释或小节标题区分「主示例（TS）」与「补充（Python）」。已发布的 Python 为主旧文档不强行全量回改，重构/大幅增补时逐步改为 TS 优先。
+
+完整规则见 `.cursor/rules/code-sample-language.mdc` 与 `.workbuddy/rules/code-sample-language.mdc`（双端同步）。
+
 ## 其他约定
 
 - 中文文档，请使用中文回复与注释。
@@ -124,3 +136,4 @@ tags: [日志]
 - 写文章时在 `posts/` 目录下新建 `.md` 文件，支持 front matter（`title` / `date` / `tags`）。
 - 不要删除 `.codebuddy` 目录，其中存放项目相关数据与配置。
 - 详细构建链接规则见 `posts/.build-link-guide.md`。
+- Markdown 编写规范细则见 `.codebuddy/rules/*.mdc`（与 `.cursor/rules/`、`.workbuddy/rules/` 三端同步）：加粗留白 `markdown-bold-spacing`、英文音标 `markdown-english-ipa`、缩写全拼+音标 `markdown-abbreviation`、代码示例语言 `code-sample-language`。编辑任何 `.md` 时务必遵守。

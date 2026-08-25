@@ -1,0 +1,50 @@
+---
+description: 文章中代码示例优先使用 Node.js + TypeScript，其次 Python
+globs: "**/*.md"
+alwaysApply: true
+---
+
+# 代码示例语言约定：Node.js + TS 优先，Python 次之
+
+在本仓库文章（`.md`）中编写代码示例时，**语言选择顺序固定为**：
+
+1. **首选 Node.js + TypeScript（Node.js + TS）**：所有 SDK 调用、脚本、工具函数示例，默认用 TS 写成。
+2. **次选 Python**：仅当 TS 示例不足以说明（如某 SDK 无 TS 类型、或概念本身 Python 更直观）时，再补 Python 版本；不要以 Python 作为唯一示例。
+3. **其他语言**（Go / Java / Bash 等）：仅作必要补充，不作为主示例。
+
+## 正确（TS 为主，Python 可选补充）
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI();
+const resp = await client.chat.completions.create({
+  model: "gpt-4o",
+  messages: [{ role: "system", content: "你是简洁的技术助手" }],
+});
+console.log(resp.choices[0].message.content);
+```
+
+<!-- 仅在必要时补充 Python，且标注"补充" -->
+
+```python
+from openai import OpenAI
+client = OpenAI()
+print(client.chat.completions.create(model="gpt-4o", messages=[...]).choices[0].message.content)
+```
+
+## 错误（不要这样写）
+
+```python
+# 全篇只用 Python，没有 TS 主示例 —— 违反约定
+from openai import OpenAI
+...
+```
+
+## 要点
+
+1. **TS 为主**：新写/重写代码示例时，先给 TS 版本，再按需补 Python。
+2. **已有 Python 为主的旧文档**：重构或大幅增补时逐步改为 TS 优先；不强行全量回改历史文章。
+3. **标注清晰**：同一概念有多语言示例时，用注释或小节标题区分「主示例（TS）」与「补充（Python）」。
+4. **类型优先**：TS 示例尽量带类型标注（如 `interface`、`type`、函数签名），体现 TS 优势。
+5. **与现有规范共存**：加粗留白、音标、缩写规则仍照常遵守（见 `markdown-bold-spacing` / `markdown-english-ipa` / `markdown-abbreviation`）。
