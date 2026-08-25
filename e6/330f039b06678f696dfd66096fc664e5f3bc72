@@ -1,0 +1,75 @@
+posts/AI/AI知识库/16-AI技术体系与OSI七层映射/01-AI技术体系与OSI七层映射.md
+  s_7b924122b31976::t_f82b81fa6fe115 1-133,141,143-157
+  s_7b924122b31976::t_489c6be4864108 134-140,142
+posts/AI/README.md
+  s_7b924122b31976::t_41b14c17a7d19e 143-147
+  s_7b924122b31976::t_3dfd499141332d 26
+.codebuddy/rules/markdown-bold-spacing.mdc
+  s_6de3314aa13810::t_0651db9cf91bd6 1-34
+.codebuddy/rules/markdown-abbreviation.mdc
+  s_6de3314aa13810::t_8716cc23e138ab 1-58
+posts/AI/AI工程师学习路线/README.md
+  s_7b924122b31976::t_142b176d90f0f4 78
+  s_7b924122b31976::t_ea73d2bdaca8f1 96
+.cursor/rules/code-sample-language.mdc
+  s_6de3314aa13810::t_c884f9154ff4c6 1-50
+.codebuddy/instructions.md
+  s_6de3314aa13810::t_c6c07115046364 139
+  s_6de3314aa13810::t_5be41055128b17 120-131
+.codebuddy/rules/markdown-english-ipa.mdc
+  s_6de3314aa13810::t_f0f57428a1f637 1-40
+.codebuddy/rules/code-sample-language.mdc
+  s_6de3314aa13810::t_4aef36e456599a 1-50
+.github/copilot-instructions.md
+  s_6de3314aa13810::t_2ba53c062b944f 101-112
+posts/AI/AI工程师学习路线/01-LLM核心行为/02-消息角色与提示结构.md
+  s_6de3314aa13810::t_df17c3e9e90f32 3,10-12,14-287,296,298-303
+posts/AI/Harness/harness框架/PI/README.md
+  s_9eb0cd63057760::t_0f92f71c638731 1-65
+"posts/AI/Harness/harness框架/DeepSeek Harness/README.md"
+  s_9eb0cd63057760::t_fb18ef7cbce622 1-61
+.workbuddy/rules/code-sample-language.mdc
+  s_6de3314aa13810::t_ca72a3cabd10f8 1-50
+.workbuddy/memory/MEMORY.md
+  s_6de3314aa13810::t_6d93b8d232462c 3-10,15,17
+posts/AI/AI知识库/README.md
+  s_7b924122b31976::t_6c797acbc4d2e5 139-143
+  s_7b924122b31976::t_fc28b8d70249a0 7,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "e6330f039b06678f696dfd66096fc664e5f3bc72",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_6de3314aa13810": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "ec83b78b271447e4b6785a9bcb597814",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_7b924122b31976": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "74bd905f9ae949ad89c52532406674bd",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_9eb0cd63057760": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "0b3bab6b02bf4d6286d454c2d64bab2e",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
