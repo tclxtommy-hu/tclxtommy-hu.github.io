@@ -1,0 +1,29 @@
+posts/AI/AI知识库/16-AI技术体系与OSI七层映射/02-物理层硬件：芯片与算力底座.md
+  s_9dc5acef507fd6::t_692f5aeaa312f3 234-240
+  s_9dc5acef507fd6::t_c48477bf6e8092 1-102,183-233
+  s_9dc5acef507fd6::t_f4823024cf3c2f 103-182
+posts/AI/AI知识库/16-AI技术体系与OSI七层映射/01-AI技术体系与OSI七层映射.md
+  s_9dc5acef507fd6::t_2c8a2ae3729068 160-169
+  s_9dc5acef507fd6::t_f6d860ece75e89 45-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "bb8b2ce5687cde2a4aad2c1e22bf5a5e490bab6c",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_9dc5acef507fd6": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "90745e83f66c491f9cbf2733ea61c5fd",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
