@@ -158,6 +158,10 @@ a:hover { color: var(--accent3); }
   font-size: 0.9rem;
 }
 
+.post-content,
+.archive-readme {
+  overflow-wrap: break-word;
+}
 .post-content h1, .post-content h2, .post-content h3,
 .post-content h4, .post-content h5, .post-content h6 {
   margin-top: 1.8em;
@@ -190,6 +194,7 @@ a:hover { color: var(--accent3); }
   border-radius: 4px;
   font-size: 0.9em;
   font-family: "Fira Code", "Consolas", monospace;
+  overflow-wrap: anywhere;
 }
 .post-content pre {
   background: #111122;
@@ -340,11 +345,16 @@ body.is-mermaid-zoomed {
   width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
+  /* Wide tables scroll inside their box instead of pushing the page wider */
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .post-content th, .post-content td {
   border: 1px solid var(--border);
   padding: 8px 12px;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 .post-content th { background: #1a1a2e; font-weight: 600; }
 .post-content hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
@@ -780,6 +790,7 @@ body.is-mermaid-zoomed {
   padding: 1px 5px;
   border-radius: 3px;
   font-size: 0.88em;
+  overflow-wrap: anywhere;
 }
 .archive-readme pre {
   background: #111122;
@@ -796,11 +807,15 @@ body.is-mermaid-zoomed {
   border-collapse: collapse;
   margin: 0.8em 0;
   font-size: 0.85rem;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .archive-readme th, .archive-readme td {
   border: 1px solid var(--border);
   padding: 6px 10px;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 .archive-readme th { background: #1a1a2e; }
 
@@ -881,11 +896,66 @@ body.is-mermaid-zoomed {
 
 @media (max-width: 900px) {
   .archive-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .archive-sidebar {
     position: static;
     max-height: none;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden auto;
+  }
+  .archive-main {
+    min-width: 0;
+    max-width: 100%;
+  }
+  /* Long nested titles wrap instead of pushing the layout wider than the screen */
+  .archive-tree .tree-node,
+  .archive-tree .tree-post {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .archive-tree .tree-post {
+    margin-left: 8px;
+    padding-left: 12px;
+  }
+}
+
+/* Back to top */
+.back-to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 120;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(20, 20, 40, 0.72);
+  color: var(--accent);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s, background 0.2s, border-color 0.2s;
+}
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.back-to-top:hover {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.12);
+}
+@media (max-width: 640px) {
+  .back-to-top {
+    right: 14px;
+    bottom: 18px;
   }
 }
 

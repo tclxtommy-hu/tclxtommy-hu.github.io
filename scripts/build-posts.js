@@ -766,33 +766,38 @@ const indexHtml = `<!DOCTYPE html>
     <div class="room-tip">Click an object to explore · Drag to orbit · Scroll to zoom</div>
   </div>
   <script type="module" src="/src/main.js"></script>
-  <!-- Background Music -->
-  <!-- <audio id="bgm" src="/assets/yesterdayOnceMore.mp3" loop preload="auto" muted autoplay></audio> -->
-  <!-- <button type="button" id="bgm-btn" class="bgm-btn" aria-label="背景音乐">🎵</button> -->
+  <!-- Background Music (lazy: audio loads only after the first click, never on page load) -->
+  <button type="button" id="bgm-btn" class="bgm-btn" aria-label="播放背景音乐" title="背景音乐">🎵</button>
   <script>
-    // (function() {
-    //   var btn = document.getElementById('bgm-btn');
-    //   var bgm = document.getElementById('bgm');
-    //   var playing = true;
-    //   function setPlaying(state) {
-    //     playing = state;
-    //     if (state) { btn.classList.add('playing'); btn.textContent = '🎵'; }
-    //     else { btn.classList.remove('playing'); btn.textContent = '🔇'; }
-    //   }
-    //   setPlaying(true);
-    //   bgm.muted = false;
-    //   bgm.play().then(function() {
-    //     setPlaying(true);
-    //   }).catch(function(err) {
-    //     setPlaying(false);
-    //     console.log('浏览器阻止播放', err);
-    //   });
-
-    //   btn.addEventListener('click', function() {
-    //     if (playing) { bgm.pause(); setPlaying(false); }
-    //     else { bgm.play().then(function(){ setPlaying(true); }).catch(function(){}); }
-    //   });
-    // })();
+    (function() {
+      var btn = document.getElementById('bgm-btn');
+      var bgm = null;
+      function setPlaying(state) {
+        if (state) { btn.classList.add('playing'); btn.textContent = '🎵'; btn.setAttribute('aria-label', '暂停背景音乐'); }
+        else { btn.classList.remove('playing'); btn.textContent = '🔇'; btn.setAttribute('aria-label', '播放背景音乐'); }
+      }
+      setPlaying(false);
+      btn.addEventListener('click', function() {
+        if (!bgm) {
+          bgm = new Audio();
+          bgm.preload = 'none';
+          bgm.loop = true;
+          bgm.src = '/assets/moonraiver.mp3';
+          bgm.addEventListener('error', function() { setPlaying(false); });
+        }
+        if (bgm.paused) {
+          bgm.play().then(function() {
+            setPlaying(true);
+          }).catch(function(err) {
+            setPlaying(false);
+            console.warn('背景音乐播放失败', err);
+          });
+        } else {
+          bgm.pause();
+          setPlaying(false);
+        }
+      });
+    })();
   </script>
   <script>
     (function() {

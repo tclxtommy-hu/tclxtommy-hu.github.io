@@ -192,20 +192,35 @@ async function getMermaidApi() {
 
 async function initMermaid() {
   const blocks = document.querySelectorAll('pre code.language-mermaid');
-  if (blocks.length > 0) {
+  if (blocks.length === 0) {
+    enhanceMermaidZoom();
+    return;
+  }
+  try {
     const mermaid = await getMermaidApi();
-    const created = [];
+    let index = 0;
     for (const block of blocks) {
       const pre = block.parentElement;
       const div = document.createElement('div');
       div.className = 'mermaid';
       div.textContent = block.textContent;
       pre.replaceWith(div);
-      created.push(div);
+      try {
+        // Render one by one: a single failed diagram must not abort the rest
+        const { svg, bindFunctions } = await mermaid.render(`mermaid-svg-${++index}`, div.textContent);
+        div.innerHTML = svg;
+        if (bindFunctions) bindFunctions(div);
+      } catch (err) {
+        // Fall back to the original code block for this diagram only
+        console.warn('[mermaid] diagram render failed:', err);
+        div.replaceWith(pre);
+      }
     }
-    await mermaid.run({ nodes: created });
+  } catch (err) {
+    console.warn('[mermaid] init failed:', err);
+  } finally {
+    enhanceMermaidZoom();
   }
-  enhanceMermaidZoom();
 }
 
 function enhanceMermaidZoom() {
@@ -514,9 +529,33 @@ function initSearch() {
   let currentPath = '';
   let viewMode = 'path';
   let syncingRecent = false;
+  let savedTreeState = null;
 
   function isDesktopArchive() {
     return desktopRecentMq.matches;
+  }
+
+  function getTreeFolderDetails() {
+    const treeEl = document.getElementById('archive-tree');
+    return treeEl ? [...treeEl.querySelectorAll('details.tree-folder')] : [];
+  }
+
+  // Collapse the whole tree while searching; remember previous open state
+  function collapseTreeForSearch() {
+    if (savedTreeState) return;
+    savedTreeState = new Set();
+    getTreeFolderDetails().forEach((details) => {
+      if (details.open) savedTreeState.add(details.dataset.path || '');
+      details.open = false;
+    });
+  }
+
+  function restoreTreeFromSearch() {
+    if (!savedTreeState) return;
+    getTreeFolderDetails().forEach((details) => {
+      details.open = savedTreeState.has(details.dataset.path || '');
+    });
+    savedTreeState = null;
   }
 
   if (archiveListEl) {
@@ -705,6 +744,7 @@ function initSearch() {
       }
       if (recentDetails.open) {
         if (input) input.value = '';
+        restoreTreeFromSearch();
         applyRecentFilter();
       } else if (viewMode === 'recent') {
         applyPathFilter('');
@@ -745,6 +785,7 @@ function initSearch() {
     if (!query) {
       resultsEl.style.display = 'none';
       listWrap.style.display = '';
+      restoreTreeFromSearch();
       // Restore tree / recent filter
       if (viewMode === 'recent') applyRecentFilter();
       else applyPathFilter(currentPath);
@@ -763,6 +804,7 @@ function initSearch() {
 
     listWrap.style.display = 'none';
     resultsEl.style.display = '';
+    collapseTreeForSearch();
     if (readmeEl) readmeEl.style.display = 'none';
     if (recentHint) recentHint.hidden = true;
 
@@ -964,6 +1006,29 @@ function initWeChatShare() {
     });
 }
 
+// ====== Back to top ======
+function initBackToTop(isHome3D) {
+  if (isHome3D) return;
+  if (document.querySelector('.back-to-top')) return;
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'back-to-top';
+  btn.setAttribute('aria-label', '回到顶部');
+  btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 4l8 8h-5v8h-6v-8H4z"/></svg>`;
+  document.body.appendChild(btn);
+
+  const toggle = () => {
+    btn.classList.toggle('is-visible', window.scrollY > window.innerHeight);
+  };
+  toggle();
+  window.addEventListener('scroll', toggle, { passive: true });
+  window.addEventListener('resize', toggle, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 // Init
 initHomeRoomIfNeeded().then((isHome3D) => {
   if (!isHome3D) {
@@ -974,4 +1039,5 @@ initHomeRoomIfNeeded().then((isHome3D) => {
   initPostToc();
   initWeChatShare();
   initMermaid();
+  initBackToTop(isHome3D);
 });
