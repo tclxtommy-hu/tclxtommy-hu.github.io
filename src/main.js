@@ -1,9 +1,15 @@
 import './style.css';
 
-async function initHomeRoomIfNeeded() {
+function initHomeRoomIfNeeded() {
   if (document.body?.dataset?.page !== 'home-3d') return false;
-  const { initHome3DRoom } = await import('./three-room.js');
-  initHome3DRoom();
+  // three.js is ~160KB gzipped: defer it until the page settles so it never
+  // competes with the critical rendering path
+  const load = () => import('./three-room.js').then((m) => m.initHome3DRoom()).catch(() => {});
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => load(), { timeout: 3000 });
+  } else {
+    setTimeout(load, 1200);
+  }
   return true;
 }
 
@@ -34,6 +40,10 @@ function initHomeSearchModal() {
     indexData = await res.json();
     return indexData;
   }
+
+  // Prefetch the index at the user's first interaction so the very search
+  // doesn't have to wait for the full JSON download
+  document.addEventListener('pointerdown', () => { loadIndex().catch(() => {}); }, { once: true, passive: true });
 
   function setOpen(open) {
     modal.hidden = !open;
@@ -118,6 +128,7 @@ function initParticles() {
   const ctx = canvas.getContext('2d');
   let w, h;
   const points = [];
+  const LINK_DIST_SQ = 120 * 120;
 
   function resize() {
     w = canvas.width = innerWidth;
@@ -139,29 +150,34 @@ function initParticles() {
   }
 
   function animate() {
-    ctx.clearRect(0, 0, w, h);
-    for (const p of points) {
-      p.x += p.speedX;
-      p.y += p.speedY;
-      if (p.x < 0 || p.x > w) p.speedX *= -1;
-      if (p.y < 0 || p.y > h) p.speedY *= -1;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    }
-    for (let a = 0; a < points.length; a++) {
-      for (let b = a + 1; b < points.length; b++) {
-        const dx = points[a].x - points[b].x;
-        const dy = points[a].y - points[b].y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 120) {
-          ctx.beginPath();
-          ctx.moveTo(points[a].x, points[a].y);
-          ctx.lineTo(points[b].x, points[b].y);
-          ctx.strokeStyle = `rgba(0,240,255,${(120 - d) / 300})`;
-          ctx.lineWidth = 0.3;
-          ctx.stroke();
+    // Skip drawing while hidden (saves CPU/battery on background tabs)
+    if (!document.hidden) {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of points) {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0 || p.x > w) p.speedX *= -1;
+        if (p.y < 0 || p.y > h) p.speedY *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+      for (let a = 0; a < points.length; a++) {
+        for (let b = a + 1; b < points.length; b++) {
+          const dx = points[a].x - points[b].x;
+          const dy = points[a].y - points[b].y;
+          const d2 = dx * dx + dy * dy;
+          // Compare squared distances (no sqrt) and only pay sqrt for links
+          if (d2 < LINK_DIST_SQ) {
+            const d = Math.sqrt(d2);
+            ctx.beginPath();
+            ctx.moveTo(points[a].x, points[a].y);
+            ctx.lineTo(points[b].x, points[b].y);
+            ctx.strokeStyle = `rgba(0,240,255,${(120 - d) / 300})`;
+            ctx.lineWidth = 0.3;
+            ctx.stroke();
+          }
         }
       }
     }
@@ -479,7 +495,8 @@ function openMermaidLightbox(diagram) {
 }
 
 // ====== PWA Service Worker ======
-if ('serviceWorker' in navigator) {
+// Production only: in dev, the SW would cache unbundled source paths and break HMR
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
@@ -498,6 +515,9 @@ function initSearch() {
     index = await res.json();
     return index;
   }
+
+  // Prefetch as soon as the user focuses the search box
+  input.addEventListener('focus', () => { loadIndex().catch(() => {}); }, { once: true });
 
   function escapeHtml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -579,12 +599,32 @@ function initSearch() {
     return search(window.__POSTS_TREE__);
   }
 
-  function showReadmeOrHint(node) {
+  // README HTML was moved out of archive.html (build emits /readmes.json);
+  // fetched once on demand when a folder is first selected
+  let readmesPromise = null;
+  function loadReadmes() {
+    if (!readmesPromise) {
+      readmesPromise = fetch('/readmes.json').then((r) => r.json()).catch(() => ({}));
+    }
+    return readmesPromise;
+  }
+
+  let readmeToken = 0;
+  async function showReadmeOrHint(node) {
     if (!readmeEl) return;
+    const token = ++readmeToken;
     if (node && node.readme) {
-      readmeEl.innerHTML = node.readme;
       readmeEl.style.display = '';
-      initMermaid();
+      readmeEl.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px 0;font-size:0.95rem;">加载中…</p>';
+      const readmes = await loadReadmes();
+      if (token !== readmeToken) return; // user already switched to another folder
+      const html = readmes[normalizePath(node.path) || ''];
+      if (html) {
+        readmeEl.innerHTML = html;
+        initMermaid();
+      } else {
+        readmeEl.style.display = 'none';
+      }
     } else if (node && node.children && node.children.length > 0) {
       // Folder has subfolders but no README
       readmeEl.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px 0;font-size:0.95rem;">📂 请点击具体文档查看内容</p>';
@@ -1029,6 +1069,93 @@ function initBackToTop(isHome3D) {
   });
 }
 
+// ====== Season theme switcher ======
+const SEASON_THEMES = [
+  { id: '', icon: '🌌', label: '默认', color: '#0a0a0f' },
+  { id: 'spring', icon: '🌸', label: '春', color: '#0d1310' },
+  { id: 'summer', icon: '☀️', label: '夏', color: '#081220' },
+  { id: 'autumn', icon: '🍂', label: '秋', color: '#14100a' },
+  { id: 'winter', icon: '❄️', label: '冬', color: '#0a0e17' },
+];
+
+function initSeasonSwitcher() {
+  const KEY = 'site-season';
+  const validIds = SEASON_THEMES.map((t) => t.id);
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'season-btn';
+  btn.setAttribute('aria-label', '切换季节皮肤');
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', 'false');
+
+  const menu = document.createElement('div');
+  menu.className = 'season-menu';
+  menu.setAttribute('role', 'menu');
+  SEASON_THEMES.forEach((theme) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.dataset.season = theme.id;
+    item.innerHTML = `<span aria-hidden="true">${theme.icon}</span><span>${theme.label}</span>`;
+    item.addEventListener('click', () => {
+      applySeason(theme.id);
+      closeMenu();
+    });
+    menu.appendChild(item);
+  });
+
+  function applySeason(/** @type {string} */ id) {
+    if (id) {
+      document.documentElement.setAttribute('data-season', id);
+    } else {
+      document.documentElement.removeAttribute('data-season');
+    }
+    try {
+      localStorage.setItem(KEY, id);
+    } catch (e) { /* storage unavailable — ignore */ }
+    const theme = SEASON_THEMES.find((t) => t.id === id) || SEASON_THEMES[0];
+    btn.textContent = theme.icon;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme.color);
+    menu.querySelectorAll('button').forEach((b) => {
+      b.classList.toggle('is-active', b.dataset.season === id);
+    });
+  }
+
+  function openMenu() {
+    menu.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeMenu() {
+    menu.classList.remove('is-open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  btn.addEventListener('click', () => {
+    if (menu.classList.contains('is-open')) closeMenu();
+    else openMenu();
+  });
+  document.addEventListener('click', (e) => {
+    const target = e.target instanceof Element ? e.target : null;
+    if (!menu.classList.contains('is-open')) return;
+    if (target && (menu.contains(target) || btn.contains(target))) return;
+    closeMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  document.body.appendChild(menu);
+  document.body.appendChild(btn);
+
+  let saved = '';
+  try {
+    saved = localStorage.getItem(KEY) || '';
+  } catch (e) { /* storage unavailable — ignore */ }
+  applySeason(validIds.includes(saved) ? saved : '');
+}
+
 // ====== Post font-size control ======
 function initFontSizeControl() {
   const control = document.querySelector('.font-size-control');
@@ -1072,15 +1199,15 @@ function initFontSizeControl() {
 }
 
 // Init
-initHomeRoomIfNeeded().then((isHome3D) => {
-  if (!isHome3D) {
-    initParticles();
-  }
-  initHomeSearchModal();
-  initSearch();
-  initPostToc();
-  initWeChatShare();
-  initMermaid();
-  initFontSizeControl();
-  initBackToTop(isHome3D);
-});
+const isHome3D = initHomeRoomIfNeeded();
+if (!isHome3D) {
+  initParticles();
+}
+initHomeSearchModal();
+initSearch();
+initPostToc();
+initWeChatShare();
+initMermaid();
+initFontSizeControl();
+initSeasonSwitcher();
+initBackToTop(isHome3D);

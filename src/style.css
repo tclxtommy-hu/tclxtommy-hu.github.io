@@ -10,7 +10,64 @@
   --accent2: #7b2fff;
   --accent3: #ff2fc8;
   --border: #1e1e2e;
+  --bg-code: #1a1a2e;
+  --bg-pre: #111122;
+  --heading: #ffffff;
   --max-width: 860px;
+}
+
+/* ====== Season Themes (春夏秋冬) ====== */
+html[data-season="spring"] {
+  --bg: #0d1310;
+  --bg-card: #141d18;
+  --text: #e4efe8;
+  --text-muted: #8fae9a;
+  --accent: #ff8fb7;
+  --accent2: #7ee787;
+  --accent3: #ffd76e;
+  --border: #1f2d25;
+  --bg-code: #17251e;
+  --bg-pre: #101a15;
+  --heading: #f2fbf5;
+}
+html[data-season="summer"] {
+  --bg: #081220;
+  --bg-card: #0f1d2e;
+  --text: #e2edf6;
+  --text-muted: #85a3bd;
+  --accent: #4cc9f0;
+  --accent2: #ffd60a;
+  --accent3: #ff7b7b;
+  --border: #16293c;
+  --bg-code: #122738;
+  --bg-pre: #0c1b2a;
+  --heading: #f2f9ff;
+}
+html[data-season="autumn"] {
+  --bg: #14100a;
+  --bg-card: #1d1810;
+  --text: #f0e8dc;
+  --text-muted: #b09a7d;
+  --accent: #ffb35c;
+  --accent2: #e07b39;
+  --accent3: #ffe066;
+  --border: #2c2214;
+  --bg-code: #251c10;
+  --bg-pre: #191207;
+  --heading: #fdf6ea;
+}
+html[data-season="winter"] {
+  --bg: #0a0e17;
+  --bg-card: #121926;
+  --text: #e2eaf3;
+  --text-muted: #8ba3c0;
+  --accent: #9ad1ff;
+  --accent2: #b197fc;
+  --accent3: #d0ebff;
+  --border: #1d2839;
+  --bg-code: #172233;
+  --bg-pre: #101828;
+  --heading: #f4f9ff;
 }
 
 body {
@@ -209,7 +266,7 @@ a:hover { color: var(--accent3); }
   margin-top: 1.8em;
   margin-bottom: 0.6em;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   scroll-margin-top: 120px;
 }
 .post-content h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
@@ -231,7 +288,7 @@ a:hover { color: var(--accent3); }
   margin: 1em 0;
 }
 .post-content code {
-  background: #1a1a2e;
+  background: var(--bg-code);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.9em;
@@ -239,7 +296,7 @@ a:hover { color: var(--accent3); }
   overflow-wrap: anywhere;
 }
 .post-content pre {
-  background: #111122;
+  background: var(--bg-pre);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 16px;
@@ -254,7 +311,7 @@ a:hover { color: var(--accent3); }
 .archive-readme .mermaid {
   margin: 1.5em 0;
   padding: 16px;
-  background: #111122;
+  background: var(--bg-pre);
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow-x: auto;
@@ -271,7 +328,7 @@ a:hover { color: var(--accent3); }
   position: relative;
   margin: 1.5em 0;
   padding: 16px;
-  background: #111122;
+  background: var(--bg-pre);
   border: 1px solid var(--border);
   border-radius: 6px;
 }
@@ -398,7 +455,7 @@ body.is-mermaid-zoomed {
   text-align: left;
   overflow-wrap: anywhere;
 }
-.post-content th { background: #1a1a2e; font-weight: 600; }
+.post-content th { background: var(--bg-code); font-weight: 600; }
 .post-content hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
 
 .post-toc {
@@ -444,7 +501,7 @@ body.is-mermaid-zoomed {
 .post-toc-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
 }
 .post-toc-toggle-text {
   font-size: 0.8rem;
@@ -506,7 +563,7 @@ body.is-mermaid-zoomed {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 24px;
-  color: #fff;
+  color: var(--heading);
 }
 .comments-loading, .comments-empty, .comments-error {
   color: var(--text-muted);
@@ -565,14 +622,14 @@ body.is-mermaid-zoomed {
 .comment-body p { margin-bottom: 0.5em; }
 .comment-body p:last-child { margin-bottom: 0; }
 .comment-body code {
-  background: #1a1a2e;
+  background: var(--bg-code);
   padding: 2px 5px;
   border-radius: 3px;
   font-size: 0.88em;
   font-family: "Fira Code", "Consolas", monospace;
 }
 .comment-body pre {
-  background: #111122;
+  background: var(--bg-pre);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
@@ -775,7 +832,7 @@ body.is-mermaid-zoomed {
 }
 .tree-root {
   font-weight: 700;
-  color: #fff;
+  color: var(--heading);
   font-size: 0.95rem;
 }
 
@@ -818,7 +875,7 @@ body.is-mermaid-zoomed {
   line-height: 1.7;
 }
 .archive-readme h1, .archive-readme h2, .archive-readme h3 {
-  color: #fff;
+  color: var(--heading);
   margin-top: 0.6em;
   margin-bottom: 0.4em;
 }
@@ -828,14 +885,14 @@ body.is-mermaid-zoomed {
 .archive-readme p { margin-bottom: 0.6em; }
 .archive-readme ul, .archive-readme ol { padding-left: 1.5em; margin-bottom: 0.6em; }
 .archive-readme code {
-  background: #1a1a2e;
+  background: var(--bg-code);
   padding: 1px 5px;
   border-radius: 3px;
   font-size: 0.88em;
   overflow-wrap: anywhere;
 }
 .archive-readme pre {
-  background: #111122;
+  background: var(--bg-pre);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px;
@@ -859,7 +916,7 @@ body.is-mermaid-zoomed {
   text-align: left;
   overflow-wrap: anywhere;
 }
-.archive-readme th { background: #1a1a2e; }
+.archive-readme th { background: var(--bg-code); }
 
 /* ====== Archive list ====== */
 .archive-list { list-style: none; }
@@ -1125,7 +1182,7 @@ body.home-3d {
 }
 .room-card-lang:hover {
   background: rgba(76, 105, 188, 0.65);
-  color: #fff;
+  color: var(--heading);
 }
 
 .room-card-body {
@@ -1408,4 +1465,90 @@ body.is-home-search-open {
 
 .bgm-btn.playing {
   animation: bgm-spin 4s linear infinite;
+}
+
+/* ====== Season Switcher ====== */
+.season-btn {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.season-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.season-menu {
+  position: fixed;
+  left: 20px;
+  bottom: 74px;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(18, 18, 26, 0.92);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.season-menu.is-open {
+  display: flex;
+}
+
+.season-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.season-menu button:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.season-menu button.is-active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .season-btn {
+    left: 14px;
+    bottom: 14px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .season-menu {
+    left: 14px;
+    bottom: 64px;
+  }
 }

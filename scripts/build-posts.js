@@ -318,8 +318,10 @@ const searchIndex = posts.map(p => ({
   category: p.category,
   subcategory: p.subcategory,
   relativeDir: toUrlPath(p.relativeDir),
-  // Strip HTML tags for plain-text search content
-  content: p.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+  // Strip HTML tags for plain-text search content.
+  // Truncate to 1200 chars: snippets only need ±120 chars around a match,
+  // and full text here was the main reason the index grew past 1MB.
+  content: p.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1200),
 }));
 fs.writeFileSync(
   path.join(ROOT, 'public', 'search-index.json'),
@@ -482,11 +484,18 @@ function buildTreeHtml(node, level) {
 const treeHtml = `<div class="archive-tree" id="archive-tree">\n${buildTreeHtml(postsTree, 0)}\n</div>`;
 
 // ====== Generate tree JSON for JS ======
+// README HTML is NOT embedded in the tree (it ballooned archive.html to ~370KB).
+// The tree only carries a `readme: true` marker; the HTML itself goes to
+// /readmes.json and is fetched on demand when a folder is selected.
+const readmeMap = {}; // urlPath -> rendered README HTML
 function treeToJson(node) {
+  if (node.readme) {
+    readmeMap[toUrlPath(node.path)] = node.readme;
+  }
   return {
     name: node.name,
     path: toUrlPath(node.path),
-    readme: node.readme,
+    readme: node.readme ? true : null,
     totalCount: node.totalCount,
     children: node.children.map(treeToJson),
     posts: node.posts.map(p => ({
@@ -498,6 +507,11 @@ function treeToJson(node) {
   };
 }
 const treeJson = JSON.stringify(treeToJson(postsTree));
+fs.writeFileSync(
+  path.join(ROOT, 'public', 'readmes.json'),
+  JSON.stringify(readmeMap),
+  'utf-8'
+);
 
 // ====== Shared HTML fragments ======
 const criticalCss = `
@@ -524,7 +538,8 @@ const headExtra = `
         navigator.serviceWorker.register('/sw.js').catch(() => {});
       });
     }
-  </script>${criticalCss}`;
+  </script>
+  <script>try{var s=localStorage.getItem('site-season');if(s)document.documentElement.setAttribute('data-season',s);}catch(e){}</script>${criticalCss}`;
 
 function buildOgMeta({ title, description, url, type = 'website', image = '/icons/icon-512.png' }) {
   const fullImage = image.startsWith('http') ? image : `https://http200.cn${image}`;
@@ -890,7 +905,7 @@ const archiveHtml = `<!DOCTYPE html>
     <nav>${navHtml}</nav>
   </header>
   <main class="container container-archive">
-    <h2 style="margin-bottom:24px;font-weight:700;color:#fff;">文章归档</h2>
+    <h2 style="margin-bottom:24px;font-weight:700;color:var(--heading,#fff);">文章归档</h2>
     <div class="search-box">
       <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
     </div>
