@@ -631,6 +631,7 @@ for (const post of posts) {
   ${post.tags.length ? `<meta property="article:tag" content="${post.tags.join(',')}">` : ''}
   ${post.category ? `<meta property="article:section" content="${post.category}">` : ''}
   ${keywordsMeta}${ogMeta}${jsonLd}${headExtra}
+  <script>try{var s=parseFloat(localStorage.getItem('post-font-scale'));if(s>=0.8&&s<=1.6)document.documentElement.style.setProperty('--post-font-scale',s);}catch(e){}</script>
 </head>
 <body>
   <canvas id="bg-canvas"></canvas>
@@ -645,7 +646,15 @@ for (const post of posts) {
         <article>
           <div class="post-header">
             <h1>${post.title}</h1>
-            <div class="post-meta">${post.date}${categoryHtml}${tagsHtml}</div>
+            <div class="post-header-meta">
+              <div class="post-meta">${post.date}${categoryHtml}${tagsHtml}</div>
+              <div class="font-size-control" role="group" aria-label="字号调节">
+                <span class="font-size-label">字号</span>
+                <button type="button" class="font-size-btn" data-action="decrease" aria-label="减小字号">A&minus;</button>
+                <button type="button" class="font-size-btn font-size-value" data-action="reset" aria-label="重置字号">100%</button>
+                <button type="button" class="font-size-btn" data-action="increase" aria-label="增大字号">A+</button>
+              </div>
+            </div>
           </div>
           <div class="post-content">${post.html}</div>
         </article>

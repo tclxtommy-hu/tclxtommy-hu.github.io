@@ -158,9 +158,51 @@ a:hover { color: var(--accent3); }
   font-size: 0.9rem;
 }
 
+/* Header meta row: meta on the left, font-size control on the right */
+.post-header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.font-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+.font-size-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.font-size-btn {
+  font-family: inherit;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.font-size-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.font-size-btn.font-size-value {
+  min-width: 52px;
+  text-align: center;
+}
+
 .post-content,
 .archive-readme {
   overflow-wrap: break-word;
+  /* Reader-adjustable font scale (set via --post-font-scale, default 100%) */
+  font-size: calc(1rem * var(--post-font-scale, 1));
 }
 .post-content h1, .post-content h2, .post-content h3,
 .post-content h4, .post-content h5, .post-content h6 {
@@ -170,8 +212,8 @@ a:hover { color: var(--accent3); }
   color: #fff;
   scroll-margin-top: 120px;
 }
-.post-content h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-.post-content h3 { font-size: 1.25rem; }
+.post-content h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.post-content h3 { font-size: 1.25em; }
 
 .post-content p { margin-bottom: 1em; }
 .post-content ul, .post-content ol { padding-left: 1.5em; margin-bottom: 1em; }
@@ -1014,8 +1056,8 @@ body.is-mermaid-zoomed {
     display: inline;
   }
 
-  .post-content h2 { font-size: 1.35rem; }
-  .post-content h3 { font-size: 1.15rem; }
+  .post-content h2 { font-size: 1.35em; }
+  .post-content h3 { font-size: 1.15em; }
 }
 
 /* ====== Responsive ====== */

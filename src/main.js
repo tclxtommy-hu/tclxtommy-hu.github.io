@@ -1029,6 +1029,48 @@ function initBackToTop(isHome3D) {
   });
 }
 
+// ====== Post font-size control ======
+function initFontSizeControl() {
+  const control = document.querySelector('.font-size-control');
+  if (!control) return;
+
+  const KEY = 'post-font-scale';
+  const MIN = 0.8;
+  const MAX = 1.6;
+  const STEP = 0.1;
+
+  const valueEl = control.querySelector('.font-size-value');
+  let scale = parseFloat(localStorage.getItem(KEY) || '');
+  if (!Number.isFinite(scale) || scale < MIN || scale > MAX) scale = 1;
+
+  /** Clamp to [MIN, MAX] and round to one decimal to avoid float drift (0.7000000000001 etc.). */
+  function clampScale(/** @type {number} */ v) {
+    return Math.round(Math.min(MAX, Math.max(MIN, v)) * 10) / 10;
+  }
+
+  function apply() {
+    scale = clampScale(scale);
+    document.documentElement.style.setProperty('--post-font-scale', String(scale));
+    if (valueEl) valueEl.textContent = `${Math.round(scale * 100)}%`;
+    try {
+      localStorage.setItem(KEY, String(scale));
+    } catch (e) { /* storage unavailable — ignore */ }
+  }
+
+  control.addEventListener('click', (e) => {
+    const target = e.target instanceof Element ? e.target : null;
+    const btn = target?.closest('button');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'increase') scale += STEP;
+    else if (action === 'decrease') scale -= STEP;
+    else scale = 1;
+    apply();
+  });
+
+  apply();
+}
+
 // Init
 initHomeRoomIfNeeded().then((isHome3D) => {
   if (!isHome3D) {
@@ -1039,5 +1081,6 @@ initHomeRoomIfNeeded().then((isHome3D) => {
   initPostToc();
   initWeChatShare();
   initMermaid();
+  initFontSizeControl();
   initBackToTop(isHome3D);
 });
