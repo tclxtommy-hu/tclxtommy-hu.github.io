@@ -978,12 +978,21 @@ function initPostToc() {
 }
 
 // ====== WeChat Share ======
+// The site is fully static (GitHub Pages), so wx.config signatures must come
+// from a small external service. Its URL lives in /wechat-share.config.json
+// ("endpoint"); when empty, fall back to a same-origin /api/wx-config (e.g.
+// behind a reverse proxy). Without a valid signature service the page simply
+// keeps WeChat's default share card (page title + URL).
+const WECHAT_JWEIXIN_SRC = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
+const WECHAT_SHARE_CONFIG_URL = '/wechat-share.config.json';
+const WECHAT_SHARE_DEFAULT_ENDPOINT = '/api/wx-config';
+
 function initWeChatShare() {
   const ua = navigator.userAgent.toLowerCase();
   if (!ua.includes('micromessenger')) return;
 
   // Extract share info from meta tags
-  const getMeta = (prop) => {
+  const getMeta = (/** @type {string} */ prop) => {
     const el = document.querySelector(`meta[property="${prop}"]`) ||
                document.querySelector(`meta[name="${prop}"]`);
     return el ? el.getAttribute('content') : '';
@@ -992,57 +1001,64 @@ function initWeChatShare() {
   const shareData = {
     title: getMeta('og:title') || document.title,
     desc: getMeta('og:description') || getMeta('description') || '',
-    link: getMeta('og:url') || window.location.href,
+    link: getMeta('og:url') || window.location.href.split('#')[0],
     imgUrl: getMeta('og:image') || 'https://http200.cn/icons/icon-512.png',
   };
 
-  // Try WeChat JS-SDK if available
-  function configWxSdk() {
-    if (typeof wx === 'undefined') return;
-
-    wx.ready(function () {
-      wx.updateAppMessageShareData({
-        title: shareData.title,
-        desc: shareData.desc,
-        link: shareData.link,
-        imgUrl: shareData.imgUrl,
-        success: function () {},
+  function loadSdkThenConfig(/** @type {any} */ cfg) {
+    if (!cfg || !cfg.appId || !cfg.timestamp || !cfg.nonceStr || !cfg.signature) return;
+    const script = document.createElement('script');
+    script.src = WECHAT_JWEIXIN_SRC;
+    script.onload = function () {
+      const wxApi = /** @type {any} */ (window).wx;
+      if (!wxApi) return;
+      wxApi.config({
+        debug: false,
+        appId: cfg.appId,
+        timestamp: cfg.timestamp,
+        nonceStr: cfg.nonceStr,
+        signature: cfg.signature,
+        jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'],
       });
-      wx.updateTimelineShareData({
-        title: shareData.title,
-        link: shareData.link,
-        imgUrl: shareData.imgUrl,
-        success: function () {},
+      wxApi.ready(function () {
+        wxApi.updateAppMessageShareData({
+          title: shareData.title,
+          desc: shareData.desc,
+          link: shareData.link,
+          imgUrl: shareData.imgUrl,
+        });
+        wxApi.updateTimelineShareData({
+          title: shareData.title,
+          link: shareData.link,
+          imgUrl: shareData.imgUrl,
+        });
       });
-    });
+      wxApi.error(function (/** @type {any} */ res) {
+        // Common causes: signature service down, signature URL mismatch, or
+        // account without JS-SDK permission. Logged only — WeChat then keeps
+        // its default share card, so this never breaks the page.
+        console.warn('[wechat-share] wx.config error:', res && res.errMsg);
+      });
+    };
+    document.head.appendChild(script);
   }
 
-  // Try to fetch wx-config from API, fallback to meta tags only
-  fetch('/api/wx-config?url=' + encodeURIComponent(window.location.href.split('#')[0]))
-    .then(function (res) { return res.json(); })
-    .then(function (cfg) {
-      if (cfg.appId && cfg.timestamp && cfg.nonceStr && cfg.signature) {
-        var script = document.createElement('script');
-        script.src = 'https://res.wx.qq.com/open/js/jweixin-1.6.0.js';
-        script.onload = function () {
-          wx.config({
-            debug: false,
-            appId: cfg.appId,
-            timestamp: cfg.timestamp,
-            nonceStr: cfg.nonceStr,
-            signature: cfg.signature,
-            jsApiList: [
-              'updateAppMessageShareData',
-              'updateTimelineShareData',
-            ],
-          });
-          configWxSdk();
-        };
-        document.head.appendChild(script);
-      }
-    })
-    .catch(function () {
-      // No server-side config available, rely on OG meta tags
+  // Resolve the signature endpoint from the deploy-time config file, then ask
+  // it to sign the current page URL (hash stripped — WeChat requires this)
+  fetch(WECHAT_SHARE_CONFIG_URL, { cache: 'no-store' })
+    .then((res) => (res.ok ? res.json() : {}))
+    .then((/** @type {any} */ cfg) => (cfg && typeof cfg.endpoint === 'string' ? cfg.endpoint : ''))
+    .catch(() => '')
+    .then((endpoint) =>
+      fetch((endpoint || WECHAT_SHARE_DEFAULT_ENDPOINT) + '?url=' + encodeURIComponent(window.location.href.split('#')[0]))
+        .then((res) => {
+          if (!res.ok) throw new Error('signature ' + res.status);
+          return res.json();
+        })
+        .then(loadSdkThenConfig)
+    )
+    .catch(() => {
+      // No signature service available — rely on WeChat's default share card
     });
 }
 
