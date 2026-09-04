@@ -1,0 +1,24 @@
+posts/AI/AI实践/客服Chatbot发展路线图-2026-09-01.md
+  s_ad3bca4cdd9f7b::t_de2bf140eec796 604-615
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "e9d949db32d979e61b3f1155da84e5dbf3820ce0",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_ad3bca4cdd9f7b": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "d23ae264fdb04643b7b175d0262c920b",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
