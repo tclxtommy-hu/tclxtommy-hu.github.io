@@ -1,6 +1,8 @@
 # Agent.md 与 Memory.md 规范
 
 > 一句话定义：Agent.md 是描述 Agent 身份/能力/边界的配置文件；Memory.md 是 Agent 持久化记忆的 Markdown 存储——两者都是用 Markdown 组织 Agent 元信息的轻量实践。
+>
+> 缩写与术语：英文术语与缩写首次出现附音标/全拼，汇总见 §8。
 
 ---
 
@@ -123,7 +125,7 @@ Agent.md 是一个 Markdown 文件，用结构化文本描述一个 Agent 的**�
 ### 2.1 定义
 Memory.md 是用 Markdown 文件持久化 Agent 记忆的轻量实践——把关键事实、决策、偏好以结构化文本存盘，跨会话复用。
 
-它解决的是 LLM **无状态**问题：每次会话默认"失忆"，Memory.md 让 Agent 能"记住"跨会话的关键信息，而无需数据库。
+它解决的是 **LLM** /ˌel el ˈem/ （ **Large Language Model** /lɑːdʒ ˈlæŋɡwɪdʒ ˈmɒdl/ ，大语言模型） **无状态** 的问题：每次会话默认"失忆"，Memory.md 让 Agent 能"记住"跨会话的关键信息，而无需数据库。
 
 ### 2.2 典型内容（分层模板）
 
@@ -192,6 +194,8 @@ Memory.md 是用 Markdown 文件持久化 Agent 记忆的轻量实践——把�
 - 向量库放"按需召回的历史"（过往对话、长文档片段）。
 - 注入时：Memory.md 全量/分层注入系统提示，向量库按 query 召回补到上下文。
 
+> 工程化落地：腾讯开源的 TencentDB Agent Memory 把「结构化硬约束 + 语义召回」做成了独立服务，见 §3。
+
 ### 2.6 最佳实践
 
 **写入层面**
@@ -230,13 +234,206 @@ Memory.md 是用 Markdown 文件持久化 Agent 记忆的轻量实践——把�
 
 ---
 
-## 3. Agent.md 与 Memory.md 的关系
+## 3. 工程化实例：TencentDB Agent Memory
 
-### 3.1 分层定位
+> **一句话** ：腾讯云数据库团队把本篇的「Memory.md 分层 + 注入策略」做成了一套独立服务——开源的团队级 Agent 记忆中枢 **TencentDB Agent Memory** /ˈtensənt ˈeɪdʒənt ˈmeməri/ ，采用 **MIT** /ˌem aɪ ˈtiː/ （ **Massachusetts Institute of Technology** /ˌmæsəˈtʃuːsɪts ˌɪnstɪtjuːt əv ˌtekˈnɒlədʒi/ ，此处指其发布的宽松开源协议）协议、TypeScript /ˈtaɪpskrɪpt/ 实现，GitHub 约 2.6 万 Star（2026-09 数据）。口号是 **Agents Remember. Humans Innovate.**（Agent 负责记忆，人类专注创新）。
+
+### 3.1 为什么把它放进这一篇
+
+Memory.md 的四个软肋，一旦从「一个人一个文件」放大到「一个团队多个 Agent」，会立刻暴露；TencentDB Agent Memory 基本是逐个补的：
+
+| Memory.md 的软肋 | 放大后的表现 | 它的解法 |
+|---|---|---|
+| 单文件存储 | 单文件建议 < 200 行，多人并发写入必冲突 | 分层存储 + 服务化读写 |
+| 全量注入 | 记忆一多就把上下文挤爆 | 上下文卸载 + 分层检索 |
+| 无权限模型 | 团队里谁都能读、谁都能改 | `private` / `team` / `restricted` / `agent` 四档可见性 + **ACL** /ˌeɪ siː ˈel/ （ **Access Control List** /ˈækses kənˈtrəʊl lɪst/ ，访问控制列表） |
+| 只记「事实」 | 记不住「这件事该怎么做」 | 把经验沉淀为 **Skill** /skɪl/ 资产（带版本与校验规则） |
+
+一句话： **Memory.md 是单机版，TencentDB Agent Memory 是团队版** 。本篇讲的规则——分层、去重、预算、脱敏——在它的机制里几乎原样出现，只是从「人工纪律」变成了「服务默认行为」。
+
+### 3.2 四层记忆：L0–L3
+
+Chat Memory 部分把记忆分成四层，L0 先落盘，再由**异步流水线**逐层提炼：
+
+| 层级 | 存什么 | 用途 | 对应本篇分层 |
+|---|---|---|---|
+| **L0** Conversation /ˌkɒnvəˈseɪʃn/ | 带完整上下文的原始对话 | 核对原话、时间戳与来源 | 无对应（留在会话日志） |
+| **L1** Atom /ˈætəm/ | 抽取出的事实、偏好、约束、事件 | 精确召回可执行信息 | L2 项目事实 |
+| **L2** Scenario /səˈnɑːriəʊ/ | 按项目/场景组织的知识块 | 快速恢复工作上下文 | L3 历史决策 |
+| **L3** Persona /pəˈsəʊnə/ | 长期画像、稳定模式、高层认知 | 让 Agent 快速进入用户与团队语境 | L1 用户偏好 |
+
+> ⚠️ **注意编号方向相反**：本篇 L1 是「最该全量注入的偏好」，它的 L3 才是「最稳定的画像」。引用时先说清是「哪种编号」。
+
+生成与检索都是分层的：平时 L2/L3 负责快速上下文引导；需要具体事实时，用 **BM25** /ˌbiː em t ˈwenti faɪv/ （ **Best Matching 25** /best ˈmætʃɪŋ ˈtwenti faɪv/ ）+ 向量检索 + **RRF** /ˌɑːr ɑːr ˈef/ （ **Reciprocal Rank Fusion** /rɪˈsɪprəkl ræŋk ˈfjuːʒn/ ，倒数排名融合）回退到 L1/L0。召回结果还受**条目数上限、字符预算、超时限制**三重约束——这正是本篇 2.6 节「预算控制」的服务化版本。
+
+### 3.3 四种记忆资产
+
+它把 Agent 工作中产生的信息固化成交付物，而不只是一堆对话记录：
+
+| 资产 | 形态 | 解决的问题 |
+|---|---|---|
+| **Chat Memory** | L0–L3 分层的对话记忆 | 跨会话记住偏好、事实、决策、交互历史 |
+| **Skill** | 带版本、资源文件、触发边界、执行步骤、校验规则的可执行经验 | 把「做过一遍的流程」变成「下次直接调用」 |
+| **Wiki** | 文档转成的结构化页面 + 链接图（Link Graph） | 新 Agent 不必从第一页重读全部文档（受 **Andrej Karpathy** /ˈændreɪ kɑːrˈpæθi/ 的「LLM Wiki」思路启发） |
+| **CodeGraph** | 代码符号、文件、调用关系、影响路径 | 改代码前先看 callers / callees 与影响范围 |
+
+资产之间靠**可见性 + 归属治理**隔离：`private`（默认，仅 Owner，连团队管理员都不可读）、`team`（团队成员可读）、`restricted`（User / Role / Agent 级 ACL 精确授权）、`agent`（给某个 Agent 定向装备）。每个 Agent 创建后自动拥有自己的 Chat Memory。
+
+### 3.4 三个关键机制
+
+1. **上下文卸载（ Context Offloading /ˈkɒntekst ˌɒfˈləʊdɪŋ/ ）+ Mermaid 任务画布**：把原始工具结果卸载到外部存储，把任务结构折叠成一张 **Mermaid** /ˈmɜːmeɪd/ 任务图——节点带 ID，细节留在图外的文件里，上下文只保留摘要与索引，实现「原文不丢、结构可查、Token 不线性增长」。
+2. **记忆即装备**：所有资产在 Memory Hub 注册为 Memory Asset，用固定绑定（Fixed Binding）+ ACL 决定「哪个 Agent 能用哪些资产」；先按 Team / User / Agent / 可见性收窄范围，再按当前 query 检索。换框架只需重新装备，不必重训模型或重灌提示。
+3. **Proxy 零代码接入**：把 Agent 的接口基址（配置项 `base_url` ）指向 **Proxy** /ˈprɒksi/ 即可，不需要插件、Hook 或 **MCP** /ˌem siː ˈpiː/ （ **Model Context Protocol** /ˈmɒdl ˈkɒntekst ˈprəʊtəkɒl/ ，模型上下文协议）。已适配 **Claude Code** /klɔːd kəʊd/、**Codex** /ˈkəʊdeks/、**CodeBuddy** /kəʊd ˈbʌdi/、**OpenClaw** /ˈəʊpən klɔː/、**Hermes** /ˈhɜːmiːz/、**DeepSeek Harness** /ˈdiːpsiːk ˈhɑːnɪs/ 等客户端，管理面板默认在 `http://localhost:8125`。
+
+### 3.5 落地示例
+
+**3.5.1 示例 A：一条记忆的完整生命周期**
+
+场景：4 人团队在做 Java 支付服务，Agent 在某次会话里听到「我们不用 TypeScript」。
+
+```text
+[L0] 2026-09-12 10:03:20  user: 我们不用 TypeScript，项目统一用 Java
+      ↓ 异步流水线（提取 → 聚合 → 蒸馏）
+[L1] { "type": "constraint", "text": "项目统一用 Java，不用 TypeScript", "confidence": 0.95, "source": "L0#1024" }
+[L2] 场景块「支付模块重构」：技术栈约束 = Java 17；主分支 = main；测试 = ./gradlew test
+[L3] 用户画像：偏好直接结论、不客套；关注性能与成本；团队 4 人
+```
+
+L1 原子事实落盘长这样（一行一条，便于增量追加）：
+
+```jsonl
+{"id":"atom_1024","layer":"L1","type":"constraint","subject":"tech-stack","text":"项目统一用 Java，不用 TypeScript","confidence":0.95,"source_turn":"L0#1024","created_at":"2026-09-12T10:03:20+08:00"}
+```
+
+而它同步给 Agent 的「人可读版本」，其实就是本篇的 Memory.md 片段—— **两者同构，一个给机器，一个给人** ：
+
+```markdown
+## 项目事实（稳定硬事实，按需注入）
+- 项目统一用 Java，不用 TypeScript —— 来源 L0#1024，2026-09-12，置信度 0.95
+```
+
+**3.5.2 示例 B：Proxy 接入 + 分层注入预算（可运行代码）**
+
+零代码接入部分：
+
+```typescript
+import OpenAI from "openai";
+
+// 唯一改动：把接口基址指向 Memory Proxy，业务代码不用动
+const client = new OpenAI({
+  baseURL: process.env.MEMORY_PROXY_URL ?? "http://localhost:8125/v1",
+  apiKey: process.env.MODEL_API_KEY ?? "",
+});
+```
+
+分层注入的预算控制（ **Token** /ˈtəʊkən/ 指计费与上下文的最小文本单位）：
+
+```typescript
+interface MemoryItem {
+  layer: "L1" | "L2" | "L3"; // L1 偏好 / L2 项目事实 / L3 历史决策（本篇语义）
+  text: string;
+  tokens: number;
+}
+
+/** 中文按 1 字 ≈ 1 token，英文按 4 字符 ≈ 1 token 粗估 */
+function estimateTokens(text: string): number {
+  const cjk = (text.match(/[\u4e00-\u9fff]/g) ?? []).length;
+  return cjk + Math.ceil((text.length - cjk) / 4);
+}
+
+/**
+ * 分层注入：L1 偏好优先 → L2 项目事实 → L3 历史决策
+ * 总预算默认取上下文窗口的 15%（对应本篇 2.6 节的 10%~20% 建议）
+ */
+export function buildMemoryBlock(
+  items: MemoryItem[],
+  contextWindow = 128_000,
+  ratio = 0.15,
+): { block: string; used: number; dropped: string[] } {
+  const budget = Math.floor(contextWindow * ratio); // 128k → 19200 token
+  const lines: string[] = [];
+  const dropped: string[] = [];
+  let used = 0;
+
+  for (const layer of ["L1", "L2", "L3"] as const) {
+    for (const item of items.filter((i) => i.layer === layer)) {
+      if (used + item.tokens > budget) {
+        dropped.push(`${layer}:${item.text}`); // 超预算 → 转按需召回，不硬塞系统提示
+        continue;
+      }
+      lines.push(`- [${layer}] ${item.text}`);
+      used += item.tokens;
+    }
+  }
+
+  return { block: lines.join("\n"), used, dropped };
+}
+```
+
+代入上面「4 人支付团队」的真实数字（上下文窗口 128k，预算 15% = 19200 token）：
+
+| 层 | 条目数 | 需要 token | 实际处理 |
+|---|---|---|---|
+| L1 偏好 | 3 | 386 | 全部注入（386 token） |
+| L2 项目事实 | 40 | 7 820 | 全部注入（累计 8 206 token） |
+| L3 历史决策 | 200 | 10 912 | 只放得下 9 条，其余 191 条进 `dropped` |
+
+→ 进 `dropped` 的 191 条改走按需召回（BM25 + 向量 + RRF），而不是硬塞进系统提示。这就是「分层注入」在工程上的落地形态。
+
+**3.5.3 示例 C：四周接入排期与验收数字**
+
+| 周 | 目标 | 动作 | 验收数字 |
+|---|---|---|---|
+| W1 | 环境与接入 | `git clone` → `deploy/global-images` → 填 `.env` 两组 LLM 参数 → `./start-all.sh` ；把 Agent 的 `base_url` 指向 Proxy | 面板 `http://localhost:8125` 可访问，健康检查返回 ready |
+| W2 | 冷启动「读档」 | 导入项目文档 → Wiki；导入代码库 → CodeGraph；导入历史会话 → Chat Memory | Wiki / CodeGraph 转 ready；L1 原子事实 ≥ 50 条 |
+| W3 | 沉淀 Skill | 挑 3 条高频流程写成 Skill（版本 + 资源文件 + 触发边界 + 执行步骤 + 校验规则） | 新会话「重复解释」次数下降一半 |
+| W4 | 度量与灰度 | 用 WideSearch / SWE-bench 子集跑接入前后对比，先给 2 个 Agent 装备资产 | Token 下降 ≥ 30%，成功率不低于基线 |
+
+官方在 OpenClaw 上公布的接入前后实测：
+
+| 记忆类型 | Benchmark /ˈbentʃmɑːk/ | 指标 | 接入前 | 接入后 | 变化 |
+|---|---|---|---|---|---|
+| 短期 | WideSearch | 任务成功率 | 33% | 50% | **+51.5%** |
+| 短期 | WideSearch | Token 消耗 | 221.31M | 85.64M | **−61.4%** |
+| 短期 | SWE-bench | 任务成功率 | 58.4% | 64.2% | +9.9% |
+| 短期 | SWE-bench | Token 消耗 | 3 474.1M | 2 375.4M | −33.1% |
+| 短期 | AA-LCR | 任务成功率 | 44.0% | 47.5% | +8.0% |
+| 短期 | AA-LCR | Token 消耗 | 112.0M | 77.3M | −31.0% |
+| 长期 | PersonaMem | 准确率 | 48% | 76% | **+59%** |
+
+> 数据来自项目官方文档与腾讯云开发者社区文章；调研阶段建议先在小样本子集上复现，再决定是否全量推广。
+
+### 3.6 选型：Memory.md 还是 TencentDB Agent Memory
+
+| 维度 | Memory.md | TencentDB Agent Memory |
+|---|---|---|
+| 适用规模 | 单人 / 单 Agent | 团队 / 多 Agent / 多框架 |
+| 记忆量级 | 几十条硬约束 | 万级对话与文档 |
+| 部署成本 | 0（就是一个 md 文件） | Docker + **Node.js** /nəʊd ˌdʒeɪ ˈes/ ≥ 22.16，需两组 LLM 参数 |
+| 长任务上下文膨胀 | 无解，只能人工精简 | 上下文卸载 + Mermaid 画布直接压缩 |
+| 权限与共享 | 随仓库权限 | 四档可见性 + ACL + 版本治理 |
+| 运行成本 | 几乎为零 | 记忆提取组 + 代理组两次 LLM 调用 |
+| 调试方式 | `git diff` 直接看 | Memory Panel 可视化 |
+
+实践建议： **先用 Memory.md 把「纪律」跑通，再按需上服务**。两者可并存——Memory.md 作为「必读硬约束 + 人工可审的兜底」，TencentDB Agent Memory 负责长尾事实与团队共享。
+
+### 3.7 注意事项
+
+- 仍处 **Beta** /ˈbiːtə/ （当前 v2.0.0）， **API** /ˌeɪ piː ˈaɪ/ （ **Application Programming Interface** /ˌæplɪˈkeɪʃn ˈprəʊɡræmɪŋ ˈɪntəfeɪs/ ，应用程序编程接口）与目录结构迭代较快，接入前锁版本。
+- 需配置两组 LLM 参数（记忆提取组 + 代理组），会产生额外 Token 成本。
+- Wiki 与 CodeGraph 是**异步构建**，导入后要等 ready；CodeGraph 目前优先支持公有 HTTPS 仓库，私有仓库与凭据支持仍在完善。
+- 全自动记忆路由仍在迭代，Hub 目前以手动绑定资产为主。
+- 隐私红线不变：`private` 是默认值，密钥与个人隐私仍不应写入任何一层的记忆。
+
+---
+
+## 4. Agent.md 与 Memory.md 的关系
+
+### 4.1 分层定位
 - **Agent.md = 静态配置**：定义"Agent 是谁、能做什么、怎么做"——相对稳定，随版本发布。
 - **Memory.md = 动态记忆**：记录"Agent 经历了什么、学到了什么"——持续演化，跨会话累积。
 
-### 3.2 生命周期对比
+### 4.2 生命周期对比
 
 | 维度 | Agent.md | Memory.md |
 |---|---|---|
@@ -246,7 +443,7 @@ Memory.md 是用 Markdown 文件持久化 Agent 记忆的轻量实践——把�
 | 回滚 | 走 Git 版本 | 走 Git 版本 + 归档 |
 | 评测 | 作为行为契约做回归 | 作为上下文影响评测 |
 
-### 3.3 协同工作流
+### 4.3 协同工作流
 1. 会话开始：加载 Agent.md → 生成系统提示；按策略注入 Memory.md 分层内容。
 2. 会话中：Agent 根据交互判断是否写入 Memory.md（新偏好/决策/待办）。
 3. 会话结束/定期：触发整理——去重、归档过期、纠错。
@@ -254,7 +451,7 @@ Memory.md 是用 Markdown 文件持久化 Agent 记忆的轻量实践——把�
 
 ---
 
-## 4. 设计要点总览
+## 5. 设计要点总览
 
 - **分层**：Agent.md 是"静态配置"，Memory.md 是"动态记忆"。
 - **更新策略**：Memory.md 需定期整理、去重、纠错、过期；Agent.md 走 PR 评审。
@@ -266,18 +463,42 @@ Memory.md 是用 Markdown 文件持久化 Agent 记忆的轻量实践——把�
 
 ---
 
-## 5. 学习要点
+## 6. 学习要点
 - Agent.md / Memory.md 是用 Markdown 组织 Agent 元信息的轻量实践。
 - 声明式配置 + 人可读持久化，降低 Agent 工程门槛。
 - Agent.md 重"静态契约"，Memory.md 重"动态累积"，两者分层互补。
 - 与向量记忆互补：结构化硬约束用 md，海量历史用向量库。
 - 关键在"纪律"：定期整理、分层注入、最小授权、隐私脱敏。
+- 规模放大后的两条路：自建靠纪律（Memory.md），团队化靠服务（TencentDB Agent Memory 的 L0–L3 + 资产治理 + Proxy 接入）。
+- 记忆工程的三个通用抓手：分层存储、预算化注入、权限与归属——换任何实现都不变。
 
 ---
 
-## 6. 参考资料
+## 7. 参考资料
 - VS Code Copilot `.instructions.md` / `copilot-instructions.md` 实践
 - `AGENTS.md` 约定（多 Agent 协作中的 Agent 描述文件）
 - Cursor `.cursorrules` / Claude Code `CLAUDE.md`
 - "Generative Agents"（记忆/反思机制）
 - ADR（Architecture Decision Records）——历史决策记录的成熟范式
+- TencentDB Agent Memory：https://github.com/Tencent/TencentDB-Agent-Memory
+- 开源说明《TencentDB Agent Memory 正式开源：让 Agent 沉淀经验，让人专注创造》，腾讯云开发者社区
+- 安装与接入文档：仓库内 `INSTALL.md` / `INSTALL_CN.md`（含 Proxy + Claude Code / CodeBuddy 用法）
+- PersonaMem 评测集：https://github.com/bowen-upenn/PersonaMem
+
+---
+
+## 8. 本文缩写
+
+| 缩写 | 音标 | 全拼 | 中文 |
+|---|---|---|---|
+| **ACL** | /ˌeɪ siː ˈel/ | Access Control List | 访问控制列表 |
+| **API** | /ˌeɪ piː ˈaɪ/ | Application Programming Interface | 应用程序编程接口 |
+| **ADR** | /ˌeɪ diː ˈɑːr/ | Architecture Decision Record | 架构决策记录 |
+| **BM25** | /ˌbiː em t ˈwenti faɪv/ | Best Matching 25 | 经典概率检索模型 |
+| **IDE** | /ˌaɪ diː ˈiː/ | Integrated Development Environment | 集成开发环境 |
+| **JSON** | /ˈdʒeɪsən/ | JavaScript Object Notation | JSON 数据交换格式 |
+| **LLM** | /ˌel el ˈem/ | Large Language Model | 大语言模型 |
+| **MCP** | /ˌem siː ˈpiː/ | Model Context Protocol | 模型上下文协议 |
+| **MIT** | /ˌem aɪ ˈtiː/ | Massachusetts Institute of Technology | 麻省理工学院（此处指其开源协议） |
+| **PR** | /ˌpiː ˈɑːr/ | Pull Request | 合并请求 |
+| **RRF** | /ˌɑːr ɑːr ˈef/ | Reciprocal Rank Fusion | 倒数排名融合 |
