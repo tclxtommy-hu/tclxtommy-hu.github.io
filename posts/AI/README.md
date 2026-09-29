@@ -23,7 +23,7 @@ flowchart LR
 
 | 知识库 | 定位 | 篇数 | 入口 |
 |--------|------|------|------|
-| **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，16 个模块 | ~46 篇 | [AI知识库/README.md](AI知识库/README.md) |
+| **AI 知识库** | AI/ML/DL/LLM 全栈基础到前沿，16 个模块 | ~47 篇 | [AI知识库/README.md](AI知识库/README.md) |
 | **Agent 开发知识** | Agent 开发专题，01–12 + 13 工程化补遗 | ~40 篇 | [Agent开发知识/README.md](Agent开发知识/README.md) |
 | **Agent 设计模式** | Agent 架构设计模式，含原理+场景+示例代码 | 9 篇 | [Agent设计模式/README.md](Agent设计模式/README.md) |
 | **AI 编程范式** | AI 辅助编程 + AI 应用开发范式 | 18 篇 | [AI编程范式/README.md](AI编程范式/README.md) |
@@ -99,6 +99,7 @@ flowchart LR
 | [01-RAG检索增强生成.md](AI知识库/09-RAG与上下文/01-RAG检索增强生成.md) | 检索-生成、向量库、切分、重排 |
 | [02-上下文工程.md](AI知识库/09-RAG与上下文/02-上下文工程.md) | 上下文选材、压缩、记忆管理 |
 | [03-向量数据库.md](AI知识库/09-RAG与上下文/03-向量数据库.md) | 向量库概念、ANN 索引、主流选型、RAG 集成 |
+| [04-向量模型Embedding.md](AI知识库/09-RAG与上下文/04-向量模型Embedding.md) | 向量模型定位、稠密/稀疏向量、多模态 Embedding、离线选型 |
 
 ### 10 微调与适配
 | 文件 | 主题 |
