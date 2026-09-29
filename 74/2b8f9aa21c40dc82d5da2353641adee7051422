@@ -1,0 +1,24 @@
+posts/AI/README.md
+  s_c7cc50f1301016::t_fdd9a73b33acd8 102
+  s_c7cc50f1301016::t_83d55c4f4a9336 26
+posts/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.md
+  s_c7cc50f1301016::t_ba1b4dde288c72 1-491
+posts/AI/AI知识库/README.md
+  s_c7cc50f1301016::t_27b986f025ccc3 98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "742b8f9aa21c40dc82d5da2353641adee7051422",
+  "prompts": {},
+  "sessions": {
+    "s_c7cc50f1301016": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "54b4f0b63fba4024b5a19884a98b6db0",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
