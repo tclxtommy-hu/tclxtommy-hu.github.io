@@ -1,0 +1,50 @@
+posts/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.md
+  s_c7cc50f1301016::t_c0132ce57aa5d9 628-633
+  s_c7cc50f1301016::t_543759a7327efb 580
+  s_c7cc50f1301016::t_3dda59ba7cf664 441-572
+  s_c7cc50f1301016::t_307e9953b536e9 582,589
+  s_c7cc50f1301016::t_01370aacd09e8e 605
+  s_c7cc50f1301016::t_fbd06e0f1a59de 594,600-602
+posts/AI/AI知识库/README.md
+  s_c7cc50f1301016::t_9d847df5330d90 98
+posts/AI/README.md
+  s_c7cc50f1301016::t_118b2d30813849 102
+.codex/rules/code-sample-language.mdc
+  s_7ee822eca4688e::t_c258e2082abb90 1-50
+.codex/rules/doc-method-with-examples.mdc
+  s_7ee822eca4688e::t_af387c8fb590be 1-51
+.codex/rules/markdown-abbreviation.mdc
+  s_7ee822eca4688e::t_ff9b9b8b49ee67 1-58
+.codex/rules/markdown-bold-spacing.mdc
+  s_7ee822eca4688e::t_b0d34f5b9cfc9d 1-34
+.codex/rules/markdown-english-ipa.mdc
+  s_7ee822eca4688e::t_f7e1762b831c8f 1-40
+AGENTS.md
+  s_7ee822eca4688e::t_b8811b183cbcd3 1-164
+posts/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.md
+  s_7ee822eca4688e::t_5f2286cbf1a0f5 3,5-6,8-15,19-527,529,531-535,537,539-545
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "05ee4869a39eb6210280d4ab520de17f4746f6c1",
+  "prompts": {},
+  "sessions": {
+    "s_7ee822eca4688e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0f0f0-ca77-7ae0-824d-73135e498fd5",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_c7cc50f1301016": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "54b4f0b63fba4024b5a19884a98b6db0",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
