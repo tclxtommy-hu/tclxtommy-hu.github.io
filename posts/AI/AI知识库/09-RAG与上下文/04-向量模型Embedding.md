@@ -438,7 +438,138 @@ const output = await extractor("红色的苹果放在木桌子上", {
 console.log(output.data.length); // 512 维句向量
 ```
 
-## 9. 常见误区
+## 9. 语义图富化模型（Graph / 知识图谱富化）
+
+> 一句话定义：以 LLM 为引擎、把非结构化文本"富化"成「实体—关系」图的模型与框架——向量模型回答"哪段话意思相近"，语义图富化回答"A 与 B 通过什么关系相连、连几跳"。
+
+### 9.1 这是什么
+
+**语义图富化**（Graph / **KG** /ˌkeɪ ˈdʒiː/ （ **Knowledge Graph** /ˈnɒlɪdʒ ɡrɑːf/ ，知识图谱）富化）的产出不是向量，而是 **三元组** /ˈtrɪpl/ （triple，"头实体—关系—尾实体"）：
+
+文档切片 → LLM 按 **Schema** /ˈskiːmə/ （结构约束）抽取实体与关系 → `(头实体, 关系, 尾实体)` + 原文证据 → 实体合并消歧 → 写入图数据库（如 **Neo4j** /ˈniːəʊ fɔː dʒeɪ/ ）→ 供图检索使用。
+
+它是 **GraphRAG** /ˈɡrɑːf ræɡ/ （ **Graph Retrieval-Augmented Generation** ，图检索增强生成）的 **建图阶段** ；在线侧的实体链接、K-hop 游走、社区摘要检索，仓库另有专文： [Graph Recall：图谱召回](../../Agent开发知识/07-RAG与知识集成/04-Graph-Recall.md) 、 [RAG 工程化与 GraphRAG](../../Agent开发知识/13-进阶与工程化/07-RAG工程化与GraphRAG.md) 。
+
+与向量模型的分工：
+
+| 维度 | 向量模型（本文主角） | 语义图富化（Graph） |
+|---|---|---|
+| 输出 | 固定维度稠密 / 稀疏向量 | 实体—关系三元组 + 属性 |
+| 回答的问题 | "哪段话意思像这个问题" | "这些实体怎么连、连几跳" |
+| 检索方式 | **ANN** /ˌeɪ en ˈen/ （ **Approximate Nearest Neighbor** /əˈprɒksɪmət ˈneərɪst ˈneɪbə/ ，近似最近邻）检索 / 点积 | 图遍历、路径、子图、社区摘要 |
+| 增量更新 | 新 chunk 单独 re-embed 即可 | 抽取 + 消歧 + 图合并，成本高 |
+| 典型短板 | 多跳关系、全局综述 | 建图贵、更新难、消歧易错 |
+
+### 9.2 使用场景：向量 RAG 会漏的题
+
+| 用户问法 | 答案实际靠什么 |
+|---|---|
+| "支付服务依赖的缓存由谁负责？" | 服务→依赖→中间件→负责人的多跳边 |
+| "某公司所有产品的共性趋势是什么？" | 跨文档实体聚合后的社区摘要 |
+| "这次故障可能波及哪些下游？" | 依赖图上的出边扩散 |
+| "谁是某某项目的负责人？他管过哪些系统？" | 人—项目—系统的关系链 |
+
+一句话：单段语义近邻能答的交给向量； **答案藏在跨文档关系链里的，交给图** 。生产上两者是互补的多路召回，不是二选一。
+
+**落地示例** （数据样例）：同一个 chunk，向量模型与图富化模型的"理解"对比——
+
+输入 chunk：
+
+```text
+支付服务由交易中台团队维护。交易中台依赖 Redis 集群做会话缓存。
+```
+
+向量模型输出（1024 维稠密向量，语义已融合，关系不可见）：
+
+```text
+[0.012, -0.207, ..., 0.094]
+```
+
+图富化输出（关系显式、可遍历、带证据）：
+
+```json
+[
+  { "subject": "支付服务", "predicate": "维护方", "object": "交易中台团队", "evidence": "支付服务由交易中台团队维护。" },
+  { "subject": "交易中台", "predicate": "依赖", "object": "Redis 集群", "evidence": "交易中台依赖 Redis 集群做会话缓存。" }
+]
+```
+
+后者入库后，问"支付服务最终依赖的缓存由谁负责"即可沿 `支付服务 -维护方→ 交易中台 -依赖→ Redis 集群` 两跳直达——这正是纯向量 Top-K 容易漏掉的证据链。
+
+### 9.3 当前可用模型与框架
+
+> 没有独立的"富化模型 API"一家独大：核心配方是「通用 LLM（GPT-4o / DeepSeek-V3 / Qwen 等强指令遵循模型）+ Schema 驱动的抽取 Prompt + 实体消歧」，框架决定质量、成本与更新能力。
+
+| 方案 | 出品方 | 定位 | 特点 |
+|---|---|---|---|
+| **Microsoft GraphRAG** | 微软 | 建图 + 社区检测 + 社区摘要 | 全局综述题准确率最高；建图 token 消耗大，更新基本需全量重建 |
+| **LightRAG** | 香港大学 | 轻量双层检索（低层实体 / 高层主题） | 支持增量更新，建图成本比微软方案低一个量级 |
+| **nano-graphrag** | 开源社区 | 微软 GraphRAG 的极简复现 | 千行级代码，适合学习与原型验证 |
+| **OneKE** | 蚂蚁集团 + 浙江大学 | 基于 LLM 的统一知识抽取框架 | 中英文双语，Schema 驱动零样本抽取（NER / RE / EE），开源给 OpenKG（开放知识图谱）社区 |
+| **OpenSPG** | 蚂蚁集团 | 工业级语义图引擎 | 图 Schema 管理 + 逻辑规则，常与 OneKE 搭配做"抽取 + 建图"一体 |
+| **LlamaIndex PropertyGraphIndex / Neo4j LLM Graph Builder** | LlamaIndex / Neo4j | 框架集成路线 | 在既有 RAG 栈里"顺手建图"，改造成本最低 |
+
+> 表内术语： **NER** /ˌen iː ˈɑːr/ （ **Named Entity Recognition** /neɪmd ˈentəti ˌrekəɡˈnɪʃn/ ，命名实体识别）、 **RE** /ˌɑːr ˈiː/ （ **Relation Extraction** /rɪˈleɪʃn ɪkˈstrækʃn/ ，关系抽取）、 **EE** /ˌiː ˈiː/ （ **Event Extraction** /ɪˈvent ɪkˈstrækʃn/ ，事件抽取）。
+
+选型速记：
+
+- **全局综述、不差钱、库少更新** → Microsoft GraphRAG；
+- **要增量更新、控成本** → LightRAG；
+- **要可控的中文领域 Schema 抽取（私有化）** → OneKE + OpenSPG（或 DeepKE）；
+- **已有 LlamaIndex / Neo4j 技术栈** → 框架内置的图构建路线。
+
+### 9.4 落地示例（主示例，Node.js + TypeScript）：LLM 抽三元组
+
+任意强 LLM + JSON Mode 即可实现最小图富化（GraphRAG 框架内做的事，本质就是这段代码的工程化加强）：
+
+```typescript
+import OpenAI from "openai";
+
+interface Triple {
+  subject: string;   // 头实体
+  predicate: string; // 关系
+  object: string;    // 尾实体
+  evidence: string;  // 支撑该三元组的原文句子
+}
+
+const client = new OpenAI({
+  baseURL: "https://api.deepseek.com/v1",
+  apiKey: process.env.DEEPSEEK_API_KEY,
+});
+
+const chunk = "支付服务由交易中台团队维护。交易中台依赖 Redis 集群做会话缓存。";
+
+const resp = await client.chat.completions.create({
+  model: "deepseek-chat",
+  response_format: { type: "json_object" },
+  messages: [
+    {
+      role: "system",
+      content:
+        "你是知识图谱富化器。从用户文本抽取实体-关系三元组，" +
+        '只输出 JSON：{"triples":[{"subject":"","predicate":"","object":"","evidence":""}]}',
+    },
+    { role: "user", content: chunk },
+  ],
+});
+
+const { triples }: { triples: Triple[] } = JSON.parse(
+  resp.choices[0].message.content!,
+);
+// 得到 9.2 节示例中的两条三元组，写入 Neo4j / NebulaGraph 即完成富化
+console.log(triples);
+```
+
+代入真实量级：以 2 万个 chunk 的客服知识库为例，微软 GraphRAG 全量建图（实体关系抽取 + 社区摘要两轮）通常消耗千万级 token；同样的库用 LightRAG 或上面的"单轮抽取"脚本，成本约降一个数量级，但全局综述题效果会打折——**富化深度与成本成正比**，按题型选配方。
+
+### 9.5 坑与代价
+
+1. **建图是 token 大户** ：少更新、需全局洞察的知识库才值得上 GraphRAG；频繁更新的库优先向量 + 增量图（LightRAG 路线）。
+2. **实体消歧决定图质量** ："阿里"与"阿里巴巴集团"不合并，图就是碎的；OneKE / OpenSPG 把消歧做成了显式工程环节。
+3. **增量更新难** ：微软 GraphRAG 基本全量重建，动态知识库慎选。
+4. **不替代向量检索** ：生产常态是"向量 + 图"多路召回（见 [Graph Recall 专文](../../Agent开发知识/07-RAG与知识集成/04-Graph-Recall.md) ），图答关系链、向量答语义近邻。
+
+## 10. 常见误区
 
 - **"向量模型能回答问题"** ：错，它只做匹配，答案是 LLM 生成的（见第 1 节比喻）。
 - **"稀疏向量也是语义向量"** ：错，稀疏是词权重向量，稠密才是语义向量（见第 3 节）。
@@ -446,27 +577,32 @@ console.log(output.data.length); // 512 维句向量
 - **"接口兼容就能混用向量"** ：错，OpenAI 兼容 API 只统一调用方式，向量空间互不相通，换模型必须全量重建（见 [03-向量数据库.md](03-向量数据库.md) 2.5 节）。
 - **"图片也有稀疏向量"** ：错，稀疏仅作用于纯文本（见 5.1、7.6 节）。
 - **"开源多模态模型能直接吃视频"** ：错，抽帧与切片都是业务侧的活（见 6、7.6 节）。
+- **"图富化能替代向量检索"** ：错，两者互补——向量答语义近邻、图答关系链，生产常做"向量 + 图"多路召回（见第 9 节）。
 
-## 10. 速查口诀
+## 11. 速查口诀
 
 - 写东西、聊天 → 普通大模型
 - 难题、多步逻辑 → 推理模型
 - 文档检索、找相似内容 → 向量模型
 - 语义改写召回 → 稠密向量
 - 实体编号精确命中 → 稀疏向量
+- 多跳关系、全局综述 → 语义图富化（LLM 抽三元组）+ GraphRAG
 - 中文私有化 RAG → BGE-M3（稠密 + 稀疏混合）
 - 图文离线检索 → BGE-VL / Qwen3-VL-Embedding
 - 浏览器前端向量化 → Transformers.js + Xenova ONNX
 
-## 11. 参考资料
+## 12. 参考资料
 
 - 火山方舟 doubao-embedding-vision 官方文档（multimodal embeddings 接口）
 - Chen et al., "M3-Embedding: Multi-Lingual, Multi-Functionality, Multi-Granularity Text Embeddings Through Self-Knowledge Distillation"（BGE-M3，2024）
 - Radford et al., "Learning Transferable Visual Models From Natural Language Supervision"（CLIP，2021）
 - Muennighoff et al., "MTEB: Massive Text Embedding Benchmark"（2022）
+- Edge et al., "From Local to Global: A Graph RAG Approach to Query-Focused Summarization"（Microsoft GraphRAG，2024）
+- Guo et al., "LightRAG: Simple and Fast Retrieval-Augmented Generation"（2024）
+- 蚂蚁集团 & 浙江大学，OneKE 大模型知识抽取框架（<http://oneke.openkg.cn/>）
 - Transformers.js：<https://huggingface.co/docs/transformers.js>
 
-## 12. 本文缩写
+## 13. 本文缩写
 
 | 缩写 | 音标 | 全拼 | 中文 |
 |------|------|------|------|
@@ -489,3 +625,9 @@ console.log(output.data.length); // 512 维句向量
 | **ONNX** | /ˈɒnks/ | Open Neural Network Exchange | 开放神经网络交换格式 |
 | **CPU** | /ˌsiː piː ˈjuː/ | Central Processing Unit | 中央处理器 |
 | **GPU** | /ˌdʒiː piː ˈjuː/ | Graphics Processing Unit | 图形处理器 |
+| **KG** | /ˌkeɪ ˈdʒiː/ | Knowledge Graph | 知识图谱 |
+| **GraphRAG** | /ˈɡrɑːf ræɡ/ | Graph Retrieval-Augmented Generation | 图检索增强生成 |
+| **ANN** | /ˌeɪ en ˈen/ | Approximate Nearest Neighbor | 近似最近邻 |
+| **NER** | /ˌen iː ˈɑːr/ | Named Entity Recognition | 命名实体识别 |
+| **RE** | /ˌɑːr ˈiː/ | Relation Extraction | 关系抽取 |
+| **EE** | /ˌiː ˈiː/ | Event Extraction | 事件抽取 |
