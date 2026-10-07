@@ -3,18 +3,24 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://http200.cn/</loc>
-    <lastmod>2026-09-30</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://http200.cn/archive.html</loc>
-    <lastmod>2026-09-30</lastmod>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/01-Prompt-Injection深挖.html</loc>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -39,6 +45,12 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/02-护栏产品化.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/01-Prompt-Injection深挖.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -100,6 +112,12 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.html</loc>
     <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI实践/读《理解深度学习Understanding Deep Learning》.html</loc>
+    <lastmod>2026-09-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -302,12 +320,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</loc>
-    <lastmod>2026-08-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/08-评测框架与基准详解.html</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -465,12 +477,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</loc>
-    <lastmod>2026-08-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html</loc>
     <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
