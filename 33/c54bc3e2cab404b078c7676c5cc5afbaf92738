@@ -1,0 +1,35 @@
+README.md
+  s_923462d3e5f517::t_cc1bfd0fa797d6 3-4,52-67,85
+public/chat.config.json
+  s_923462d3e5f517::t_a34588d722d5b1 1-3
+public/sw.js
+  s_923462d3e5f517::t_162ab1a05cc798 1-3,47-53,59-61
+scripts/build-posts.js
+  s_923462d3e5f517::t_fbe932ab0e2384 790-812
+src/main.js
+  s_923462d3e5f517::t_5c9f7a7269dc83 2,1224
+src/room-chat.js
+  s_923462d3e5f517::t_9aef849984dedc 1-464
+src/style.css
+  s_923462d3e5f517::t_762a4f4b3c4513 1359-1677,1874-1902
+src/three-room.js
+  s_923462d3e5f517::t_99fc6a44443eeb 1239-1260,1529-1538,1564-1584,1611-1627,1635-1641
+vite.config.js
+  s_923462d3e5f517::t_3924815910f212 40-41,44-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "33c54bc3e2cab404b078c7676c5cc5afbaf92738",
+  "prompts": {},
+  "sessions": {
+    "s_923462d3e5f517": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a133ea-ca2e-7ff1-82c4-5c83dddb354f",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
