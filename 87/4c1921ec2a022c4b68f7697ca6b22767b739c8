@@ -1,0 +1,19 @@
+posts/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.md
+  s_869de4a74c482d::t_40c1fd808a9e76 3,5,7,9,11,13,15,17-18,20-338
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "874c1921ec2a022c4b68f7697ca6b22767b739c8",
+  "prompts": {},
+  "sessions": {
+    "s_869de4a74c482d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1198a-1c54-7cd1-af82-614b5df772d1",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
