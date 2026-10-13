@@ -1236,6 +1236,28 @@ export function initHome3DRoom() {
   const characterRig = addCharacter(charWrap);
   room.add(charWrap);
 
+  // 点击小人 → 弹出聊天窗口（在 pointerup 里做射线检测，这里先把可点中的网格收集好）
+  const charHitTargets = [];
+  charWrap.traverse((obj) => {
+    if (obj.isMesh) {
+      obj.userData.action = 'open-chat';
+      charHitTargets.push(obj);
+    }
+  });
+
+  // 统一走这里打开聊天窗；room-chat.js 没接上时（HTML/JS 版本不一致、缓存了旧文件）
+  // 给一条照着做就能好的提示，而不是点了没反应、控制台一片安静
+  function openChat() {
+    if (!/** @type {any} */ (window).__roomChatReady) {
+      console.warn(
+        '[room-chat] 聊天模块未就绪，点击不会弹窗。多半是页面拿到了旧版文件：' +
+          '先重跑 npm run dev（或 npm run build，index.html 由 scripts/build-posts.js 生成），' +
+          '再按 Ctrl/Cmd + Shift + R 强制刷新。'
+      );
+    }
+    window.dispatchEvent(new CustomEvent('room:open-chat'));
+  }
+
   // Chair stays at the target position (not inside charWrap)
   if (characterRig.chairGroup) {
     characterRig.chairGroup.position.copy(charEndPos);
@@ -1504,6 +1526,16 @@ export function initHome3DRoom() {
 
   const temp = new THREE.Vector3();
 
+  // 小人头顶的「聊聊」气泡：和四张信息卡一样，把 3D 坐标投影成屏幕坐标
+  const chatBadge = document.createElement('button');
+  chatBadge.type = 'button';
+  chatBadge.className = 'room-chat-badge';
+  chatBadge.textContent = '💬 聊聊';
+  chatBadge.setAttribute('aria-label', '和小人聊天');
+  chatBadge.addEventListener('click', openChat);
+  hotspotWrap.appendChild(chatBadge);
+  const charHeadAnchor = new THREE.Vector3();
+
   function updateHotspots() {
     const rect = mount.getBoundingClientRect();
     const width = rect.width;
@@ -1528,6 +1560,27 @@ export function initHome3DRoom() {
       button.style.opacity = '1';
       button.style.pointerEvents = 'auto';
       button.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+    }
+
+    // 小人头顶的「聊聊」气泡：入场镜头飞完之后才显示，跟着小人一起动
+    if (!introDone) {
+      chatBadge.style.opacity = '0';
+      chatBadge.style.pointerEvents = 'none';
+    } else {
+      charHeadAnchor.set(0, 1.62, 0);
+      charWrap.localToWorld(charHeadAnchor);
+      charHeadAnchor.project(camera);
+      const badgeVisible = charHeadAnchor.z < 1 && charHeadAnchor.z > -1;
+      if (!badgeVisible) {
+        chatBadge.style.opacity = '0';
+        chatBadge.style.pointerEvents = 'none';
+      } else {
+        const bx = (charHeadAnchor.x * 0.5 + 0.5) * width;
+        const by = (-charHeadAnchor.y * 0.5 + 0.5) * height;
+        chatBadge.style.opacity = '1';
+        chatBadge.style.pointerEvents = 'auto';
+        chatBadge.style.transform = `translate(${bx}px, ${by}px) translate(-50%, -100%)`;
+      }
     }
   }
 
@@ -1555,6 +1608,23 @@ export function initHome3DRoom() {
     }
   });
 
+  // 鼠标悬在小人身上时变成手型，提示这里可以点
+  let hoverPending = false;
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    const { clientX, clientY } = e;
+    if (dragState.moved || hoverPending) return;
+    hoverPending = true;
+    requestAnimationFrame(() => {
+      hoverPending = false;
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const overCharacter = raycaster.intersectObjects(charHitTargets, false).length > 0;
+      renderer.domElement.style.cursor = overCharacter ? 'pointer' : '';
+    });
+  });
+
   renderer.domElement.addEventListener('pointerup', (e) => {
     if (dragState.moved) return;
     const rect = renderer.domElement.getBoundingClientRect();
@@ -1562,6 +1632,13 @@ export function initHome3DRoom() {
     pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(pointer, camera);
+
+    // 优先判定小人：点中任何一块身体网格都打开聊天窗口
+    if (raycaster.intersectObjects(charHitTargets, false).length > 0) {
+      openChat();
+      return;
+    }
+
     const hits = raycaster.intersectObjects(interactiveTargets, false);
     if (hits.length === 0) return;
 

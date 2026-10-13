@@ -787,7 +787,29 @@ const indexHtml = `<!DOCTYPE html>
       </div>
     </div>
 
-    <div class="room-tip">Click an object to explore · Drag to orbit · Scroll to zoom</div>
+    <!-- 点小人弹聊天窗：接口端是另一仓库 tclxtommy-hu.github.io.bff，前端逻辑在 src/room-chat.js -->
+    <div class="room-chat-modal" id="room-chat-modal" hidden>
+      <div class="room-chat-panel" role="dialog" aria-modal="true" aria-labelledby="room-chat-title">
+        <header class="room-chat-header">
+          <span class="room-chat-avatar" aria-hidden="true">🧑‍💻</span>
+          <div class="room-chat-heading">
+            <h2 id="room-chat-title">和房间主人聊聊</h2>
+            <p id="room-chat-status">TommyHu · 在线</p>
+          </div>
+          <button type="button" class="room-chat-icon-btn" id="room-chat-voice" aria-pressed="false" aria-label="朗读回复" title="朗读回复">🔇</button>
+          <button type="button" class="room-chat-icon-btn room-chat-close" id="room-chat-close" aria-label="关闭聊天">×</button>
+        </header>
+        <div class="room-chat-log" id="room-chat-log" role="log" aria-live="polite"></div>
+        <form class="room-chat-form" id="room-chat-form">
+          <button type="button" class="room-chat-icon-btn room-chat-mic" id="room-chat-mic" aria-pressed="false" aria-label="语音输入" title="语音输入">🎤</button>
+          <textarea id="room-chat-input" rows="1" placeholder="输入问题，Enter 发送 · Shift+Enter 换行" autocomplete="off"></textarea>
+          <button type="submit" class="room-chat-send" id="room-chat-send">发送</button>
+        </form>
+        <p class="room-chat-hint" id="room-chat-hint">语音输入与朗读都调用浏览器系统接口（Web Speech API），不依赖第三方服务</p>
+      </div>
+    </div>
+
+    <div class="room-tip">点击小人聊天 · Click objects to explore · Drag to orbit · Scroll to zoom</div>
   </div>
   <script type="module" src="/src/main.js"></script>
   <!-- Background Music (lazy: audio loads only after the first click, never on page load) -->
