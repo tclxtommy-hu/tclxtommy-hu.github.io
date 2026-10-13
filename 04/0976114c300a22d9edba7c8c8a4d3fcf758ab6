@@ -1,0 +1,14 @@
+vite.config.js
+  h_63381fac4a1ac5 52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "040976114c300a22d9edba7c8c8a4d3fcf758ab6",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
