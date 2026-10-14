@@ -53,10 +53,66 @@ function renderRich(text) {
   let html = escapeHtml(text);
   html = html.replace(/```[a-zA-Z0-9]*\n?([\s\S]*?)```/g, (_, code) => `<pre class="room-chat-code">${code.replace(/\n$/, '')}</pre>`);
   html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-  html = html.replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank" rel="noreferrer">$1</a>');
+  html = linkify(html);
   html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\n/g, '<br>');
   return html;
+}
+
+/** 链接末尾粘上的标点（中文句号、顿号、右括号……）要剥掉，否则点开是 404 */
+const TRAILING_PUNCT = /[。，、；：）】》)\]}.,;:]+$/;
+/** 中文（含中文标点）在 URL 里只可能出现在站内文章路径上，见 cutHref 的说明 */
+const FIRST_CJK = /[\u3000-\u303f\u4e00-\u9fff\uff00-\uffef]/;
+/** 短于这个长度就不当链接（避免把残缺的 http:// 变成锚点） */
+const LINK_MIN_LENGTH = 'https://'.length + 1;
+
+/**
+ * @param {string} href
+ * @param {string} label
+ * @returns {string}
+ */
+function anchor(href, label) {
+  return `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+}
+
+/**
+ * 从「URL + 后面可能粘着的话」里切出真正的链接，剩下的原样返回。
+ *
+ * 1) 站内文章地址一定以 `.html` 结尾 —— 切到最后一个 `.html` 为止，后面的中文正文留给文本；
+ * 2) 其他链接没有 `.html`，那就遇到中文就停（真 URL 里不该有中文，后面的多半是模型继续写的话）；
+ * 3) 最后再把 `。` `，` `)` 这类尾巴标点剥掉。
+ * @param {string} raw
+ * @returns {{ href: string, rest: string }}
+ */
+function cutHref(raw) {
+  let href = raw.replace(TRAILING_PUNCT, '');
+  const htmlAt = href.lastIndexOf('.html');
+  if (htmlAt !== -1) {
+    href = href.slice(0, htmlAt + '.html'.length);
+  } else {
+    const cjkAt = href.search(FIRST_CJK);
+    if (cjkAt !== -1) href = href.slice(0, cjkAt);
+  }
+  return { href, rest: raw.slice(href.length) };
+}
+
+/**
+ * 把 http(s) 链接变成「新窗口打开」的锚点（输入必须是 escapeHtml 之后的文本）：
+ *   - `[标题](https://…)` → 锚文本用标题；
+ *   - 裸链接 → 锚文本就是 URL 本身，粘在尾巴上的中文标点留在链接外面。
+ * BFF 注入给模型的文章地址就是裸链接，所以这里是「点了能不能打开」的关键一步。
+ * @param {string} html
+ * @returns {string}
+ */
+export function linkify(html) {
+  return html.replace(
+    /\[([^\]\n]{1,120})\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s<>"'`]+)/g,
+    (match, mdText, mdHref, bare) => {
+      const { href, rest } = cutHref(mdHref ?? bare ?? '');
+      if (href.length < LINK_MIN_LENGTH) return match;
+      return anchor(href, mdHref ? mdText : href) + rest;
+    }
+  );
 }
 
 /** 朗读前把 Markdown 记号去掉，避免读出「星号」「井号」 */
