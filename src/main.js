@@ -1,4 +1,5 @@
 import './style.css';
+import { initHomeChatModal } from './room-chat.js';
 
 function initHomeRoomIfNeeded() {
   if (document.body?.dataset?.page !== 'home-3d') return false;
@@ -1220,6 +1221,7 @@ if (!isHome3D) {
   initParticles();
 }
 initHomeSearchModal();
+initHomeChatModal();
 initSearch();
 initPostToc();
 initWeChatShare();

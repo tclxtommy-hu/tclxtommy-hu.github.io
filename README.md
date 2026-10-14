@@ -1,5 +1,7 @@
 # HTTP200
 
+> 最后修改时间：2026-10-13 14:56
+
 > 最新 AI 技术、网络 IT、软件开发与编程技术分享 · [http200.cn](https://http200.cn)
 
 个人技术博客 & AI 知识库，聚焦 **Agent 开发、大语言模型、AI 编程范式**等前沿话题。首页是一个 Three.js 驱动的 3D 交互空间，文章通过归档页浏览。
@@ -46,6 +48,22 @@ npm run build
 # 新建文章
 npm run new
 ```
+
+### 3D 房间聊天需要同时起 BFF
+
+首页点小人弹出的聊天窗口，后端是单独仓库 **[tclxtommy-hu.github.io.bff](https://github.com/tclxtommy-hu/tclxtommy-hu.github.io.bff)**（零依赖 Node.js，转发 OpenAI 协议中转站，API Key 只留在服务端）：
+
+```bash
+# 终端 1：BFF（默认 8788）
+cd ../tclxtommy-hu.github.io.bff && npm start
+
+# 终端 2：本仓库，vite 已把 /api/chat、/api/health 代理到 127.0.0.1:8788
+npm run dev
+```
+
+只有一个线上地址要配：`public/chat.config.json` 的 `apiBase`。留空 = 同源（本地开发走 vite 代理）；线上填 BFF 的 HTTPS 地址（浏览器不允许 https 页面调 http 接口）。细节见 BFF 仓库的 `README.md`。
+
+> ⚠️ 首页 `index.html` 和 `archive.html` 都由 `scripts/build-posts.js` **生成**：要改房间里的 DOM 结构（比如聊天窗、信息卡），请改脚本里的模板，直接手改 `index.html` 会在下次 `npm run dev` / `npm run build` 时被覆盖。
 
 ## 发布
 

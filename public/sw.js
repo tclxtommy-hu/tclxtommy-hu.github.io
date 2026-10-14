@@ -1,4 +1,6 @@
-const CACHE_NAME = 'http200-v2';
+// v4：/src/（vite dev 源码模块）与 chat.config.json 彻底不进 SW 缓存，
+// 顺带让 activate 清掉旧缓存（v2/v3 里可能缓存着改动前的 /src/*.js）
+const CACHE_NAME = 'http200-v4';
 const PRECACHE = [
   '/',
   '/archive.html',
@@ -42,10 +44,20 @@ function isStaticAsset(pathname) {
   );
 }
 
+// 完全不进 SW 缓存的路径（连离线兜底都不要）：
+//   /src/            —— vite dev 直接给的源码模块，被缓存过就会出现「页面在跑旧代码」
+//   chat.config.json —— 换后端地址后必须立刻生效，不能被旧值顶掉
+function isNoCachePath(pathname) {
+  return pathname.startsWith('/src/') || pathname === '/chat.config.json';
+}
+
 self.addEventListener('fetch', (e) => {
   if (!canCacheRequest(e.request)) return;
 
   const url = new URL(e.request.url);
+
+  // 不插手：交给浏览器直接走网络
+  if (isNoCachePath(url.pathname)) return;
 
   if (isStaticAsset(url.pathname)) {
     e.respondWith((async () => {
