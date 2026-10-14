@@ -1,0 +1,30 @@
+public/chat.config.json
+  h_63381fac4a1ac5 2
+vite.config.js
+  h_63381fac4a1ac5 45-48,54-55
+src/room-chat.js
+  s_923462d3e5f517::t_8df1bc97fe6bc8 121-132,183,186,189-192,294-296
+public/sitemap.xml
+  h_63381fac4a1ac5 6,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "ecad031a61cc6287790db521d0ca16a380295012",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_923462d3e5f517": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a133ea-ca2e-7ff1-82c4-5c83dddb354f",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
