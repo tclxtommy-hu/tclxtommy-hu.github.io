@@ -118,7 +118,18 @@ export function initHomeChatModal() {
   let recognition = null;
   let listening = false;
 
-  resolveApiBase().then((base) => { apiBase = base; });
+  resolveApiBase().then((base) => {
+    apiBase = base;
+    // apiBase 为空 = 按同源请求 /api/chat。本地开发有 vite 代理没问题，
+    // 但线上站点是纯静态（GitHub Pages），POST 会被静态服务器拒掉（405 Not Allowed）
+    const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
+    if (!base && !isLocal) {
+      console.warn(
+        '[room-chat] public/chat.config.json 的 apiBase 是空的：线上会把聊天请求打到站点自己（静态服务器通常回 405 Not Allowed）。' +
+          '请填 BFF 的 HTTPS 地址，例如 { "apiBase": "https://bff.http200.cn" }。'
+      );
+    }
+  });
 
   // ---------- 消息渲染 ----------
 
@@ -169,12 +180,16 @@ export function initHomeChatModal() {
     });
 
     if (!res.ok || !res.body) {
+      const raw = await res.text().catch(() => '');
       let detail = `HTTP ${res.status}`;
       try {
-        const data = await res.json();
+        const data = JSON.parse(raw);
         if (data && data.error) detail = String(data.error);
       } catch {
-        // 响应不是 JSON，就用状态码
+        // 不是 JSON：多半打到了静态站点（GitHub Pages / Nginx 静态目录对 POST 回 405）
+        if (res.status === 405 || res.status === 404 || /<html/i.test(raw)) {
+          detail = `HTTP ${res.status}：这个地址不是 BFF，像是静态站点`;
+        }
       }
       throw new Error(detail);
     }
@@ -276,8 +291,9 @@ export function initHomeChatModal() {
         bubble.innerHTML = `<em>连接后端失败：${escapeHtml(message)}</em>`;
         addSystemNote(
           apiBase
-            ? `后端地址：${apiBase}${CHAT_ENDPOINT_PATH}，请确认 BFF 已启动、且已放行当前站点跨域。`
-            : '还没配置后端地址。本地开发：先起 BFF（默认 8788），或在 public/chat.config.json 里填 apiBase。'
+            ? `请求地址：${apiBase}${CHAT_ENDPOINT_PATH}。请确认：BFF 已启动、前面有 HTTPS 反代、且 ALLOWED_ORIGINS 里含 ${window.location.origin}。`
+            : '还没配置接口地址（public/chat.config.json 的 apiBase 为空），请求打到了站点自己。' +
+              '线上请填 BFF 的 HTTPS 地址，例如 { "apiBase": "https://bff.http200.cn" }；本地开发留空即可（走 vite 代理）。'
         );
       }
     } finally {
