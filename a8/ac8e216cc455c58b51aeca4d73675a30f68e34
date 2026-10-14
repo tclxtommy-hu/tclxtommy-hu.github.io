@@ -1,0 +1,19 @@
+src/room-chat.js
+  s_d0eb5f63207dcd::t_617561ee1e38df 56,62-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "a8ac8e216cc455c58b51aeca4d73675a30f68e34",
+  "prompts": {},
+  "sessions": {
+    "s_d0eb5f63207dcd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13992-88a3-7951-88cc-6a60e78a7c79",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
