@@ -1,0 +1,44 @@
+index.html
+  h_63381fac4a1ac5 82,95-96,106
+  h_63381fac4a1ac5 86
+src/three-room.js
+  h_63381fac4a1ac5 1533
+scripts/build-posts.js
+  h_63381fac4a1ac5 544-546,550,559-560,568-569,677,755,818,820
+  h_63381fac4a1ac5 547-549,551-558,561-567
+src/main.js
+  s_e27ede085e4741::t_a317790bc2b14e 2-3,1225-1228
+src/room-chat.js
+  s_e27ede085e4741::t_724f8643f97a0f 18-26,138-155,157-159,183,190-196,209-213,331-334,336-337,340-351,362,391,529-565,573,612-622,637-657
+src/text-selection.js
+  s_e27ede085e4741::t_e9d09bd263601e 1-194
+archive.html
+  h_63381fac4a1ac5 60-63,66-70,73,105,107,376,427,469,495-504,506,513-521,535,603,612,2240
+public/search-index.json
+  h_63381fac4a1ac5 1
+public/sitemap.xml
+  h_63381fac4a1ac5 6,12,16-21,24-30
+src/style.css
+  h_63381fac4a1ac5 1086-1089,1402,1416,1420,1432,1441,1453,1458,1464,1470,1484,1489,1493,1504,1515,1523,1527,1540,1546,1550,1561,1566,1572,1579,1589,1594,1606,1615,1632,1637,1653,1657,1661,1881,1886,1892,1897,1907-2140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "95c32783abbdbc59b97a9a12375777c6b92a8101",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_e27ede085e4741": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13d31-8bae-7ae2-b320-c4f8144e2c91",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
