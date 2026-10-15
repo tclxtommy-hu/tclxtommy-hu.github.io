@@ -1,5 +1,6 @@
 import './style.css';
-import { initHomeChatModal } from './room-chat.js';
+import { initChatModal, initPageChatEntry } from './room-chat.js';
+import { initTextSelectionAsk } from './text-selection.js';
 
 function initHomeRoomIfNeeded() {
   if (document.body?.dataset?.page !== 'home-3d') return false;
@@ -1221,7 +1222,10 @@ if (!isHome3D) {
   initParticles();
 }
 initHomeSearchModal();
-initHomeChatModal();
+// 聊天窗骨架两种页面都有：首页 3D 房间（点小人 / 头顶气泡）和文章页（右下角入口 + 划词）
+initChatModal();
+initPageChatEntry();
+initTextSelectionAsk();
 initSearch();
 initPostToc();
 initWeChatShare();

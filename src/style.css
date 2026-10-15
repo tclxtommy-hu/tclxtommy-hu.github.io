@@ -1083,6 +1083,10 @@ body.is-mermaid-zoomed {
   .post-layout {
     display: flex;
     flex-direction: column;
+    /* 基础规则是 grid 的 align-items: start；换成纵向 flex 后它会按 max-content 量宽，
+       一篇带长代码行的文章能把整页撑到 900px+（手机上等于横向溢出、fixed 元素被拉宽）。
+       stretch 才是纵向 flex 该有的行为：子项铺满容器宽度。 */
+    align-items: stretch;
     gap: 20px;
   }
 
@@ -1395,7 +1399,7 @@ body.is-home-search-open {
 }
 
 /* ====== 3D 房间：聊天窗口 ====== */
-.home-3d .room-chat-modal {
+.room-chat-modal {
   position: fixed;
   inset: 0;
   /* 必须高于右下角的 🎵 背景音乐按钮和左下角的季节按钮（z-index: 100），
@@ -1409,11 +1413,11 @@ body.is-home-search-open {
   backdrop-filter: blur(4px);
 }
 
-.home-3d .room-chat-modal[hidden] {
+.room-chat-modal[hidden] {
   display: none;
 }
 
-.home-3d .room-chat-panel {
+.room-chat-panel {
   display: flex;
   flex-direction: column;
   width: min(560px, calc(100vw - 28px));
@@ -1425,7 +1429,7 @@ body.is-home-search-open {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
 }
 
-.home-3d .room-chat-header {
+.room-chat-header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1434,7 +1438,7 @@ body.is-home-search-open {
   background: rgba(19, 26, 68, 0.5);
 }
 
-.home-3d .room-chat-avatar {
+.room-chat-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1446,24 +1450,24 @@ body.is-home-search-open {
   font-size: 1.15rem;
 }
 
-.home-3d .room-chat-heading {
+.room-chat-heading {
   flex: 1;
   min-width: 0;
 }
 
-.home-3d .room-chat-heading h2 {
+.room-chat-heading h2 {
   margin: 0;
   font-size: 1.02rem;
   color: #f2f7ff;
 }
 
-.home-3d .room-chat-heading p {
+.room-chat-heading p {
   margin: 2px 0 0;
   font-size: 0.76rem;
   color: #93a9dd;
 }
 
-.home-3d .room-chat-icon-btn {
+.room-chat-icon-btn {
   flex: none;
   width: 36px;
   height: 36px;
@@ -1477,16 +1481,16 @@ body.is-home-search-open {
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
-.home-3d .room-chat-icon-btn:hover {
+.room-chat-icon-btn:hover {
   background: rgba(66, 92, 170, 0.7);
   border-color: rgba(214, 230, 255, 0.7);
 }
 
-.home-3d .room-chat-close {
+.room-chat-close {
   font-size: 1.25rem;
 }
 
-.home-3d .room-chat-mic.is-listening {
+.room-chat-mic.is-listening {
   background: linear-gradient(120deg, rgba(76, 124, 255, 0.95), rgba(150, 78, 226, 0.95));
   border-color: rgba(226, 236, 255, 0.85);
   animation: room-chat-pulse 1.1s ease-in-out infinite;
@@ -1497,7 +1501,7 @@ body.is-home-search-open {
   50% { box-shadow: 0 0 0 8px rgba(120, 150, 255, 0); }
 }
 
-.home-3d .room-chat-log {
+.room-chat-log {
   flex: 1;
   min-height: 180px;
   overflow-y: auto;
@@ -1508,7 +1512,7 @@ body.is-home-search-open {
   gap: 12px;
 }
 
-.home-3d .room-chat-msg {
+.room-chat-msg {
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -1516,11 +1520,11 @@ body.is-home-search-open {
   max-width: 100%;
 }
 
-.home-3d .room-chat-msg--assistant {
+.room-chat-msg--assistant {
   justify-content: flex-start;
 }
 
-.home-3d .room-chat-bubble {
+.room-chat-bubble {
   max-width: min(78%, 420px);
   padding: 9px 12px;
   border-radius: 14px;
@@ -1533,17 +1537,17 @@ body.is-home-search-open {
   border: 1px solid rgba(137, 165, 237, 0.26);
 }
 
-.home-3d .room-chat-msg--user .room-chat-bubble {
+.room-chat-msg--user .room-chat-bubble {
   background: linear-gradient(130deg, rgba(76, 124, 255, 0.92), rgba(118, 68, 200, 0.92));
   border-color: rgba(206, 222, 255, 0.45);
   color: #f7faff;
 }
 
-.home-3d .room-chat-msg--system {
+.room-chat-msg--system {
   justify-content: center;
 }
 
-.home-3d .room-chat-msg--system .room-chat-bubble {
+.room-chat-msg--system .room-chat-bubble {
   max-width: 92%;
   background: transparent;
   border: none;
@@ -1554,25 +1558,25 @@ body.is-home-search-open {
   text-align: center;
 }
 
-.home-3d .room-chat-bubble em {
+.room-chat-bubble em {
   color: #9fb3e0;
   font-style: normal;
 }
 
-.home-3d .room-chat-bubble a {
+.room-chat-bubble a {
   color: #a9c8ff;
   text-decoration: underline;
   word-break: break-all;
 }
 
-.home-3d .room-chat-bubble code {
+.room-chat-bubble code {
   padding: 1px 5px;
   border-radius: 5px;
   background: rgba(8, 12, 34, 0.75);
   font-size: 0.86em;
 }
 
-.home-3d .room-chat-code {
+.room-chat-code {
   margin: 6px 0 2px;
   padding: 8px 10px;
   overflow-x: auto;
@@ -1582,12 +1586,12 @@ body.is-home-search-open {
   line-height: 1.55;
 }
 
-.home-3d .room-chat-thinking {
+.room-chat-thinking {
   color: #90a6dc;
   font-size: 0.9rem;
 }
 
-.home-3d .room-chat-thinking::after {
+.room-chat-thinking::after {
   content: '';
   animation: room-chat-dots 1.2s steps(4, end) infinite;
 }
@@ -1599,7 +1603,7 @@ body.is-home-search-open {
   75%, 100% { content: '···'; }
 }
 
-.home-3d .room-chat-form {
+.room-chat-form {
   display: flex;
   align-items: flex-end;
   gap: 8px;
@@ -1608,7 +1612,7 @@ body.is-home-search-open {
   background: rgba(12, 18, 52, 0.72);
 }
 
-.home-3d .room-chat-form textarea {
+.room-chat-form textarea {
   flex: 1;
   min-height: 38px;
   max-height: 140px;
@@ -1625,12 +1629,12 @@ body.is-home-search-open {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.home-3d .room-chat-form textarea:focus {
+.room-chat-form textarea:focus {
   border-color: rgba(150, 180, 255, 0.75);
   box-shadow: 0 0 0 3px rgba(76, 124, 255, 0.18);
 }
 
-.home-3d .room-chat-send {
+.room-chat-send {
   flex: none;
   min-width: 68px;
   height: 38px;
@@ -1646,15 +1650,15 @@ body.is-home-search-open {
   transition: filter 0.2s, border-color 0.2s;
 }
 
-.home-3d .room-chat-send:hover {
+.room-chat-send:hover {
   filter: brightness(1.1);
 }
 
-.home-3d .room-chat-send.is-stop {
+.room-chat-send.is-stop {
   background: rgba(120, 50, 70, 0.85);
 }
 
-.home-3d .room-chat-hint {
+.room-chat-hint {
   margin: 0;
   padding: 6px 14px 10px;
   font-size: 0.74rem;
@@ -1874,23 +1878,23 @@ body.is-home-chat-open .season-menu {
 
 /* ====== 手机端：聊天窗口铺满下半屏 ====== */
 @media (max-width: 640px) {
-  .home-3d .room-chat-modal {
+  .room-chat-modal {
     padding: 0;
     align-items: flex-end;
   }
 
-  .home-3d .room-chat-panel {
+  .room-chat-panel {
     width: 100vw;
     max-height: min(80dvh, 620px);
     border-radius: 18px 18px 0 0;
   }
 
-  .home-3d .room-chat-log {
+  .room-chat-log {
     min-height: 150px;
     padding: 12px;
   }
 
-  .home-3d .room-chat-bubble {
+  .room-chat-bubble {
     max-width: 84%;
     font-size: 0.92rem;
   }
@@ -1898,5 +1902,239 @@ body.is-home-chat-open .season-menu {
   .home-3d .room-chat-badge {
     font-size: 0.8rem;
     padding: 5px 10px;
+  }
+}
+
+/* ====== 文章页：划词问 AI + 右下角常驻入口 ====== */
+
+/* 选段旁的浮层：固定在视口坐标（滚动即收起，见 src/text-selection.js），left 是选区中心 */
+.ask-sel-bubble {
+  position: fixed;
+  z-index: 125;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(137, 165, 237, 0.34);
+  border-radius: 11px;
+  background: rgba(14, 18, 44, 0.97);
+  box-shadow: 0 12px 30px rgba(4, 8, 26, 0.6);
+  backdrop-filter: blur(6px);
+  animation: ask-sel-in 0.14s ease-out;
+}
+
+.ask-sel-bubble[hidden] {
+  display: none;
+}
+
+@keyframes ask-sel-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to { opacity: 1; transform: translateX(-50%); }
+}
+
+.ask-sel-btn {
+  padding: 6px 11px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #dce6ff;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.ask-sel-btn:hover {
+  background: rgba(76, 124, 255, 0.22);
+  color: #fff;
+}
+
+.ask-sel-ask {
+  background: linear-gradient(120deg, rgba(76, 124, 255, 0.9), rgba(150, 78, 226, 0.88));
+  color: #f7faff;
+}
+
+.ask-sel-bubble.is-copied .ask-sel-copy {
+  color: #7ff0b0;
+}
+
+/* 文章页右下角常驻入口：压在「回到顶部」（bottom: 24px，高 40px）上方 */
+.post-chat-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 76px;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  border: 1px solid rgba(165, 195, 255, 0.34);
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(76, 124, 255, 0.94), rgba(150, 78, 226, 0.9));
+  color: #f6f9ff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  box-shadow: 0 12px 28px rgba(6, 10, 31, 0.45);
+  cursor: pointer;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-chat-fab:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 14px 32px rgba(76, 124, 255, 0.42);
+}
+
+/* 聊天窗打开时收掉它，别压住底部输入区 */
+body.is-home-chat-open .post-chat-fab {
+  display: none;
+}
+
+/* 输入区上方的引用卡片（划词进来的选段，发送后自动清空） */
+.room-chat-quote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 12px 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(137, 165, 237, 0.28);
+  border-left: 3px solid rgba(120, 160, 255, 0.85);
+  border-radius: 8px;
+  background: rgba(20, 28, 68, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.room-chat-quote[hidden] {
+  display: none;
+}
+
+.room-chat-quote-label {
+  flex: none;
+  color: #9fb6ea;
+  font-weight: 600;
+}
+
+.room-chat-quote-text {
+  display: -webkit-box;
+  flex: 1;
+  min-width: 0;
+  max-height: 4.6em;
+  overflow: hidden;
+  color: #cfdbff;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.room-chat-quote-close {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #b9c8ea;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.room-chat-quote-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* 用户气泡里的引用块：和问题同一条气泡，靠左侧色条区分「这段是引用的」 */
+.room-chat-msg-quote {
+  margin-bottom: 6px;
+  padding: 6px 9px;
+  border-left: 3px solid rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 0.82em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  opacity: 0.92;
+}
+
+/* ====== 聊天窗滚动条：跟 .post-toc 一样细、半透明、圆角，
+   默认的 Windows 滚动条（浅灰轨道 + 上下箭头）在深色面板里太扎眼。
+   scrollbar-width / scrollbar-color 是给 Firefox 的，::-webkit-* 是 Chrome/Edge。 ====== */
+.room-chat-log,
+.room-chat-code,
+.room-chat-form textarea {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(137, 165, 237, 0.4) transparent;
+}
+
+.room-chat-log::-webkit-scrollbar {
+  width: 8px;
+}
+
+.room-chat-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.room-chat-log::-webkit-scrollbar-thumb {
+  background: rgba(137, 165, 237, 0.32);
+  border-radius: 999px;
+}
+
+.room-chat-log::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 180, 255, 0.55);
+}
+
+/* 输入框：再窄一点，平时近乎透明，鼠标进来或聚焦才显形 ——
+   空输入框右边挂一条灰条最难看，而「总是显示滚动条」的系统设置又躲不掉 */
+.room-chat-form textarea::-webkit-scrollbar {
+  width: 7px;
+}
+
+.room-chat-form textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.room-chat-form textarea::-webkit-scrollbar-thumb {
+  background: rgba(137, 165, 237, 0.2);
+  border-radius: 999px;
+}
+
+.room-chat-form textarea:hover::-webkit-scrollbar-thumb,
+.room-chat-form textarea:focus::-webkit-scrollbar-thumb {
+  background: rgba(150, 180, 255, 0.5);
+}
+
+/* 聊天里的代码块是横向滚动，高度那 7px 就是它的滚动条 */
+.room-chat-code::-webkit-scrollbar {
+  height: 7px;
+}
+
+.room-chat-code::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.room-chat-code::-webkit-scrollbar-thumb {
+  background: rgba(137, 165, 237, 0.38);
+  border-radius: 999px;
+}
+
+/* 横竖滚动条交汇处的方块不该是个灰疙瘩 */
+.room-chat-log::-webkit-scrollbar-corner,
+.room-chat-code::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@media (max-width: 640px) {
+  .post-chat-fab {
+    right: 14px;
+    bottom: 66px;
+    padding: 8px 13px;
+    font-size: 0.82rem;
+  }
+
+  .room-chat-quote {
+    margin: 0 10px 8px;
   }
 }

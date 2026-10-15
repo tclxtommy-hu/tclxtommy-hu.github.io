@@ -1530,7 +1530,7 @@ export function initHome3DRoom() {
   const chatBadge = document.createElement('button');
   chatBadge.type = 'button';
   chatBadge.className = 'room-chat-badge';
-  chatBadge.textContent = '💬 聊聊';
+  chatBadge.textContent = '💬 Chat';
   chatBadge.setAttribute('aria-label', '和小人聊天');
   chatBadge.addEventListener('click', openChat);
   hotspotWrap.appendChild(chatBadge);

@@ -3,19 +3,31 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://http200.cn/</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://http200.cn/archive.html</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</loc>
-    <lastmod>2026-10-13</lastmod>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Harness/上下文压缩机制对比.html</loc>
+    <lastmod>2026-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -891,12 +903,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/03-向量数据库.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

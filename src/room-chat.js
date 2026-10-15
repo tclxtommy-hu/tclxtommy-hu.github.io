@@ -15,6 +15,15 @@ const MAX_HISTORY_TURNS = 8;
 
 const GREETING = '嗨，我是 TommyHu 👋 这个房间里的人就是我。想聊技术、聊项目，还是想问问我的经历？直接问我，也可以点麦克风用说的。';
 
+/** 文章页的招呼语：那边的主线是「找文章 / 问文章里的内容」 */
+const GREETING_POST = '嗨，我是 TommyHu 的 AI 分身 👋 全站文章我都读过——想找什么直接问我，也可以把正文里的段落划词丢给我。';
+
+/** 输入框留空、但手上带着引用时用的默认问题，省掉「你倒是问一句啊」的空转 */
+const DEFAULT_QUOTE_QUESTION = '这段内容是什么意思？结合我博客里的相关文章讲一下。';
+
+/** 划词选段的长度上限：太长会白烧 token，UI 上也读不完 */
+const MAX_QUOTE_CHARS = 1200;
+
 /**
  * 解析后端地址。
  * 优先级：window.__CHAT_API_BASE__ > /chat.config.json 的 apiBase > 同源（走 vite 代理）。
@@ -126,11 +135,28 @@ function toSpeechText(text) {
     .trim();
 }
 
-export function initHomeChatModal() {
-  if (document.body?.dataset?.page !== 'home-3d') return;
+/**
+ * 把文章页划词的选段拼成模型能看懂的引用块（含出处链接，模型才会去找站内相关文章）：
+ *
+ *   引用自《标题》(https://http200.cn/posts-html/xxx.html)：
+ *   > 第一行
+ *   > 第二行
+ *
+ * @param {{ text: string, title?: string, url?: string }} quote
+ * @returns {string}
+ */
+function formatQuote(quote) {
+  const head = quote.title ? `引用自《${quote.title}》` : '引用自本站文章';
+  const body = quote.text
+    .split('\n')
+    .map((line) => `> ${line}`)
+    .join('\n');
+  return `${head}${quote.url ? `(${quote.url})` : ''}：\n${body}`;
+}
 
-  // 聊天窗骨架来自 index.html。注意：首页 index.html 是 scripts/build-posts.js 生成的，
-  // 改了模板必须重跑 npm run dev / npm run build，否则这里的节点会缺失。
+export function initChatModal() {
+  // 聊天窗骨架由 scripts/build-posts.js 生成：首页 index.html 和所有文章页 posts-html/**.html 都有。
+  // 注意：改了模板必须重跑 npm run dev / npm run build，否则这里的节点会缺失。
   // 以前这种缺失是「静默 return」，表现就是点小人毫无反应、控制台也不报错，极难排查 —— 现在直接报错说清楚。
   const NODE_IDS = {
     modal: 'room-chat-modal',
@@ -154,13 +180,20 @@ export function initHomeChatModal() {
   if (missing.length > 0) {
     console.error(
       `[room-chat] 聊天窗节点缺失：${missing.join('、')}。` +
-        '请确认 index.html 是由 scripts/build-posts.js 生成的最新版本（重跑 npm run dev 或 npm run build），' +
+        '请确认 index.html 与 posts-html/**.html 都是 scripts/build-posts.js 生成的最新版本（重跑 npm run dev 或 npm run build），' +
         '并按 Ctrl/Cmd + Shift + R 强制刷新清掉旧缓存。'
     );
     return;
   }
   const { modal, log, form, input, sendBtn, closeBtn, micBtn, voiceBtn, hint } = nodes;
   const status = document.getElementById('room-chat-status');
+  // 引用卡片是可选的：缓存里的旧 HTML 没有这个节点，缺了就降级（不报错、不影响普通聊天）
+  const quoteCard = document.getElementById('room-chat-quote');
+  const isPostPage = document.body?.dataset?.page === 'post';
+  if (isPostPage) {
+    const titleEl = document.getElementById('room-chat-title');
+    if (titleEl) titleEl.textContent = '问问站点里的文章';
+  }
 
   /** @type {string} */
   let apiBase = '';
@@ -173,6 +206,11 @@ export function initHomeChatModal() {
   /** @type {any} */
   let recognition = null;
   let listening = false;
+  /**
+   * 待发送的引用（文章页划词进来时设置），发送后清空。
+   * @type {{ text: string, title?: string, url?: string } | null}
+   */
+  let pendingQuote = null;
 
   resolveApiBase().then((base) => {
     apiBase = base;
@@ -290,12 +328,27 @@ export function initHomeChatModal() {
 
   // ---------- 一次问答 ----------
 
-  /** @param {string} text */
+  /**
+   * 一次问答。
+   * @param {string} text 用户输入的问题；带引用时允许留空（用默认问题兜底）
+   */
   async function ask(text) {
-    const question = text.trim();
+    const quote = pendingQuote;
+    const question = (text || '').trim() || (quote ? DEFAULT_QUOTE_QUESTION : '');
     if (!question || inflight) return;
 
-    addBubble('user').textContent = question;
+    // 气泡里把引用单独摆一行，方便回看「我问的是这一段」；发给模型的正文则额外带出处
+    const userBubble = addBubble('user');
+    if (quote) {
+      const quoted = document.createElement('div');
+      quoted.className = 'room-chat-msg-quote';
+      quoted.textContent = quote.text;
+      userBubble.appendChild(quoted);
+    }
+    userBubble.appendChild(document.createTextNode(question));
+    const payload = quote ? `${formatQuote(quote)}\n\n${question}` : question;
+
+    setQuote(null);
     input.value = '';
     autoGrow();
     stopListening();
@@ -306,7 +359,7 @@ export function initHomeChatModal() {
     thinking.textContent = '思考中…';
     bubble.appendChild(thinking);
 
-    const messages = [...history.slice(-MAX_HISTORY_TURNS * 2), { role: 'user', content: question }];
+    const messages = [...history.slice(-MAX_HISTORY_TURNS * 2), { role: 'user', content: payload }];
     let answer = '';
     let reasonSeen = false;
 
@@ -335,7 +388,7 @@ export function initHomeChatModal() {
           : '<em>（没有收到回复）</em>';
       }
 
-      history.push({ role: 'user', content: question });
+      history.push({ role: 'user', content: payload });
       history.push({ role: 'assistant', content: answer });
       history = history.slice(-MAX_HISTORY_TURNS * 2);
       if (answer && speakReplies) speak(answer);
@@ -473,6 +526,43 @@ export function initHomeChatModal() {
     input.style.height = `${Math.min(input.scrollHeight, 140)}px`;
   }
 
+  /**
+   * 设置 / 清除输入区上方的引用卡片（文章页划词、或外部事件带 detail.quote 时调用）。
+   * @param {{ text: string, title?: string, url?: string } | null} quote
+   */
+  function setQuote(quote) {
+    pendingQuote = quote;
+    if (!quoteCard) return;
+    quoteCard.innerHTML = '';
+    if (!quote) {
+      quoteCard.hidden = true;
+      input.placeholder = '输入问题，Enter 发送 · Shift+Enter 换行';
+      return;
+    }
+    quoteCard.hidden = false;
+
+    const label = document.createElement('span');
+    label.className = 'room-chat-quote-label';
+    label.textContent = quote.title ? `引用《${quote.title}》` : '引用选段';
+
+    const body = document.createElement('span');
+    body.className = 'room-chat-quote-text';
+    body.textContent = quote.text;
+
+    const clear = document.createElement('button');
+    clear.type = 'button';
+    clear.className = 'room-chat-quote-close';
+    clear.setAttribute('aria-label', '移除引用');
+    clear.textContent = '×';
+    clear.addEventListener('click', () => {
+      setQuote(null);
+      input.focus();
+    });
+
+    quoteCard.append(label, body, clear);
+    input.placeholder = '针对这段内容想了解什么？留空直接回车，我来解释';
+  }
+
   function setOpen(open) {
     modal.hidden = !open;
     modal.classList.toggle('is-open', open);
@@ -480,7 +570,7 @@ export function initHomeChatModal() {
     if (open) {
       if (!started) {
         started = true;
-        addBubble('assistant').innerHTML = renderRich(GREETING);
+        addBubble('assistant').innerHTML = renderRich(isPostPage ? GREETING_POST : GREETING);
       }
       requestAnimationFrame(() => input.focus());
     } else {
@@ -519,7 +609,17 @@ export function initHomeChatModal() {
     if (e.key === 'Escape' && !modal.hidden) setOpen(false);
   });
 
-  window.addEventListener('room:open-chat', () => setOpen(true));
+  // 划词气泡（src/text-selection.js）、文章页右下角入口、3D 房间的小人都走这个事件。
+  // 带 detail.quote 时先把选段挂成引用卡片，用户提问就自动带上出处。
+  window.addEventListener('room:open-chat', (event) => {
+    const { quote, sourceTitle, sourceUrl } = /** @type {any} */ (event).detail || {};
+    setOpen(true);
+    setQuote(
+      quote
+        ? { text: String(quote).slice(0, MAX_QUOTE_CHARS), title: sourceTitle || '', url: sourceUrl || '' }
+        : null
+    );
+  });
 
   // 语音不可用时直接隐藏按钮，避免点了没反应
   if (!SpeechRecognitionCtor) {
@@ -533,4 +633,25 @@ export function initHomeChatModal() {
 
   // 供 three-room.js 判断「聊天模块是否就绪」：没就绪时点气泡会给出可操作的提示
   /** @type {any} */ (window).__roomChatReady = true;
+}
+
+/**
+ * 文章页右下角的常驻入口（不划词也能随手问一句）。
+ * 首页 3D 房间不需要它：那边是点小人 / 头顶的「聊聊」气泡。
+ */
+export function initPageChatEntry() {
+  if (document.body?.dataset?.page !== 'post') return;
+  if (document.getElementById('post-chat-fab')) return;
+
+  const fab = document.createElement('button');
+  fab.type = 'button';
+  fab.id = 'post-chat-fab';
+  fab.className = 'post-chat-fab';
+  fab.textContent = '💬 问 AI';
+  fab.title = '基于全站文章问答，也可以先划词再问';
+  fab.setAttribute('aria-label', '打开 AI 问答');
+  fab.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('room:open-chat'));
+  });
+  document.body.appendChild(fab);
 }

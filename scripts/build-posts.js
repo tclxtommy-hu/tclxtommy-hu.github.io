@@ -541,6 +541,32 @@ const headExtra = `
   </script>
   <script>try{var s=localStorage.getItem('site-season');if(s)document.documentElement.setAttribute('data-season',s);}catch(e){}</script>${criticalCss}`;
 
+// 聊天窗骨架：首页 3D 房间和文章页共用一份，逻辑在 src/room-chat.js（节点 id 对不上会直接报错）。
+// 打开方式：首页点小人 / 头顶「聊聊」气泡；文章页右下角常驻入口 + 正文划词气泡。
+const chatModalHtml = `
+    <div class="room-chat-modal" id="room-chat-modal" hidden>
+      <div class="room-chat-panel" role="dialog" aria-modal="true" aria-labelledby="room-chat-title">
+        <header class="room-chat-header">
+          <span class="room-chat-avatar" aria-hidden="true">🧑</span>
+          <div class="room-chat-heading">
+            <h2 id="room-chat-title">和房间主人聊聊</h2>
+            <p id="room-chat-status">TommyHu · 在线</p>
+          </div>
+          <button type="button" class="room-chat-icon-btn" id="room-chat-voice" aria-pressed="false" aria-label="朗读回复" title="朗读回复">🔇</button>
+          <button type="button" class="room-chat-icon-btn room-chat-close" id="room-chat-close" aria-label="关闭聊天">×</button>
+        </header>
+        <div class="room-chat-log" id="room-chat-log" role="log" aria-live="polite"></div>
+        <!-- 文章页划词进来的引用卡片：发送时会拼成「引用自《标题》(链接)：> 选段」，模型才知道这段出自哪篇 -->
+        <div class="room-chat-quote" id="room-chat-quote" hidden></div>
+        <form class="room-chat-form" id="room-chat-form">
+          <button type="button" class="room-chat-icon-btn room-chat-mic" id="room-chat-mic" aria-pressed="false" aria-label="语音输入" title="语音输入">🎤</button>
+          <textarea id="room-chat-input" rows="1" placeholder="输入问题，Enter 发送 · Shift+Enter 换行" autocomplete="off"></textarea>
+          <button type="submit" class="room-chat-send" id="room-chat-send">发送</button>
+        </form>
+        <p class="room-chat-hint" id="room-chat-hint">语音输入与朗读都调用浏览器系统接口（Web Speech API），不依赖第三方服务</p>
+      </div>
+    </div>`;
+
 function buildOgMeta({ title, description, url, type = 'website', image = '/icons/icon-512.png' }) {
   const fullImage = image.startsWith('http') ? image : `https://http200.cn${image}`;
   const cleanDesc = attrEscape(description.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim());
@@ -648,7 +674,7 @@ for (const post of posts) {
   ${keywordsMeta}${ogMeta}${jsonLd}${headExtra}
   <script>try{var s=parseFloat(localStorage.getItem('post-font-scale'));if(s>=0.8&&s<=1.6)document.documentElement.style.setProperty('--post-font-scale',s);}catch(e){}</script>
 </head>
-<body>
+<body data-page="post">
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
@@ -726,6 +752,7 @@ for (const post of posts) {
     <a href="/archive.html" class="back-link">← 返回归档</a>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  ${chatModalHtml}
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>
@@ -788,28 +815,9 @@ const indexHtml = `<!DOCTYPE html>
     </div>
 
     <!-- 点小人弹聊天窗：接口端是另一仓库 tclxtommy-hu.github.io.bff，前端逻辑在 src/room-chat.js -->
-    <div class="room-chat-modal" id="room-chat-modal" hidden>
-      <div class="room-chat-panel" role="dialog" aria-modal="true" aria-labelledby="room-chat-title">
-        <header class="room-chat-header">
-          <span class="room-chat-avatar" aria-hidden="true">🧑‍💻</span>
-          <div class="room-chat-heading">
-            <h2 id="room-chat-title">和房间主人聊聊</h2>
-            <p id="room-chat-status">TommyHu · 在线</p>
-          </div>
-          <button type="button" class="room-chat-icon-btn" id="room-chat-voice" aria-pressed="false" aria-label="朗读回复" title="朗读回复">🔇</button>
-          <button type="button" class="room-chat-icon-btn room-chat-close" id="room-chat-close" aria-label="关闭聊天">×</button>
-        </header>
-        <div class="room-chat-log" id="room-chat-log" role="log" aria-live="polite"></div>
-        <form class="room-chat-form" id="room-chat-form">
-          <button type="button" class="room-chat-icon-btn room-chat-mic" id="room-chat-mic" aria-pressed="false" aria-label="语音输入" title="语音输入">🎤</button>
-          <textarea id="room-chat-input" rows="1" placeholder="输入问题，Enter 发送 · Shift+Enter 换行" autocomplete="off"></textarea>
-          <button type="submit" class="room-chat-send" id="room-chat-send">发送</button>
-        </form>
-        <p class="room-chat-hint" id="room-chat-hint">语音输入与朗读都调用浏览器系统接口（Web Speech API），不依赖第三方服务</p>
-      </div>
-    </div>
+    ${chatModalHtml}
 
-    <div class="room-tip">点击小人聊天 · Click objects to explore · Drag to orbit · Scroll to zoom</div>
+    <div class="room-tip">Click objects to explore · Drag to orbit · Scroll to zoom</div>
   </div>
   <script type="module" src="/src/main.js"></script>
   <!-- Background Music (lazy: audio loads only after the first click, never on page load) -->
