@@ -1,0 +1,29 @@
+posts/AI/AI实践/copilot配置.md
+  s_e2e2c006a1e119::t_e3dae4e06ddcf6 9
+  h_63381fac4a1ac5 3-6,11
+  h_63381fac4a1ac5 1-2,7-8,10
+posts/AI/AI实践/codex配置.md
+  h_63381fac4a1ac5 3-4,6-323
+  h_63381fac4a1ac5 1-2,5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "2093c528e794b756c9b7a96fef6fbeaf21a8b54d",
+  "prompts": {},
+  "humans": {
+    "h_63381fac4a1ac5": {
+      "author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  },
+  "sessions": {
+    "s_e2e2c006a1e119": {
+      "agent_id": {
+        "tool": "github-copilot-tab",
+        "id": "ai_tab-1792478889315",
+        "model": "default"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
