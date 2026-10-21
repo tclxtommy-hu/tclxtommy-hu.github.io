@@ -1,0 +1,33 @@
+404.html
+  s_14ba1f3a714b3f::t_4d27a9e6094edd 51
+archive.html
+  s_14ba1f3a714b3f::t_66dc53467e7950 63-70,73,108,110,302-303,501-510,512,519-527,699,708,2297
+posts/AI/AI实践/大模型LLm没有记忆？.md
+  s_14ba1f3a714b3f::t_972b51a41551fa 1-343
+posts/AI/AI编程范式/AI应用开发范式/09-llm-api.md
+  s_14ba1f3a714b3f::t_0fed83d2834ef1 3-4,7,57-303,338-339,901-916
+public/feed.xml
+  s_14ba1f3a714b3f::t_09dd6af1975b81 8,10-17,22,26-33
+public/posts-tree.json
+  s_14ba1f3a714b3f::t_bb938deb29e28f 1
+public/search-index.json
+  s_14ba1f3a714b3f::t_5c413250aa700c 1
+public/sitemap.xml
+  s_14ba1f3a714b3f::t_7666a04b2d5e6c 16-21,28-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "ab2fc2354af949833dcd72de321e99e27264f793",
+  "prompts": {},
+  "sessions": {
+    "s_14ba1f3a714b3f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15d50-979f-79e3-ad22-5f490c64cb09",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
