@@ -1,0 +1,29 @@
+posts/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.md
+  s_14ba1f3a714b3f::t_b1f452e7bc670e 1,3,5-6,8,10,12-23,25,27-698
+public/posts-tree.json
+  s_a2c3094b7eacbe::t_b06e60efd82244 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "a024a5b31d0eb70f1b5f46483c2d9847f851ff99",
+  "prompts": {},
+  "sessions": {
+    "s_14ba1f3a714b3f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15d50-979f-79e3-ad22-5f490c64cb09",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_a2c3094b7eacbe": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15c79-1dcf-78e0-9f12-dca420c14c23",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
