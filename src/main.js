@@ -19,7 +19,8 @@ function initHomeSearchModal() {
   if (document.body?.dataset?.page !== 'home-3d') return;
 
   const modal = document.getElementById('room-search-modal');
-  const input = document.getElementById('room-search-input');
+  /** @type {HTMLInputElement | null} */
+  const input = /** @type {any} */ (document.getElementById('room-search-input'));
   const results = document.getElementById('room-search-results');
   const closeBtn = document.getElementById('room-search-close');
   if (!modal || !input || !results || !closeBtn) return;
@@ -43,15 +44,15 @@ function initHomeSearchModal() {
     return indexData;
   }
 
-  // Prefetch the index at the user's first interaction so the very search
-  // doesn't have to wait for the full JSON download
-  document.addEventListener('pointerdown', () => { loadIndex().catch(() => {}); }, { once: true, passive: true });
-
+  // 只在「要搜索」时才预取索引：打开搜索面板就是那个信号。
+  // 以前挂在 document 的第一次 pointerdown 上 —— 首页随便点一下（点小人、点按钮、
+  // 双击选词）都会白下 440KB 的 search-index.json。
   function setOpen(open) {
     modal.hidden = !open;
     modal.classList.toggle('is-open', open);
     document.body.classList.toggle('is-home-search-open', open);
     if (open) {
+      loadIndex().catch(() => {});
       requestAnimationFrame(() => input.focus());
     }
   }
@@ -125,9 +126,11 @@ function initHomeSearchModal() {
 
 // ====== Particle background animation ======
 function initParticles() {
-  const canvas = document.getElementById('bg-canvas');
+  /** @type {HTMLCanvasElement | null} */
+  const canvas = /** @type {any} */ (document.getElementById('bg-canvas'));
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   let w, h;
   const points = [];
   const LINK_DIST_SQ = 120 * 120;
@@ -242,7 +245,9 @@ async function initMermaid() {
 }
 
 function enhanceMermaidZoom() {
-  document.querySelectorAll('.mermaid').forEach((diagram) => {
+  document.querySelectorAll('.mermaid').forEach((el) => {
+    // querySelectorAll 只保证是 Element；下面要用 HTMLElement 的 keydown 事件类型
+    const diagram = /** @type {HTMLElement} */ (el);
     if (diagram.closest('.mermaid-wrap')) return;
     if (!diagram.querySelector('svg')) return;
 
@@ -303,9 +308,12 @@ function getMermaidLightbox() {
   `;
   document.body.appendChild(overlay);
 
-  const viewport = overlay.querySelector('.mermaid-lightbox-viewport');
-  const world = overlay.querySelector('.mermaid-lightbox-world');
-  const label = overlay.querySelector('[data-zoom-label]');
+  /** @type {HTMLElement} */
+  const viewport = /** @type {any} */ (overlay.querySelector('.mermaid-lightbox-viewport'));
+  /** @type {HTMLElement} */
+  const world = /** @type {any} */ (overlay.querySelector('.mermaid-lightbox-world'));
+  /** @type {HTMLElement} */
+  const label = /** @type {any} */ (overlay.querySelector('[data-zoom-label]'));
   const pointers = new Map();
   let scale = 1;
   let tx = 0;
@@ -388,7 +396,8 @@ function getMermaidLightbox() {
   }
 
   overlay.addEventListener('click', (e) => {
-    const action = e.target.closest('[data-action]')?.dataset.action;
+    const target = e.target instanceof Element ? e.target : null;
+    const action = target?.closest('[data-action]')?.getAttribute('data-action');
     if (!action) return;
     if (action === 'close') close();
     else if (action === 'in') zoomCenter(scale * 1.25);
@@ -402,7 +411,7 @@ function getMermaidLightbox() {
   }, { passive: false });
 
   viewport.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('button')) return;
+    if (e.target instanceof Element && e.target.closest('button')) return;
     viewport.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.size === 2) {
@@ -504,7 +513,8 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 
 // ====== Search ======
 function initSearch() {
-  const input = document.getElementById('search-input');
+  /** @type {HTMLInputElement | null} */
+  const input = /** @type {any} */ (document.getElementById('search-input'));
   if (!input) return;
 
   const resultsEl = document.getElementById('search-results');
@@ -542,24 +552,29 @@ function initSearch() {
 
   // ====== Tree-based filter ======
   const readmeEl = document.getElementById('archive-readme');
-  const treeFolders = document.querySelectorAll('.archive-tree .tree-node');
+  /** @type {NodeListOf<HTMLElement>} */
+  const treeFolders = /** @type {any} */ (document.querySelectorAll('.archive-tree .tree-node'));
   const recentToggle = document.getElementById('archive-recent-toggle');
-  const recentDetails = document.getElementById('archive-recent');
+  /** @type {HTMLDetailsElement | null} */
+  const recentDetails = /** @type {any} */ (document.getElementById('archive-recent'));
   const recentHint = document.getElementById('archive-recent-hint');
+  /** @type {HTMLElement | null} */
   const archiveListEl = document.getElementById('archive-list');
   const desktopRecentMq = window.matchMedia('(min-width: 901px)');
   let currentPath = '';
   let viewMode = 'path';
   let syncingRecent = false;
+  /** @type {Set<string> | null} */
   let savedTreeState = null;
 
   function isDesktopArchive() {
     return desktopRecentMq.matches;
   }
 
+  /** @returns {HTMLDetailsElement[]} */
   function getTreeFolderDetails() {
     const treeEl = document.getElementById('archive-tree');
-    return treeEl ? [...treeEl.querySelectorAll('details.tree-folder')] : [];
+    return treeEl ? /** @type {any} */ ([...treeEl.querySelectorAll('details.tree-folder')]) : [];
   }
 
   // Collapse the whole tree while searching; remember previous open state
@@ -581,7 +596,9 @@ function initSearch() {
   }
 
   if (archiveListEl) {
-    archiveListEl.querySelectorAll('.archive-item').forEach((el, i) => {
+    /** @type {NodeListOf<HTMLElement>} */
+    const items = /** @type {any} */ (archiveListEl.querySelectorAll('.archive-item'));
+    items.forEach((el, i) => {
       el.dataset.index = String(i);
     });
   }
@@ -648,7 +665,8 @@ function initSearch() {
     if (!treeEl) return;
 
     // Ensure root is always open so the selected path stays visible
-    const rootDetails = treeEl.querySelector('.tree-folder[data-path=""]');
+    /** @type {HTMLDetailsElement | null} */
+    const rootDetails = /** @type {any} */ (treeEl.querySelector('.tree-folder[data-path=""]'));
     if (rootDetails) rootDetails.open = true;
 
     // Build ancestor paths: e.g., "AI/Agent开发知识/02-推理范式" → ["AI", "AI/Agent开发知识", "AI/Agent开发知识/02-推理范式"]
@@ -658,18 +676,23 @@ function initSearch() {
       accumulated = accumulated ? accumulated + '/' + part : part;
       // When collapsing via click, skip the target node so native close sticks
       if (!includeSelf && accumulated === path) continue;
-      const details = treeEl.querySelector(`.tree-folder[data-path="${CSS.escape(accumulated)}"]`);
+      /** @type {HTMLDetailsElement | null} */
+      const details = /** @type {any} */ (
+        treeEl.querySelector(`.tree-folder[data-path="${CSS.escape(accumulated)}"]`)
+      );
       if (details) details.open = true;
     }
   }
 
+  /** @returns {HTMLElement[]} */
   function getArchiveItems() {
-    return listWrap ? [...listWrap.querySelectorAll('.archive-item')] : [];
+    return listWrap ? /** @type {any} */ ([...listWrap.querySelectorAll('.archive-item')]) : [];
   }
 
   function setDateLabels(mode) {
     getArchiveItems().forEach((el) => {
-      const dateEl = el.querySelector('.archive-date');
+      /** @type {HTMLElement | null} */
+      const dateEl = /** @type {any} */ (el.querySelector('.archive-date'));
       if (!dateEl) return;
       const label = mode === 'recent' ? dateEl.dataset.mtimeLabel : dateEl.dataset.pubDate;
       if (label) dateEl.textContent = label;
@@ -719,7 +742,7 @@ function initSearch() {
     }
     setDateLabels('recent');
 
-    const url = new URL(window.location);
+    const url = new URL(window.location.href);
     url.searchParams.set('recent', '1');
     url.searchParams.delete('path');
     window.history.replaceState({}, '', url);
@@ -766,7 +789,7 @@ function initSearch() {
     }
 
     // Update URL
-    const url = new URL(window.location);
+    const url = new URL(window.location.href);
     url.searchParams.delete('recent');
     if (path) {
       url.searchParams.set('path', path);

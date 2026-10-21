@@ -7,7 +7,10 @@
     "dev": "node scripts/build-posts.js && vite",
     "build": "node scripts/build-posts.js && vite build",
     "preview": "vite preview",
-    "new": "node scripts/new-post.js"
+    "new": "node scripts/new-post.js",
+    "typecheck": "tsc -p jsconfig.json",
+    "images": "node scripts/images.js",
+    "check:generated": "node scripts/check-generated.js"
   },
   "repository": {
     "type": "git",
@@ -17,11 +20,13 @@
   "author": "TommyHu",
   "license": "ISC",
   "devDependencies": {
+    "@types/three": "^0.170.0",
     "gray-matter": "^4.0.3",
     "marked": "^18.0.0",
     "mermaid": "^11.16.0",
     "sharp": "^0.34.5",
     "three": "^0.170.0",
+    "typescript": "^5.9.3",
     "vite": "^8.0.5"
   }
 }

@@ -13,6 +13,7 @@ import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import { buildImageIndex } from './images.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -197,6 +198,19 @@ renderer.heading = function heading({ tokens, depth, _headingId }) {
   return `<h${depth} id="${_headingId}">${text}</h${depth}>`;
 };
 
+// 正文配图：构建期已把 PNG/JPEG 转成同目录 WebP（见 scripts/images.js）。
+// 这里做三件事：换 src 到 .webp、补 width/height（消 CLS）、加 lazy + async。
+// 索引里没有的图（外链、没走 public/ 的路径）原样输出，只补懒加载属性。
+renderer.image = function image({ href, title, text }) {
+  const raw = String(href || '');
+  const publicSrc = raw.replace(/^(?:\.\.\/)*public\//, '/');
+  const optimized = imageIndex.get(publicSrc);
+  const src = optimized ? optimized.src : publicSrc;
+  const size = optimized ? ` width="${optimized.width}" height="${optimized.height}"` : '';
+  const titleAttr = title ? ` title="${attrEscape(title)}"` : '';
+  return `<img src="${attrEscape(src)}" alt="${attrEscape(String(text || ''))}"${titleAttr}${size} loading="lazy" decoding="async">`;
+};
+
 // Clean old generated HTML (recursive)
 function cleanDir(dir) {
   if (!fs.existsSync(dir)) return;
@@ -217,6 +231,10 @@ cleanDir(POSTS_HTML_DIR);
 
 // Read all markdown files recursively
 const mdFiles = findMdFiles(POSTS_DIR, POSTS_DIR);
+
+// 正文配图索引（构建期顺手把 PNG/JPEG 转成 WebP）。顶层 await：ESM 脚本里合法，
+// 放在渲染之前即可 —— 下面 renderer.image 只会在这里赋值之后才被调用。
+const imageIndex = await buildImageIndex();
 
 const posts = mdFiles.map(({ fullPath, relativeDir }) => {
   const raw = fs.readFileSync(fullPath, 'utf-8');
@@ -541,8 +559,8 @@ const headExtra = `
   </script>
   <script>try{var s=localStorage.getItem('site-season');if(s)document.documentElement.setAttribute('data-season',s);}catch(e){}</script>${criticalCss}`;
 
-// 聊天窗骨架：首页 3D 房间和文章页共用一份，逻辑在 src/room-chat.js（节点 id 对不上会直接报错）。
-// 打开方式：首页点小人 / 头顶「聊聊」气泡；文章页右下角常驻入口 + 正文划词气泡。
+// 聊天窗骨架：首页 3D 房间、文章页、归档页共用一份，逻辑在 src/room-chat.js（节点 id 对不上会直接报错）。
+// 打开方式：首页点小人 / 头顶「聊聊」气泡；文章页、归档页用右下角常驻入口（文章页还有正文划词气泡）。
 const chatModalHtml = `
     <div class="room-chat-modal" id="room-chat-modal" hidden>
       <div class="room-chat-panel" role="dialog" aria-modal="true" aria-labelledby="room-chat-title">
@@ -927,7 +945,7 @@ const archiveHtml = `<!DOCTYPE html>
   <meta name="description" content="${siteDesc}">
   ${keywordsMeta}${buildOgMeta({ title: '归档 - HTTP200', description: siteDesc, url: '/archive.html' })}${buildJsonLd({ type: 'CollectionPage', title: '归档 - HTTP200', description: siteDesc, url: '/archive.html' })}${headExtra}
 </head>
-<body>
+<body data-page="archive">
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
@@ -956,6 +974,7 @@ const archiveHtml = `<!DOCTYPE html>
     </div>
   </main>
   <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  ${chatModalHtml}
   </div>
   <script>
     window.__POSTS_TREE__ = ${treeJson};

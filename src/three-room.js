@@ -1239,9 +1239,11 @@ export function initHome3DRoom() {
   // 点击小人 → 弹出聊天窗口（在 pointerup 里做射线检测，这里先把可点中的网格收集好）
   const charHitTargets = [];
   charWrap.traverse((obj) => {
-    if (obj.isMesh) {
-      obj.userData.action = 'open-chat';
-      charHitTargets.push(obj);
+    // 同上：traverse 的元素是 Object3D，isMesh / userData 都在 Mesh 上
+    const mesh = /** @type {import('three').Mesh} */ (obj);
+    if (mesh.isMesh) {
+      mesh.userData.action = 'open-chat';
+      charHitTargets.push(mesh);
     }
   });
 
@@ -1461,9 +1463,11 @@ export function initHome3DRoom() {
   }
 
   room.traverse((obj) => {
-    if (obj.isMesh) {
-      obj.castShadow = true;
-      obj.receiveShadow = true;
+    // traverse 给的是 Object3D；阴影只对 Mesh 有意义，收窄一下类型
+    const mesh = /** @type {import('three').Mesh} */ (obj);
+    if (mesh.isMesh) {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
     }
   });
 
@@ -1508,7 +1512,8 @@ export function initHome3DRoom() {
     });
   }
 
-  hotspotWrap.querySelectorAll('.room-hotspot').forEach((btn) => {
+  hotspotWrap.querySelectorAll('.room-hotspot').forEach((el) => {
+    const btn = /** @type {HTMLElement} */ (el);
     const key = btn.dataset.hotspot;
     if (key) {
       hotspotButtons.set(key, btn);

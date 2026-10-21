@@ -284,6 +284,9 @@ a:hover { color: var(--accent3); }
 }
 .post-content img {
   max-width: 100%;
+  /* 正文图片现在带 width/height 属性（构建期写入，防 CLS），
+     必须配 height: auto，否则小屏上宽度被压小、高度还留着原值，图会被拉扁 */
+  height: auto;
   border-radius: 6px;
   margin: 1em 0;
 }
@@ -1418,6 +1421,7 @@ body.is-home-search-open {
 }
 
 .room-chat-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: min(560px, calc(100vw - 28px));
@@ -1427,6 +1431,18 @@ body.is-home-search-open {
   border-radius: 18px;
   background: linear-gradient(170deg, rgba(12, 18, 54, 0.97), rgba(9, 14, 43, 0.95));
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* 四个角的缩放把手：默认不显示（手机端是底部抽屉，不缩放），PC 端在下面的断点里打开。
+   元素由 src/room-chat.js 现造，HTML 模板不为它多背一份。 */
+.room-chat-resize {
+  display: none;
+}
+
+/* 手动定过尺寸之后，消息区的 min-height 要让位 —— 否则把窗口拖矮一点，
+   输入框会被挤出面板（面板是 overflow: hidden，直接看不见了） */
+.room-chat-panel.is-sized .room-chat-log {
+  min-height: 0;
 }
 
 .room-chat-header {
@@ -1876,6 +1892,118 @@ body.is-home-chat-open .season-menu {
   }
 }
 
+/* ====== PC 端：聊天窗是右下角的可拖动浮窗，不铺蒙层 ======
+   1) 蒙层（半透明底 + 模糊 + 锁滚动）是手机「底部抽屉」的配套做法：抽屉占满下半屏，
+      底下本来也点不到东西。桌面上的使用场景是「一边看文章一边问」，蒙层会把正文压暗、
+      还锁住滚动，反而碍事 —— 所以这里让 .room-chat-modal 退化成透明的定位层：
+      事件穿透到页面，只留面板本体浮在右下角。
+   2) 面板 position: fixed 后自己就是浮窗，拖拽逻辑在 src/room-chat.js（拖标题栏）。 */
+@media (min-width: 641px) {
+  .room-chat-modal {
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    /* 整层不接收点击：点页面照常选中文字、点链接；只有面板自己是可点的 */
+    pointer-events: none;
+  }
+
+  .room-chat-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    left: auto;
+    top: auto;
+    width: min(420px, calc(100vw - 40px));
+    max-height: min(72vh, 620px);
+    /* 浮在内容上，阴影给足才看得出是「另一层」 */
+    box-shadow: 0 22px 56px rgba(0, 0, 0, 0.58);
+    pointer-events: auto;
+  }
+
+  /* 标题栏是拖拽把手 */
+  .room-chat-header {
+    cursor: grab;
+    user-select: none;
+    /* 触屏本上按住标题栏拖动时别让页面跟着滚 */
+    touch-action: none;
+  }
+
+  /* 拖起来的时候「抬」一点：阴影加重，且拖动中不选字 */
+  .room-chat-panel.is-dragging {
+    box-shadow: 0 30px 74px rgba(0, 0, 0, 0.68);
+    user-select: none;
+  }
+
+  .room-chat-panel.is-dragging .room-chat-header {
+    cursor: grabbing;
+  }
+
+  /* 四个角的缩放把手：三颗小圆点摆成直角（右下角那颗 + 左边 + 上面），
+     另外三个角靠 transform 旋转复用同一套画法，比原来的斜纹干净得多。
+     面板本身 overflow: hidden + 圆角，所以贴边的部分会被圆角自然裁掉。 */
+  .room-chat-resize {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    color: rgba(200, 219, 255, 0.85);
+    opacity: 0.45;
+    touch-action: none;
+    transition: opacity 0.18s ease, color 0.18s ease;
+  }
+
+  .room-chat-resize::before {
+    content: '';
+    position: absolute;
+    /* 往里收 7px：面板圆角是 18px，点太靠尖上会被圆角裁掉一块 */
+    right: 7px;
+    bottom: 7px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    /* 左边一颗、上面一颗：三颗点组成一个「⌐」形转角 */
+    box-shadow: -7px 0 0 currentColor, 0 -7px 0 currentColor;
+  }
+
+  .room-chat-resize--br { right: 0; bottom: 0; }
+  .room-chat-resize--tr { right: 0; top: 0; transform: rotate(270deg); }
+  .room-chat-resize--bl { left: 0; bottom: 0; transform: rotate(90deg); }
+  .room-chat-resize--tl { left: 0; top: 0; transform: rotate(180deg); }
+
+  .room-chat-resize--br,
+  .room-chat-resize--tl {
+    cursor: nwse-resize;
+  }
+
+  .room-chat-resize--tr,
+  .room-chat-resize--bl {
+    cursor: nesw-resize;
+  }
+
+  /* 鼠标进面板才点亮，平时退到背景里，不抢消息区的注意力 */
+  .room-chat-panel:hover .room-chat-resize {
+    opacity: 0.9;
+  }
+
+  .room-chat-resize:hover {
+    opacity: 1;
+    color: #eaf2ff;
+  }
+
+  /* 缩放过程中同样别选字 */
+  .room-chat-panel.is-resizing {
+    box-shadow: 0 30px 74px rgba(0, 0, 0, 0.68);
+    user-select: none;
+  }
+
+  /* 浮窗不是模态：桌面端打开聊天不锁页面滚动（3D 首页本来就不能滚，排除掉） */
+  body.is-home-chat-open:not(.home-3d) {
+    overflow: visible;
+  }
+}
+
 /* ====== 手机端：聊天窗口铺满下半屏 ====== */
 @media (max-width: 640px) {
   .room-chat-modal {
@@ -1987,8 +2115,10 @@ body.is-home-chat-open .season-menu {
   box-shadow: 0 14px 32px rgba(76, 124, 255, 0.42);
 }
 
-/* 聊天窗打开时收掉它，别压住底部输入区 */
-body.is-home-chat-open .post-chat-fab {
+/* 聊天窗打开时收掉右下角这两个：它们都在 body 直挂、z-index 比 .page-wrap 里的聊天面板高，
+   不收起会压在输入区上面（「回到顶部」只在滚动后才显形，重叠时特别刺眼） */
+body.is-home-chat-open .post-chat-fab,
+body.is-home-chat-open .back-to-top {
   display: none;
 }
 

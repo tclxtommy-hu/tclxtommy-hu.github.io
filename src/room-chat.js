@@ -185,12 +185,20 @@ export function initChatModal() {
     );
     return;
   }
-  const { modal, log, form, input, sendBtn, closeBtn, micBtn, voiceBtn, hint } = nodes;
+  const { modal, log, form, closeBtn, micBtn, voiceBtn, hint } = nodes;
+  // 节点表统一按 HTMLElement 存（循环里按 id 取），到这儿再收窄成具体类型：
+  // 输入框要 value / placeholder，发送键要 disabled —— 都是 HTMLElement 上没有的
+  /** @type {HTMLTextAreaElement} */
+  const input = /** @type {any} */ (nodes.input);
+  /** @type {HTMLButtonElement} */
+  const sendBtn = /** @type {any} */ (nodes.sendBtn);
   const status = document.getElementById('room-chat-status');
   // 引用卡片是可选的：缓存里的旧 HTML 没有这个节点，缺了就降级（不报错、不影响普通聊天）
   const quoteCard = document.getElementById('room-chat-quote');
-  const isPostPage = document.body?.dataset?.page === 'post';
-  if (isPostPage) {
+  // 首页 3D 房间是「和房间主人聊」，其余页面（文章页 / 归档页）主线都是「找文章、问文章」，
+  // 招呼语和标题要跟着换 —— 否则归档页上会说「这个房间里的人就是我」，明显对不上。
+  const isHomeChat = document.body?.dataset?.page === 'home-3d';
+  if (!isHomeChat) {
     const titleEl = document.getElementById('room-chat-title');
     if (titleEl) titleEl.textContent = '问问站点里的文章';
   }
@@ -359,6 +367,7 @@ export function initChatModal() {
     thinking.textContent = '思考中…';
     bubble.appendChild(thinking);
 
+    /** @type {{ role: 'user' | 'assistant', content: string }[]} */
     const messages = [...history.slice(-MAX_HISTORY_TURNS * 2), { role: 'user', content: payload }];
     let answer = '';
     let reasonSeen = false;
@@ -570,14 +579,350 @@ export function initChatModal() {
     if (open) {
       if (!started) {
         started = true;
-        addBubble('assistant').innerHTML = renderRich(isPostPage ? GREETING_POST : GREETING);
+        addBubble('assistant').innerHTML = renderRich(isHomeChat ? GREETING : GREETING_POST);
       }
-      requestAnimationFrame(() => input.focus());
+      requestAnimationFrame(() => {
+        // 面板刚显示出来：offsetWidth / offsetHeight 现在才是真值，
+        // 「上次拖到的位置」要等这一刻才能算准（隐藏时算出来全是 0）
+        syncPanelLayout();
+        input.focus();
+      });
     } else {
       inflight?.abort();
       stopListening();
       window.speechSynthesis?.cancel();
     }
+  }
+
+  // ---------- PC 端：右下角浮窗（可拖动、可缩放） ----------
+  //
+  // 手机端仍是「底部抽屉 + 蒙层」，桌面端（CSS 的同一条断点 min-width: 641px）
+  // 面板是 position: fixed 的浮窗，这里管它的拖动（标题栏）、缩放（右下角把手）和记忆。
+  //
+  // 位置按「距视口右、下边各多少 px」存 localStorage，而不是存绝对 left/top：
+  // 换台分辨率更高的显示器、或把窗口拉大，浮窗仍然贴着右下角，不会留在半空里。
+
+  /** @type {HTMLElement | null} */
+  const panel = /** @type {any} */ (modal.querySelector('.room-chat-panel'));
+  /** @type {HTMLElement | null} */
+  const header = /** @type {any} */ (modal.querySelector('.room-chat-header'));
+
+  /** 和 CSS 里的 @media (min-width: 641px) 保持一致 */
+  const DESKTOP_QUERY = '(min-width: 641px)';
+  const desktopMedia = window.matchMedia(DESKTOP_QUERY);
+  /** 浮窗离视口边缘至少留这么多，拖到贴边也还抓得住标题栏 */
+  const PANEL_GAP = 12;
+  /** 缩放下限：再窄输入框 + 发送按钮就挤成一团了 */
+  const PANEL_MIN_WIDTH = 320;
+  const PANEL_MIN_HEIGHT = 280;
+  const PANEL_POS_KEY = 'room-chat-panel-pos';
+
+  function isDesktopPanel() {
+    return desktopMedia.matches;
+  }
+
+  /** 拖动中的指针状态：dx / dy 是「指针 - 面板左上角」的偏移，保证抓哪拖哪 */
+  /** @type {{ pointerId: number, dx: number, dy: number } | null} */
+  let drag = null;
+  /**
+   * 缩放中的指针状态：记下起始指针位置、框的四个边，以及这个角拖的是哪两条边。
+   * @type {{
+   *   pointerId: number,
+   *   edgeX: 'left' | 'right',
+   *   edgeY: 'top' | 'bottom',
+   *   startX: number,
+   *   startY: number,
+   *   start: { left: number, top: number, right: number, bottom: number, width: number, height: number },
+   * } | null}
+   */
+  let resize = null;
+  /** 拖动后的坐标；null = 还在用 CSS 的右下角默认位置 */
+  /** @type {{ left: number, top: number } | null} */
+  let panelPos = null;
+  /** 用户是否手动缩放过：没缩放过就别把「当前内容撑出来的高度」写死进存储 */
+  let panelSized = false;
+
+  /** @returns {{ right: number, bottom: number, width: number | null, height: number | null } | null} */
+  function readPanelPos() {
+    try {
+      const raw = localStorage.getItem(PANEL_POS_KEY);
+      if (!raw) return null;
+      const pos = JSON.parse(raw);
+      if (!pos || !Number.isFinite(pos.right) || !Number.isFinite(pos.bottom)) return null;
+      // 尺寸是可选的：只拖过位置、没缩放过的那条记录里就没有 width/height
+      const size = (v) => (Number.isFinite(v) ? v : null);
+      return { right: pos.right, bottom: pos.bottom, width: size(pos.width), height: size(pos.height) };
+    } catch {
+      return null;
+    }
+  }
+
+  function savePanelPos() {
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    /** @type {{ right: number, bottom: number, width?: number, height?: number }} */
+    const record = {
+      right: Math.max(0, Math.round(window.innerWidth - rect.right)),
+      bottom: Math.max(0, Math.round(window.innerHeight - rect.bottom)),
+    };
+    // 只有手动缩放过才存尺寸：否则会把「当前内容刚好撑出来的高度」写死，
+    // 下次对话变长也不会自己长高了
+    if (panelSized) {
+      record.width = Math.round(rect.width);
+      record.height = Math.round(rect.height);
+    }
+    try {
+      localStorage.setItem(PANEL_POS_KEY, JSON.stringify(record));
+    } catch {
+      // 隐私模式 / 禁用存储：位置记不住就记不住，不影响聊天
+    }
+  }
+
+  /**
+   * 把浮窗摆到 (left, top)，超出一律夹回视口内 ——
+   * 窗口缩小、或上次记下的位置在当前分辨率下放不进去，都靠这里兜住。
+   * @param {number} left
+   * @param {number} top
+   */
+  function movePanel(left, top) {
+    if (!panel) return;
+    const maxLeft = Math.max(PANEL_GAP, window.innerWidth - panel.offsetWidth - PANEL_GAP);
+    const maxTop = Math.max(PANEL_GAP, window.innerHeight - panel.offsetHeight - PANEL_GAP);
+    panelPos = {
+      left: Math.min(Math.max(left, PANEL_GAP), maxLeft),
+      top: Math.min(Math.max(top, PANEL_GAP), maxTop),
+    };
+    panel.style.left = `${panelPos.left}px`;
+    panel.style.top = `${panelPos.top}px`;
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+  }
+
+  /**
+   * 一次性定下位置 + 尺寸（四个角的缩放、恢复上次尺寸都走这里）。
+   * 尺寸先夹到 [最小尺寸, 视口 - 2×留白]，位置再按尺寸夹一次，保证整个面板都在视口里。
+   * 必须显式写 height —— CSS 的 max-height 是给「内容自适应」用的，不写 height 就拖不高。
+   * @param {number} left
+   * @param {number} top
+   * @param {number} width
+   * @param {number} height
+   */
+  function placePanel(left, top, width, height) {
+    if (!panel) return;
+    const maxWidth = Math.max(PANEL_MIN_WIDTH, window.innerWidth - PANEL_GAP * 2);
+    const maxHeight = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - PANEL_GAP * 2);
+    const w = Math.min(Math.max(Math.round(width), PANEL_MIN_WIDTH), maxWidth);
+    const h = Math.min(Math.max(Math.round(height), PANEL_MIN_HEIGHT), maxHeight);
+    const maxLeft = Math.max(PANEL_GAP, window.innerWidth - w - PANEL_GAP);
+    const maxTop = Math.max(PANEL_GAP, window.innerHeight - h - PANEL_GAP);
+    panelPos = {
+      left: Math.min(Math.max(Math.round(left), PANEL_GAP), maxLeft),
+      top: Math.min(Math.max(Math.round(top), PANEL_GAP), maxTop),
+    };
+    panel.style.width = `${w}px`;
+    panel.style.height = `${h}px`;
+    panel.style.maxHeight = 'none';
+    panel.style.left = `${panelPos.left}px`;
+    panel.style.top = `${panelPos.top}px`;
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+    // 定过尺寸后消息区不再保底 180px，不然把窗口拖矮会把输入框挤出面板
+    panel.classList.add('is-sized');
+  }
+
+  /** 交还给 CSS：手机端、或还没拖过 / 缩放过的时候都走右下角默认位置和默认尺寸 */
+  function resetPanelPosition() {
+    if (!panel) return;
+    panelPos = null;
+    panelSized = false;
+    panel.style.left = '';
+    panel.style.top = '';
+    panel.style.right = '';
+    panel.style.bottom = '';
+    panel.style.width = '';
+    panel.style.height = '';
+    panel.style.maxHeight = '';
+    panel.classList.remove('is-sized');
+  }
+
+  /** 按当前视口恢复上次拖到的位置和缩放过的尺寸；手机端一律回到默认（底部抽屉不吃这套） */
+  function syncPanelLayout() {
+    if (!panel) return;
+    const desktop = isDesktopPanel();
+    // 桌面端不是模态对话框（没有蒙层，页面照常可点），aria-modal 要跟着关掉
+    panel.setAttribute('aria-modal', desktop ? 'false' : 'true');
+    if (!desktop) {
+      resetPanelPosition();
+      return;
+    }
+    const saved = readPanelPos();
+    if (!saved) {
+      if (panelPos) resetPanelPosition();
+      return;
+    }
+    // 缩放过就按「距右/下多少 + 尺寸」一次性还原，不用先定尺寸再量一遍
+    if (saved.width !== null && saved.height !== null) {
+      panelSized = true;
+      placePanel(
+        window.innerWidth - saved.right - saved.width,
+        window.innerHeight - saved.bottom - saved.height,
+        saved.width,
+        saved.height
+      );
+      return;
+    }
+    movePanel(
+      window.innerWidth - saved.right - panel.offsetWidth,
+      window.innerHeight - saved.bottom - panel.offsetHeight
+    );
+  }
+
+  /** @param {PointerEvent} event */
+  function startDrag(event) {
+    if (!panel || !header || !isDesktopPanel() || drag || event.button !== 0) return;
+    // 标题栏右侧的朗读 / 关闭按钮不是把手
+    if (event.target instanceof Element && event.target.closest('button, a, input, textarea, select')) return;
+    const rect = panel.getBoundingClientRect();
+    drag = { pointerId: event.pointerId, dx: event.clientX - rect.left, dy: event.clientY - rect.top };
+    panel.classList.add('is-dragging');
+    // 捕获指针：鼠标甩到窗口外面再松手也能收到 pointerup，不至于「粘」在手上
+    try {
+      header.setPointerCapture(event.pointerId);
+    } catch {
+      // 指针已失效就退化成普通拖拽（window 上的 pointermove/pointerup 照样收得到）
+    }
+    event.preventDefault();
+  }
+
+  /** @param {PointerEvent} event */
+  function onDragMove(event) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    movePanel(event.clientX - drag.dx, event.clientY - drag.dy);
+  }
+
+  function endDrag() {
+    if (!drag) return;
+    drag = null;
+    panel?.classList.remove('is-dragging');
+    savePanelPos();
+  }
+
+  /**
+   * 按住某个角的把手开始缩放。edgeX / edgeY 记的是「这个角拖的是哪两条边」，
+   * 拖动时对面那条边固定不动（拖左上角，右下角就钉在原地）。
+   * @param {PointerEvent} event
+   */
+  function startResize(event) {
+    if (!panel || !isDesktopPanel() || resize || drag || event.button !== 0) return;
+    const handle = event.currentTarget;
+    if (!(handle instanceof HTMLElement)) return;
+    const rect = panel.getBoundingClientRect();
+    resize = {
+      pointerId: event.pointerId,
+      edgeX: handle.dataset.edgeX === 'left' ? 'left' : 'right',
+      edgeY: handle.dataset.edgeY === 'top' ? 'top' : 'bottom',
+      startX: event.clientX,
+      startY: event.clientY,
+      /** 手势开始时的框，缩放全程都基于它算，不会自己滚雪球 */
+      start: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height },
+    };
+    panel.classList.add('is-resizing');
+    try {
+      handle.setPointerCapture(event.pointerId);
+    } catch {
+      // 指针已失效：window 上的 pointermove/pointerup 照样收得到
+    }
+    event.preventDefault();
+  }
+
+  /** @param {PointerEvent} event */
+  function onResizeMove(event) {
+    if (!resize || event.pointerId !== resize.pointerId) return;
+    const { start, edgeX, edgeY } = resize;
+    const dx = event.clientX - resize.startX;
+    const dy = event.clientY - resize.startY;
+    const maxWidth = Math.max(PANEL_MIN_WIDTH, window.innerWidth - PANEL_GAP * 2);
+    const maxHeight = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - PANEL_GAP * 2);
+    const width = Math.min(Math.max(edgeX === 'right' ? start.width + dx : start.width - dx, PANEL_MIN_WIDTH), maxWidth);
+    const height = Math.min(Math.max(edgeY === 'bottom' ? start.height + dy : start.height - dy, PANEL_MIN_HEIGHT), maxHeight);
+    // 右边那条边不动 → 用它的位置反推 left；下边同理
+    const left = edgeX === 'right' ? start.left : start.right - width;
+    const top = edgeY === 'bottom' ? start.top : start.bottom - height;
+    panelSized = true;
+    placePanel(left, top, width, height);
+  }
+
+  function endResize() {
+    if (!resize) return;
+    resize = null;
+    panel?.classList.remove('is-resizing');
+    savePanelPos();
+  }
+
+  if (panel && header) {
+    header.addEventListener('pointerdown', startDrag);
+
+    // 四个角的缩放把手（PC 端才显示，见 CSS）。样式靠 transform 旋转复用同一套点阵。
+    for (const [corner, edgeX, edgeY] of [
+      ['br', 'right', 'bottom'],
+      ['tr', 'right', 'top'],
+      ['bl', 'left', 'bottom'],
+      ['tl', 'left', 'top'],
+    ]) {
+      const handle = document.createElement('div');
+      handle.className = `room-chat-resize room-chat-resize--${corner}`;
+      handle.dataset.edgeX = edgeX;
+      handle.dataset.edgeY = edgeY;
+      handle.setAttribute('aria-hidden', 'true');
+      handle.title = '拖动调整窗口大小';
+      handle.addEventListener('pointerdown', startResize);
+      panel.appendChild(handle);
+    }
+
+    // 监听挂在 window 上：面板再窄，鼠标拖出面板边界也不会断
+    window.addEventListener('pointermove', onDragMove);
+    window.addEventListener('pointermove', onResizeMove);
+    window.addEventListener('pointerup', () => {
+      endDrag();
+      endResize();
+    });
+    window.addEventListener('pointercancel', () => {
+      endDrag();
+      endResize();
+    });
+    window.addEventListener('blur', () => {
+      endDrag();
+      endResize();
+    });
+    desktopMedia.addEventListener?.('change', () => {
+      if (!modal.hidden) syncPanelLayout();
+    });
+    window.addEventListener('resize', () => {
+      if (modal.hidden) return;
+      // 窗口变小了：先按新视口把尺寸夹一次（位置跟着一起夹），再处理没缩放过的情况
+      if (panelSized && panel.offsetWidth) {
+        const rect = panel.getBoundingClientRect();
+        placePanel(rect.left, rect.top, rect.width, rect.height);
+      }
+      // 没缩放过的话位置只做「夹回视口」，不做右下角吸附：用户把它拖到哪就留在哪
+      if (!panelPos) return;
+      movePanel(panelPos.left, panelPos.top);
+    });
+    // 面板高度会随对话变长（标题栏 + 消息 + 引用卡片都会撑高）。
+    // 拖过之后 top 是固定的，光让高度长就会顶出屏幕下沿 —— 高度一变就重新夹一次，
+    // 效果就是「往下长到头了就开始往上顶」，跟 IM 的浮窗一样。
+    if (typeof ResizeObserver === 'function') {
+      const panelResizeObserver = new ResizeObserver(() => {
+        // 拖动 / 缩放中的位置和尺寸由指针事件负责；没拖过就交给 CSS 的 bottom: 20px 定位
+        if (drag || resize || !panelPos) return;
+        // 收起时面板 display: none，量出来是 0×0 —— 拿这个尺寸去夹会把位置算歪
+        if (!panel.offsetWidth) return;
+        movePanel(panelPos.left, panelPos.top);
+      });
+      panelResizeObserver.observe(panel);
+    }
+    // 这一刻面板还是 hidden（offsetWidth 全是 0），只把语义对齐，位置留给 setOpen 里那一帧
+    panel.setAttribute('aria-modal', isDesktopPanel() ? 'false' : 'true');
   }
 
   form.addEventListener('submit', (e) => {
@@ -636,11 +981,14 @@ export function initChatModal() {
 }
 
 /**
- * 文章页右下角的常驻入口（不划词也能随手问一句）。
- * 首页 3D 房间不需要它：那边是点小人 / 头顶的「聊聊」气泡。
+ * 内容页（文章页、归档页）右下角的常驻入口：不划词也能随手问一句。
+ * 首页 3D 房间不需要它 —— 那边是点小人 / 头顶的「聊聊」气泡。
  */
 export function initPageChatEntry() {
-  if (document.body?.dataset?.page !== 'post') return;
+  const page = document.body?.dataset?.page || '';
+  // 只有首页走「点小人」那条路；其余页面（post / archive ……）一律挂个常驻入口，
+  // 新页面只要带上 data-page 且不是 home-3d，就自动有入口（聊天窗骨架也得一起带上）
+  if (page === 'home-3d') return;
   if (document.getElementById('post-chat-fab')) return;
 
   const fab = document.createElement('button');
@@ -648,7 +996,8 @@ export function initPageChatEntry() {
   fab.id = 'post-chat-fab';
   fab.className = 'post-chat-fab';
   fab.textContent = '💬 问 AI';
-  fab.title = '基于全站文章问答，也可以先划词再问';
+  // 划词入口只存在于有正文的页面（text-selection.js 要有 .post-content），别给归档页瞎承诺
+  fab.title = document.querySelector('.post-content') ? '基于全站文章问答，也可以先划词再问' : '基于全站文章问答，试试问点什么';
   fab.setAttribute('aria-label', '打开 AI 问答');
   fab.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('room:open-chat'));

@@ -1,0 +1,21 @@
+{
+  // 只做「检查」，不产出任何文件：JS 源码里本来就有大量 JSDoc（@type / @param），
+  // 这份配置只是把这些注释变成真正的类型检查，跑 `npm run typecheck` 就能发现
+  // 「把 null 当元素用」「属性名写错」这类光看代码看不出来的问题。
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.js", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "demo", "posts-html", "public"]
+}
