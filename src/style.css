@@ -16,58 +16,20 @@
   --max-width: 860px;
 }
 
-/* ====== Season Themes (春夏秋冬) ====== */
-html[data-season="spring"] {
-  --bg: #0d1310;
-  --bg-card: #141d18;
-  --text: #e4efe8;
-  --text-muted: #8fae9a;
-  --accent: #ff8fb7;
-  --accent2: #7ee787;
-  --accent3: #ffd76e;
-  --border: #1f2d25;
-  --bg-code: #17251e;
-  --bg-pre: #101a15;
-  --heading: #f2fbf5;
-}
-html[data-season="summer"] {
-  --bg: #081220;
-  --bg-card: #0f1d2e;
-  --text: #e2edf6;
-  --text-muted: #85a3bd;
-  --accent: #4cc9f0;
-  --accent2: #ffd60a;
-  --accent3: #ff7b7b;
-  --border: #16293c;
-  --bg-code: #122738;
-  --bg-pre: #0c1b2a;
-  --heading: #f2f9ff;
-}
-html[data-season="autumn"] {
-  --bg: #14100a;
-  --bg-card: #1d1810;
-  --text: #f0e8dc;
-  --text-muted: #b09a7d;
-  --accent: #ffb35c;
-  --accent2: #e07b39;
-  --accent3: #ffe066;
-  --border: #2c2214;
-  --bg-code: #251c10;
-  --bg-pre: #191207;
-  --heading: #fdf6ea;
-}
-html[data-season="winter"] {
-  --bg: #0a0e17;
-  --bg-card: #121926;
-  --text: #e2eaf3;
-  --text-muted: #8ba3c0;
-  --accent: #9ad1ff;
-  --accent2: #b197fc;
-  --accent3: #d0ebff;
-  --border: #1d2839;
-  --bg-code: #172233;
-  --bg-pre: #101828;
-  --heading: #f4f9ff;
+/* ====== Theme: 极简白（无 data-theme 时是默认深色） ====== */
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --bg-card: #ffffff;
+  --text: #1b1f24;
+  --text-muted: #5d6673;
+  --accent: #0b63c5;
+  --accent2: #6b4fd8;
+  --accent3: #b0346f;
+  --border: #dfe4ec;
+  --bg-code: #e8edf4;
+  --bg-pre: #eef3f9;
+  --heading: #11141a;
 }
 
 body {
@@ -1690,8 +1652,8 @@ body.is-home-chat-open {
 
 /* 聊天窗打开时，收掉浮在页面四角的按钮（聊天时用不到，还会挡住输入区） */
 body.is-home-chat-open .bgm-btn,
-body.is-home-chat-open .season-btn,
-body.is-home-chat-open .season-menu {
+body.is-home-chat-open .theme-btn,
+body.is-home-chat-open .theme-menu {
   display: none;
 }
 
@@ -1806,8 +1768,8 @@ body.is-home-chat-open .season-menu {
   animation: bgm-spin 4s linear infinite;
 }
 
-/* ====== Season Switcher ====== */
-.season-btn {
+/* ====== Theme Switcher ====== */
+.theme-btn {
   position: fixed;
   left: 20px;
   bottom: 20px;
@@ -1828,12 +1790,12 @@ body.is-home-chat-open .season-menu {
   transition: border-color 0.2s, transform 0.2s;
 }
 
-.season-btn:hover {
+.theme-btn:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
 }
 
-.season-menu {
+.theme-menu {
   position: fixed;
   left: 20px;
   bottom: 74px;
@@ -1849,11 +1811,11 @@ body.is-home-chat-open .season-menu {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
-.season-menu.is-open {
+.theme-menu.is-open {
   display: flex;
 }
 
-.season-menu button {
+.theme-menu button {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1869,24 +1831,24 @@ body.is-home-chat-open .season-menu {
   transition: background 0.15s, color 0.15s;
 }
 
-.season-menu button:hover {
+.theme-menu button:hover {
   background: rgba(255, 255, 255, 0.07);
 }
 
-.season-menu button.is-active {
+.theme-menu button.is-active {
   color: var(--accent);
   font-weight: 600;
 }
 
 @media (max-width: 640px) {
-  .season-btn {
+  .theme-btn {
     left: 14px;
     bottom: 14px;
     width: 40px;
     height: 40px;
   }
 
-  .season-menu {
+  .theme-menu {
     left: 14px;
     bottom: 64px;
   }
@@ -2267,4 +2229,1200 @@ body.is-home-chat-open .back-to-top {
   .room-chat-quote {
     margin: 0 10px 8px;
   }
+}
+
+/* ============================================================
+   阅读增强 & 体验优化
+   ============================================================ */
+
+/* ---------- 键盘焦点：全站统一 focus ring ---------- */
+/* 之前 :focus 全靠浏览器默认（还被两处 outline: none 干掉了），键盘用户根本看不到自己在哪 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.search-box input:focus-visible,
+.room-chat-form textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ---------- 跳到正文 ---------- */
+.skip-link {
+  position: fixed;
+  top: -64px;
+  left: 16px;
+  z-index: 300;
+  padding: 10px 16px;
+  border-radius: 0 0 10px 10px;
+  background: var(--accent);
+  color: #04121a;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.18s ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0;
+}
+
+/* ---------- 标题锚点 ---------- */
+.heading-anchor {
+  margin-left: 0.4em;
+  color: var(--text-muted);
+  font-size: 0.6em;
+  vertical-align: middle;
+  font-weight: 400;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+h1:hover .heading-anchor,
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--accent);
+}
+
+/* 触屏没有 hover，常显淡一点，否则永远看不见 */
+@media (hover: none) {
+  .heading-anchor {
+    opacity: 0.45;
+  }
+}
+
+/* ---------- 代码块：语言角标 + 复制 ---------- */
+/* 角标/按钮包在 .code-block 里、<pre> 外面，这样选中代码复制不会带上「复制」两个字 */
+.code-block {
+  position: relative;
+}
+
+.code-block pre {
+  margin: 1em 0;
+  /* 右上角常驻「复制」按钮：所有代码块都留出顶部一条，触屏上也不会压住第一行 */
+  padding-top: 30px;
+}
+
+/* 有语言角标的块多留一点上边距，免得角标压在第一行代码上 */
+.post-content pre.has-lang,
+.archive-readme pre.has-lang {
+  padding-top: 30px;
+}
+
+.code-lang {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.code-copy {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(10, 14, 30, 0.86);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.code-block:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+
+.code-copy:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- 代码语法高亮（highlight.js 构建期输出，默认深色配色） ---------- */
+.hljs-comment,
+.hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-doctag,
+.hljs-name {
+  color: #ff7b72;
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: #a5d6ff;
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: #79c0ff;
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_ {
+  color: #d2a8ff;
+}
+
+.hljs-variable,
+.hljs-params,
+.hljs-property {
+  color: #c9d1d9;
+}
+
+.hljs-built_in,
+.hljs-type,
+.hljs-class .hljs-title {
+  color: #ffa657;
+}
+
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+  color: #ffa198;
+}
+
+.hljs-tag,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #7ee787;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: #a5d6ff;
+}
+
+@media (hover: none) {
+  .code-copy {
+    opacity: 1;
+  }
+}
+
+/* ---------- 正文配图：点击放大 ---------- */
+.post-content img {
+  cursor: zoom-in;
+}
+
+.img-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: rgba(3, 6, 18, 0.93);
+  cursor: zoom-out;
+}
+
+.img-lightbox[hidden] {
+  display: none;
+}
+
+.img-lightbox-img {
+  max-width: min(1200px, 94vw);
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  cursor: zoom-out;
+}
+
+.img-lightbox-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(18, 18, 26, 0.9);
+  color: var(--text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body.is-lightbox-open {
+  overflow: hidden;
+}
+
+/* ---------- 轻提示 ---------- */
+.site-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 260;
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(16, 22, 44, 0.96);
+  color: var(--text);
+  font-size: 0.86rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.site-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------- 上一篇 / 下一篇 ---------- */
+.post-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 40px 0 8px;
+}
+
+.post-pager-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(14, 18, 40, 0.5);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.post-pager-item:hover {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.06);
+  transform: translateY(-2px);
+}
+
+.post-pager-item.is-next {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* 只有一篇可跳时（第一篇 / 最后一篇），别留一个空框：单独那个占右列 */
+.post-pager-item:only-child.is-next {
+  grid-column: 2;
+}
+
+.post-pager-item.is-empty {
+  border-style: dashed;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.post-pager-label {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.post-pager-title {
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .post-pager {
+    grid-template-columns: 1fr;
+  }
+
+  .post-pager-item.is-next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ---------- 相关文章 ---------- */
+.related-posts {
+  margin: 36px 0 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.related-title {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.related-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.related-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.related-list a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+}
+
+.related-list a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.related-meta {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
+/* ---------- 搜索：快捷键提示 + 结果键盘高亮 ---------- */
+.search-box {
+  position: relative;
+}
+
+.search-kbd {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* 有快捷键提示时才给输入框让出右边距（:has 不支持就自然回落，不影响输入） */
+.search-box:has(.search-kbd) input {
+  padding-right: 88px;
+}
+
+@media (max-width: 640px) {
+  .search-kbd {
+    display: none;
+  }
+}
+
+.post-item.is-active {
+  background: rgba(0, 240, 255, 0.07);
+  border-radius: 8px;
+}
+
+/* ---------- 404 ---------- */
+.container-404 {
+  max-width: 720px;
+  padding: 72px 0 60px;
+}
+
+.notfound-code {
+  margin: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent3));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-size: 3.4rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.notfound-title {
+  margin: 8px 0 10px;
+  font-size: 1.5rem;
+}
+
+.notfound-text {
+  margin: 0 0 24px;
+  color: var(--text-muted);
+}
+
+.notfound-subtitle {
+  margin: 32px 0 12px;
+  font-size: 1.05rem;
+}
+
+.notfound-list {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.notfound-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.notfound-list a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.notfound-list a:hover {
+  color: var(--accent);
+}
+
+.notfound-date {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* ---------- RSS ---------- */
+.rss-link {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.rss-link:hover {
+  color: var(--accent);
+}
+
+/* ---------- 聊天：新对话 / 复制回答 ---------- */
+.room-chat-reset {
+  font-size: 1.05rem;
+}
+
+.room-chat-copy {
+  display: block;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.room-chat-copy:hover {
+  color: var(--accent);
+}
+
+/* ---------- 尊重「减少动效」偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   文章页右侧快捷入口：目录树 + 全站搜索
+   ============================================================ */
+
+/* 压在「问 AI」（bottom: 76px）上方，和「回到顶部」排成一列 */
+.post-quick-nav {
+  position: fixed;
+  right: 20px;
+  bottom: 124px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.post-quick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(165, 195, 255, 0.3);
+  border-radius: 999px;
+  background: rgba(20, 20, 40, 0.84);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 20px rgba(6, 10, 31, 0.32);
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.post-quick-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0, 240, 255, 0.08);
+}
+
+/* 聊天窗打开时和另外两个右下角按钮一起收起来 */
+body.is-home-chat-open .post-quick-nav {
+  display: none;
+}
+
+/* ---------- 通用浮层 ---------- */
+.site-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(3, 6, 18, 0.74);
+  backdrop-filter: blur(5px);
+}
+
+.site-modal[hidden] {
+  display: none;
+}
+
+.site-modal-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 96vw);
+  max-height: min(82vh, 760px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(12, 14, 30, 0.98);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+/* 面板只是容器，不需要一圈大焦点环（键盘焦点会给到里面的控件） */
+.site-modal-panel:focus,
+.site-modal-panel:focus-visible {
+  outline: none;
+}
+
+.site-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-modal-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.site-modal-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.site-modal-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+body.is-site-modal-open {
+  overflow: hidden;
+}
+
+/* ---------- 全站搜索 ---------- */
+.site-search-box {
+  margin: 14px 18px 8px;
+}
+
+.site-search-results {
+  flex: 1;
+  min-height: 160px;
+  overflow: auto;
+  padding: 0 18px 18px;
+}
+
+.site-search-results .post-list {
+  margin: 0;
+  padding: 0;
+}
+
+.site-search-results .post-item {
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.site-search-results .search-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 30px 0;
+}
+
+.site-search-results .search-highlight {
+  color: var(--accent3);
+  font-weight: 700;
+}
+
+/* ---------- 文章目录 ---------- */
+.site-tree-panel {
+  width: min(620px, 96vw);
+  max-height: min(86vh, 820px);
+}
+
+.site-tree-body {
+  flex: 1;
+  overflow: auto;
+  padding: 10px 18px 18px;
+}
+
+.site-tree-body .search-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 30px 0;
+}
+
+.site-tree-folder {
+  margin: 2px 0;
+}
+
+.site-tree-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+/* 默认三角被 list-style:none 去掉了，这里补一个能看懂「可展开」的箭头 */
+.site-tree-summary::before {
+  content: '▸';
+  flex: none;
+  width: 1em;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.site-tree-folder[open] > .site-tree-summary::before {
+  content: '▾';
+}
+
+.site-tree-summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-tree-summary:hover {
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.site-tree-folder .site-tree-folder {
+  margin-left: 14px;
+  padding-left: 6px;
+  border-left: 1px dashed var(--border);
+}
+
+.site-tree-count {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+
+.site-tree-archive {
+  display: block;
+  margin: 2px 0 4px 18px;
+  color: var(--accent);
+  font-size: 0.74rem;
+  text-decoration: none;
+}
+
+.site-tree-archive:hover {
+  text-decoration: underline;
+}
+
+.site-tree-post {
+  display: block;
+  padding: 6px 8px 6px 22px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+
+.site-tree-post:hover {
+  color: var(--accent);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.site-tree-post.is-current {
+  color: var(--accent);
+  background: rgba(0, 240, 255, 0.09);
+  font-weight: 600;
+}
+
+.site-tree-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+}
+
+.site-tree-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.site-tree-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .post-quick-nav {
+    right: 14px;
+    bottom: 112px;
+  }
+
+  .post-quick-btn {
+    height: 38px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .site-modal {
+    padding: 10px;
+  }
+
+  .site-modal-panel {
+    max-height: 88vh;
+  }
+
+  /* 小屏上快捷键角标隐藏了，输入框别再留 88px 的空白 */
+  .search-box:has(.search-kbd) input {
+    padding-right: 16px;
+  }
+}
+
+/* ============================================================
+   极简白：把仍然写死的深色面板换成白色 / 浅色
+   ============================================================ */
+
+/* 白底上不需要星空粒子，留着反而显脏 */
+html[data-theme="light"] #bg-canvas {
+  display: none;
+}
+
+/* 右下角 / 左下角浮层 */
+html[data-theme="light"] .back-to-top,
+html[data-theme="light"] .post-quick-btn,
+html[data-theme="light"] .theme-btn,
+html[data-theme="light"] .bgm-btn {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: 0 10px 24px rgba(20, 28, 45, 0.12);
+}
+
+html[data-theme="light"] .post-quick-btn:hover,
+html[data-theme="light"] .back-to-top:hover,
+html[data-theme="light"] .theme-btn:hover,
+html[data-theme="light"] .bgm-btn:hover {
+  background: #fff;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+html[data-theme="light"] .theme-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: var(--border);
+  box-shadow: 0 14px 34px rgba(20, 28, 45, 0.16);
+}
+
+html[data-theme="light"] .theme-menu button:hover {
+  background: rgba(11, 99, 197, 0.08);
+}
+
+/* 文章阅读区 */
+html[data-theme="light"] .post-toc {
+  background: rgba(255, 255, 255, 0.94);
+}
+
+html[data-theme="light"] .post-toc::-webkit-scrollbar-thumb {
+  border-color: rgba(255, 255, 255, 0.94);
+}
+
+html[data-theme="light"] .post-pager-item {
+  background: #fff;
+}
+
+html[data-theme="light"] .post-pager-item:hover {
+  background: rgba(11, 99, 197, 0.05);
+}
+
+html[data-theme="light"] .code-copy {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: var(--border);
+}
+
+/* 浅色主题下代码块别和页面糊成一片：加深底色 + 左侧细色条 */
+html[data-theme="light"] .post-content pre,
+html[data-theme="light"] .archive-readme pre {
+  border-color: #d6dfe9;
+  box-shadow: inset 3px 0 0 rgba(11, 99, 197, 0.35);
+}
+
+/* 代码语法高亮：浅色主题换成 GitHub Light 风格 */
+html[data-theme="light"] .hljs-comment,
+html[data-theme="light"] .hljs-quote {
+  color: #6a737d;
+}
+
+html[data-theme="light"] .hljs-keyword,
+html[data-theme="light"] .hljs-selector-tag,
+html[data-theme="light"] .hljs-literal,
+html[data-theme="light"] .hljs-section,
+html[data-theme="light"] .hljs-doctag,
+html[data-theme="light"] .hljs-name {
+  color: #cf222e;
+}
+
+html[data-theme="light"] .hljs-string,
+html[data-theme="light"] .hljs-attr,
+html[data-theme="light"] .hljs-template-tag,
+html[data-theme="light"] .hljs-template-variable {
+  color: #0a3069;
+}
+
+html[data-theme="light"] .hljs-number,
+html[data-theme="light"] .hljs-symbol,
+html[data-theme="light"] .hljs-bullet {
+  color: #0550ae;
+}
+
+html[data-theme="light"] .hljs-title,
+html[data-theme="light"] .hljs-title.function_,
+html[data-theme="light"] .hljs-title.class_ {
+  color: #8250df;
+}
+
+html[data-theme="light"] .hljs-variable,
+html[data-theme="light"] .hljs-params,
+html[data-theme="light"] .hljs-property {
+  color: #24292f;
+}
+
+html[data-theme="light"] .hljs-built_in,
+html[data-theme="light"] .hljs-type,
+html[data-theme="light"] .hljs-class .hljs-title {
+  color: #953800;
+}
+
+html[data-theme="light"] .hljs-meta,
+html[data-theme="light"] .hljs-meta .hljs-keyword {
+  color: #82071e;
+}
+
+html[data-theme="light"] .hljs-tag,
+html[data-theme="light"] .hljs-selector-id,
+html[data-theme="light"] .hljs-selector-class {
+  color: #116329;
+}
+
+html[data-theme="light"] .hljs-regexp,
+html[data-theme="light"] .hljs-link {
+  color: #0a3069;
+}
+
+html[data-theme="light"] .search-kbd {
+  background: #f1f3f6;
+}
+
+html[data-theme="light"] .site-toast {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 12px 30px rgba(20, 28, 45, 0.16);
+}
+
+html[data-theme="light"] .comment-btn:hover {
+  color: #fff;
+}
+
+/* 「新增」角标在浅色主题下用白字，别再是黑字压深色渐变 */
+html[data-theme="light"] .archive-badge-new {
+  color: #fff;
+  background: linear-gradient(90deg, #2f7ee0, #c04f8c);
+}
+
+html[data-theme="light"] .skip-link {
+  color: #fff;
+}
+
+html[data-theme="light"] .mermaid-zoom-btn {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="light"] .ask-sel-bubble {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: var(--border);
+  box-shadow: 0 12px 30px rgba(20, 28, 45, 0.18);
+}
+
+html[data-theme="light"] .ask-sel-btn {
+  color: var(--text);
+}
+
+html[data-theme="light"] .ask-sel-btn:hover {
+  background: rgba(11, 99, 197, 0.1);
+  color: var(--accent);
+}
+
+/* 全站搜索 / 目录浮层 */
+html[data-theme="light"] .site-modal {
+  background: rgba(24, 32, 48, 0.32);
+}
+
+html[data-theme="light"] .site-modal-panel {
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(20, 28, 45, 0.22);
+}
+
+html[data-theme="light"] .site-tree-summary:hover {
+  background: rgba(11, 99, 197, 0.06);
+}
+
+html[data-theme="light"] .site-tree-post:hover,
+html[data-theme="light"] .site-tree-post.is-current {
+  color: var(--accent);
+  background: rgba(11, 99, 197, 0.07);
+}
+
+/* 首页 3D 房间的浮层（场景本身在 three-room.js 里切到白天） */
+html[data-theme="light"] .home-3d .room-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(245, 250, 255, 0.84));
+  border-color: rgba(90, 130, 190, 0.28);
+  box-shadow: 0 16px 40px rgba(30, 50, 90, 0.16);
+}
+
+html[data-theme="light"] .home-3d .room-card-kicker {
+  color: var(--accent);
+}
+
+html[data-theme="light"] .home-3d .room-card h1 {
+  color: #11141a;
+}
+
+html[data-theme="light"] .home-3d .room-card p {
+  color: #333c4a;
+}
+
+html[data-theme="light"] .room-card-lang {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(90, 130, 190, 0.28);
+  color: var(--text);
+}
+
+html[data-theme="light"] .room-card-lang:hover {
+  background: #fff;
+  color: var(--accent);
+}
+
+html[data-theme="light"] .home-3d .room-card-actions a {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(90, 130, 190, 0.28);
+  color: var(--text);
+}
+
+html[data-theme="light"] .home-3d .room-card-actions a:hover {
+  background: #fff;
+  border-color: var(--accent);
+}
+
+html[data-theme="light"] .home-3d .room-hotspot {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(90, 130, 190, 0.4);
+  color: #17202c;
+  box-shadow: 0 8px 22px rgba(30, 50, 90, 0.18);
+}
+
+html[data-theme="light"] .home-3d .room-hotspot:hover,
+html[data-theme="light"] .home-3d .room-hotspot.is-active {
+  background: linear-gradient(120deg, #3b82e6, #7c5cd6);
+  border-color: #fff;
+  color: #fff;
+}
+
+html[data-theme="light"] .home-3d .room-tip {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(90, 130, 190, 0.3);
+  color: #2b3646;
+}
+
+html[data-theme="light"] .home-3d .room-search-modal {
+  background: rgba(20, 30, 50, 0.3);
+}
+
+html[data-theme="light"] .home-3d .room-search-panel {
+  background: #fff;
+  border-color: var(--border);
+  box-shadow: 0 18px 50px rgba(20, 28, 45, 0.2);
+}
+
+html[data-theme="light"] .home-3d .room-search-header h2 {
+  color: var(--text);
+}
+
+html[data-theme="light"] .home-3d #room-search-close {
+  background: #fff;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="light"] .home-3d .room-search-box input,
+html[data-theme="light"] .home-3d #room-search-results .post-item {
+  background: #fff;
+}
+
+/* 聊天窗 */
+html[data-theme="light"] .room-chat-panel {
+  background: #fff;
+  border-color: var(--border);
+  box-shadow: 0 18px 50px rgba(20, 28, 45, 0.22);
+}
+
+html[data-theme="light"] .room-chat-header {
+  background: #f7f9fc;
+  border-bottom-color: var(--border);
+}
+
+html[data-theme="light"] .room-chat-heading h2 {
+  color: var(--text);
+}
+
+html[data-theme="light"] .room-chat-heading p {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-icon-btn {
+  background: #f1f4f9;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="light"] .room-chat-icon-btn:hover {
+  background: #e8edf6;
+  border-color: var(--accent);
+}
+
+html[data-theme="light"] .room-chat-bubble {
+  background: #f2f5fa;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="light"] .room-chat-msg--user .room-chat-bubble {
+  background: linear-gradient(130deg, #3b82e6, #7c5cd6);
+  border-color: transparent;
+  color: #fff;
+}
+
+html[data-theme="light"] .room-chat-msg--system .room-chat-bubble,
+html[data-theme="light"] .room-chat-bubble em {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-bubble a {
+  color: var(--accent);
+}
+
+html[data-theme="light"] .room-chat-bubble code,
+html[data-theme="light"] .room-chat-code {
+  background: #e9eef6;
+}
+
+html[data-theme="light"] .room-chat-thinking {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-form {
+  background: #f7f9fc;
+  border-top-color: var(--border);
+}
+
+html[data-theme="light"] .room-chat-form textarea {
+  background: #fff;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html[data-theme="light"] .room-chat-hint {
+  background: #f7f9fc;
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-quote {
+  border-color: var(--border);
+  border-left-color: var(--accent);
+}
+
+html[data-theme="light"] .room-chat-quote-label {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-quote-text {
+  color: var(--text);
+}
+
+html[data-theme="light"] .room-chat-quote-close {
+  background: #eef1f6;
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-msg-quote {
+  background: rgba(11, 99, 197, 0.06);
+  border-left-color: var(--accent);
+}
+
+html[data-theme="light"] .room-chat-log::-webkit-scrollbar-thumb,
+html[data-theme="light"] .room-chat-code::-webkit-scrollbar-thumb {
+  background: rgba(11, 99, 197, 0.28);
 }

@@ -12,7 +12,7 @@ const MAX_QUOTE_CHARS = 1200;
 const MIN_QUOTE_CHARS = 2;
 
 /** 兜底复制：非 HTTPS（或没给剪贴板权限）时 navigator.clipboard 不可用 */
-async function copyText(text) {
+export async function copyText(text) {
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text);

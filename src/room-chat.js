@@ -8,6 +8,8 @@
 //   - 语音输入：SpeechRecognition / webkitSpeechRecognition
 //   - 语音朗读：speechSynthesis
 
+import { copyText } from './text-selection.js';
+
 const CHAT_CONFIG_URL = '/chat.config.json';
 const CHAT_ENDPOINT_PATH = '/api/chat';
 /** 携带多少轮历史（不含本次提问），太多会白烧 token */
@@ -16,13 +18,21 @@ const MAX_HISTORY_TURNS = 8;
 const GREETING = '嗨，我是 TommyHu 👋 这个房间里的人就是我。想聊技术、聊项目，还是想问问我的经历？直接问我，也可以点麦克风用说的。';
 
 /** 文章页的招呼语：那边的主线是「找文章 / 问文章里的内容」 */
-const GREETING_POST = '嗨，我是 TommyHu 的 AI 分身 👋 全站文章我都读过——想找什么直接问我，也可以把正文里的段落划词丢给我。';
+const GREETING_POST = '嗨，我是 TommyHu 的 AI 分身 👋 全站文章我都读过，也能直接聊你正在看的这篇——问「这篇文章讲了什么」「总结一下」都行，也可以把正文里的段落划词丢给我。';
+
+/** 归档 / 404 等没有「当前文章」的页面：只承诺全站问答，别提「这篇」 */
+const GREETING_ARCHIVE = '嗨，我是 TommyHu 的 AI 分身 👋 全站文章我都读过——想找什么直接问我，也可以把正文里的段落划词丢给我。';
 
 /** 输入框留空、但手上带着引用时用的默认问题，省掉「你倒是问一句啊」的空转 */
 const DEFAULT_QUOTE_QUESTION = '这段内容是什么意思？结合我博客里的相关文章讲一下。';
 
 /** 划词选段的长度上限：太长会白烧 token，UI 上也读不完 */
 const MAX_QUOTE_CHARS = 1200;
+
+/** BFF 单条消息上限（MAX_MESSAGE_CHARS 默认 4000），留点余量给上下文分隔块 */
+const MAX_SEND_CHARS = 3600;
+/** 当前文章最多塞多少字：够模型概括，又不至于每轮都烧一大截 token */
+const ARTICLE_CONTEXT_CHARS = 2400;
 
 /**
  * 解析后端地址。
@@ -186,6 +196,8 @@ export function initChatModal() {
     return;
   }
   const { modal, log, form, closeBtn, micBtn, voiceBtn, hint } = nodes;
+  // 「新对话」是后加的可选按钮：老缓存里的 HTML 没有它，缺了就少个功能，不至于整个聊天窗打不开
+  const resetBtn = document.getElementById('room-chat-reset');
   // 节点表统一按 HTMLElement 存（循环里按 id 取），到这儿再收窄成具体类型：
   // 输入框要 value / placeholder，发送键要 disabled —— 都是 HTMLElement 上没有的
   /** @type {HTMLTextAreaElement} */
@@ -198,9 +210,15 @@ export function initChatModal() {
   // 首页 3D 房间是「和房间主人聊」，其余页面（文章页 / 归档页）主线都是「找文章、问文章」，
   // 招呼语和标题要跟着换 —— 否则归档页上会说「这个房间里的人就是我」，明显对不上。
   const isHomeChat = document.body?.dataset?.page === 'home-3d';
+  const isPostPage = document.body?.dataset?.page === 'post';
+  /** 招呼语按页面类型切换：文章页多承诺「当前这篇文章」，归档页没有当前文章 */
+  const greetingText = isHomeChat ? GREETING : isPostPage ? GREETING_POST : GREETING_ARCHIVE;
   if (!isHomeChat) {
     const titleEl = document.getElementById('room-chat-title');
-    if (titleEl) titleEl.textContent = '问问站点里的文章';
+    if (titleEl) {
+      // 文章页能带上当前正文，标题就说清楚；归档页没有「当前文章」可聊
+      titleEl.textContent = isPostPage ? '聊聊这篇文章' : '问问站点里的文章';
+    }
   }
 
   /** @type {string} */
@@ -219,6 +237,68 @@ export function initChatModal() {
    * @type {{ text: string, title?: string, url?: string } | null}
    */
   let pendingQuote = null;
+
+  /**
+   * 文章页：把「当前文章」压成一段模型能读的上下文。
+   * 只读一次并缓存；克隆一份再读，避免把标题右侧的「#」锚点带进去，也不动真实 DOM。
+   * @type {{ title: string, url: string, text: string } | null | undefined}
+   */
+  let articleContext;
+
+  /** @returns {{ title: string, url: string, text: string } | null} */
+  function getArticleContext() {
+    if (articleContext !== undefined) return articleContext;
+    articleContext = null;
+    if (document.body?.dataset?.page !== 'post') return articleContext;
+
+    const content = document.querySelector('.post-content');
+    if (!content) return articleContext;
+
+    const title =
+      document.querySelector('.post-header h1')?.textContent?.trim() ||
+      document.title.replace(/\s*-\s*http200\.cn\s*$/, '');
+
+    const clone = /** @type {HTMLElement} */ (content.cloneNode(true));
+    clone.querySelectorAll('.heading-anchor, script, style').forEach((node) => node.remove());
+    clone.setAttribute('aria-hidden', 'true');
+    // 离屏但仍在布局里：innerText 需要布局才能正确分行
+    clone.style.cssText = 'position:absolute;left:-99999px;top:0;width:800px;';
+    document.body.appendChild(clone);
+    const text = (clone.innerText || '').replace(/\n{3,}/g, '\n\n').trim();
+    clone.remove();
+
+    if (!text) return articleContext;
+    articleContext = { title, url: window.location.href, text: text.slice(0, ARTICLE_CONTEXT_CHARS) };
+    return articleContext;
+  }
+
+  /**
+   * 把当前文章附在这次提问后面：
+   * - BFF 只接受 user/assistant（system 由服务端注入），所以只能拼进 user 消息；
+   * - 问题放最前面，BFF 的检索仍按问题（前 200 字）走；
+   * - 只影响本次请求，不写进 history，避免每轮重复塞几千字。
+   * @param {string} content
+   * @returns {string}
+   */
+  function withArticleContext(content) {
+    const ctx = getArticleContext();
+    if (!ctx) return content;
+
+    // 「这篇文章讲的什么 / 总结一下」这类问题，别被 system 里「回复 60 字以内」压成一句话
+    const wantsSummary = /(?:这|本|该)\s*(?:篇|个)?\s*文章|本文|讲了(?:什么|啥)|讲的是什么|总结|概括|主要内容|中心思想|说的什么/.test(content);
+    const header =
+      `\n\n---\n【当前文章】访客正在阅读《${ctx.title}》，链接：${ctx.url}\n` +
+      '如果问题里说「这篇文章 / 本文 / 上面 / 这里」，指的就是这篇；与本文无关的问题照常回答，不要硬扯。\n' +
+      (wantsSummary
+        ? '访客想了解这篇文章：请用 3～6 句话概括主题、结构和关键结论（这条可以超过 60 字），不要逐段复述。\n'
+        : '回答本文相关问题时用简洁中文概括，别大段复述原文。\n') +
+      '【正文摘录（可能已截断）】\n';
+
+    // BFF 单条消息上限 4000 字：问题太长时宁可不加文章，也不要触发 400
+    const budget = MAX_SEND_CHARS - content.length - header.length;
+    if (budget < 200) return content;
+    return `${content}${header}${ctx.text.slice(0, budget)}`;
+  }
 
   resolveApiBase().then((base) => {
     apiBase = base;
@@ -256,6 +336,28 @@ export function initChatModal() {
     const bubble = addBubble('system');
     bubble.textContent = text;
     return bubble;
+  }
+
+  /**
+   * 给一条 AI 回答挂「复制」按钮（回答里的命令/代码段可以直接复制走）。
+   * @param {HTMLElement} bubble
+   * @param {string} text 原始回答（不是渲染后的 HTML）
+   */
+  function addCopyButton(bubble, text) {
+    if (!text || bubble.querySelector('.room-chat-copy')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'room-chat-copy';
+    btn.textContent = '复制';
+    btn.setAttribute('aria-label', '复制这条回答');
+    btn.addEventListener('click', async () => {
+      const ok = await copyText(text);
+      btn.textContent = ok ? '已复制' : '复制失败';
+      window.setTimeout(() => {
+        btn.textContent = '复制';
+      }, 1400);
+    });
+    bubble.appendChild(btn);
   }
 
   function setBusy(busy) {
@@ -355,6 +457,8 @@ export function initChatModal() {
     }
     userBubble.appendChild(document.createTextNode(question));
     const payload = quote ? `${formatQuote(quote)}\n\n${question}` : question;
+    // 文章页把当前文章附在最新一条 user 消息后面；history 里仍只存原始问题
+    const outgoing = withArticleContext(payload);
 
     setQuote(null);
     input.value = '';
@@ -368,7 +472,7 @@ export function initChatModal() {
     bubble.appendChild(thinking);
 
     /** @type {{ role: 'user' | 'assistant', content: string }[]} */
-    const messages = [...history.slice(-MAX_HISTORY_TURNS * 2), { role: 'user', content: payload }];
+    const messages = [...history.slice(-MAX_HISTORY_TURNS * 2), { role: 'user', content: outgoing }];
     let answer = '';
     let reasonSeen = false;
 
@@ -391,6 +495,7 @@ export function initChatModal() {
 
       if (answer) {
         bubble.innerHTML = renderRich(answer);
+        addCopyButton(bubble, answer);
       } else {
         bubble.innerHTML = reasonSeen
           ? '<em>（这次没组织好语言，再问我一次试试？）</em>'
@@ -404,6 +509,7 @@ export function initChatModal() {
     } catch (err) {
       if (/** @type {any} */ (err)?.name === 'AbortError') {
         bubble.innerHTML = renderRich(answer ? `${answer}\n（已停止）` : '（已停止）');
+        addCopyButton(bubble, answer);
       } else {
         const message = err instanceof Error ? err.message : String(err);
         bubble.innerHTML = `<em>连接后端失败：${escapeHtml(message)}</em>`;
@@ -579,7 +685,7 @@ export function initChatModal() {
     if (open) {
       if (!started) {
         started = true;
-        addBubble('assistant').innerHTML = renderRich(isHomeChat ? GREETING : GREETING_POST);
+        addBubble('assistant').innerHTML = renderRich(greetingText);
       }
       requestAnimationFrame(() => {
         // 面板刚显示出来：offsetWidth / offsetHeight 现在才是真值，
@@ -946,6 +1052,40 @@ export function initChatModal() {
   voiceBtn.addEventListener('click', () => setSpeakReplies(!speakReplies));
   closeBtn.addEventListener('click', () => setOpen(false));
 
+  // 新对话：清空上下文和消息区。聊偏了不用刷新页面。
+  resetBtn?.addEventListener('click', () => {
+    inflight?.abort();
+    history = [];
+    log.replaceChildren();
+    addBubble('assistant').innerHTML = renderRich(greetingText);
+    setQuote(null);
+    setBusy(false);
+    if (status) status.textContent = 'TommyHu · 在线';
+    input.value = '';
+    autoGrow();
+    input.focus();
+  });
+
+  // 手机端是模态对话框：Tab 不该跑到面板底下的页面上。
+  // 桌面端是右下角浮窗（不遮页面），就不拦了。
+  modal.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || modal.hidden || isDesktopPanel()) return;
+    const focusables = /** @type {HTMLElement[]} */ ([
+      ...modal.querySelectorAll('button:not([hidden]), textarea, input, a[href]'),
+    ]).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+    if (e.shiftKey && (active === first || !modal.contains(active))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
   modal.addEventListener('click', (e) => {
     if (e.target === modal) setOpen(false);
   });
@@ -997,7 +1137,7 @@ export function initPageChatEntry() {
   fab.className = 'post-chat-fab';
   fab.textContent = '💬 问 AI';
   // 划词入口只存在于有正文的页面（text-selection.js 要有 .post-content），别给归档页瞎承诺
-  fab.title = document.querySelector('.post-content') ? '基于全站文章问答，也可以先划词再问' : '基于全站文章问答，试试问点什么';
+  fab.title = document.querySelector('.post-content') ? '可以问当前这篇文章，也可以先划词再问' : '基于全站文章问答，试试问点什么';
   fab.setAttribute('aria-label', '打开 AI 问答');
   fab.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('room:open-chat'));

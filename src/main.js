@@ -1,6 +1,8 @@
 import './style.css';
 import { initChatModal, initPageChatEntry } from './room-chat.js';
 import { initTextSelectionAsk } from './text-selection.js';
+import { initCodeCopy, initImageLightbox, initHeadingAnchors } from './reading.js';
+import { initPostQuickNav } from './site-nav.js';
 
 function initHomeRoomIfNeeded() {
   if (document.body?.dataset?.page !== 'home-3d') return false;
@@ -24,6 +26,9 @@ function initHomeSearchModal() {
   const results = document.getElementById('room-search-results');
   const closeBtn = document.getElementById('room-search-close');
   if (!modal || !input || !results || !closeBtn) return;
+
+  // 房间里的搜索结果同样支持 ↑↓ + Enter
+  initResultKeyboardNav(input, results);
 
   let indexData = null;
 
@@ -134,10 +139,13 @@ function initParticles() {
   let w, h;
   const points = [];
   const LINK_DIST_SQ = 120 * 120;
+  /** 「减少动效」下只画静态一帧；resize 会把画布清空，需要补画 */
+  let staticOnly = false;
 
   function resize() {
     w = canvas.width = innerWidth;
     h = canvas.height = innerHeight;
+    if (staticOnly) drawFrame();
   }
   resize();
   window.addEventListener('resize', resize);
@@ -154,6 +162,40 @@ function initParticles() {
     });
   }
 
+  function drawFrame() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of points) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    for (let a = 0; a < points.length; a++) {
+      for (let b = a + 1; b < points.length; b++) {
+        const dx = points[a].x - points[b].x;
+        const dy = points[a].y - points[b].y;
+        const d2 = dx * dx + dy * dy;
+        // Compare squared distances (no sqrt) and only pay sqrt for links
+        if (d2 < LINK_DIST_SQ) {
+          const d = Math.sqrt(d2);
+          ctx.beginPath();
+          ctx.moveTo(points[a].x, points[a].y);
+          ctx.lineTo(points[b].x, points[b].y);
+          ctx.strokeStyle = `rgba(0,240,255,${(120 - d) / 300})`;
+          ctx.lineWidth = 0.3;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  // 「减少动效」偏好：画一帧静态星空就停，别再逐帧刷新
+  staticOnly = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (staticOnly) {
+    drawFrame();
+    return;
+  }
+
   function animate() {
     // Skip drawing while hidden (saves CPU/battery on background tabs)
     if (!document.hidden) {
@@ -163,28 +205,8 @@ function initParticles() {
         p.y += p.speedY;
         if (p.x < 0 || p.x > w) p.speedX *= -1;
         if (p.y < 0 || p.y > h) p.speedY *= -1;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
       }
-      for (let a = 0; a < points.length; a++) {
-        for (let b = a + 1; b < points.length; b++) {
-          const dx = points[a].x - points[b].x;
-          const dy = points[a].y - points[b].y;
-          const d2 = dx * dx + dy * dy;
-          // Compare squared distances (no sqrt) and only pay sqrt for links
-          if (d2 < LINK_DIST_SQ) {
-            const d = Math.sqrt(d2);
-            ctx.beginPath();
-            ctx.moveTo(points[a].x, points[a].y);
-            ctx.lineTo(points[b].x, points[b].y);
-            ctx.strokeStyle = `rgba(0,240,255,${(120 - d) / 300})`;
-            ctx.lineWidth = 0.3;
-            ctx.stroke();
-          }
-        }
-      }
+      drawFrame();
     }
     requestAnimationFrame(animate);
   }
@@ -193,21 +215,23 @@ function initParticles() {
 
 // ====== Mermaid diagram rendering ======
 let mermaidApi = null;
+let mermaidTheme = '';
 let mermaidLightbox = null;
 
 async function getMermaidApi() {
-  if (mermaidApi) return mermaidApi;
-  const mermaid = await import('mermaid');
+  const theme = document.documentElement.dataset.theme === 'light' ? 'default' : 'dark';
+  if (mermaidApi && mermaidTheme === theme) return mermaidApi;
+  const mermaid = mermaidApi ? { default: mermaidApi } : await import('mermaid');
   mermaid.default.initialize({
     startOnLoad: false,
-    theme: 'dark',
-    themeVariables: {
-      primaryColor: '#7b2fff',
-      primaryTextColor: '#e0e0e6',
-      lineColor: '#00f0ff',
-    },
+    theme,
+    themeVariables:
+      theme === 'default'
+        ? { primaryColor: '#e8f0ff', primaryTextColor: '#1b1f24', lineColor: '#0b63c5' }
+        : { primaryColor: '#7b2fff', primaryTextColor: '#e0e0e6', lineColor: '#00f0ff' },
   });
   mermaidApi = mermaid.default;
+  mermaidTheme = theme;
   return mermaidApi;
 }
 
@@ -225,6 +249,8 @@ async function initMermaid() {
       const div = document.createElement('div');
       div.className = 'mermaid';
       div.textContent = block.textContent;
+      // 主题切换后要按源码重画，所以把源码留在 DOM 上
+      div.dataset.source = block.textContent;
       pre.replaceWith(div);
       try {
         // Render one by one: a single failed diagram must not abort the rest
@@ -241,6 +267,29 @@ async function initMermaid() {
     console.warn('[mermaid] init failed:', err);
   } finally {
     enhanceMermaidZoom();
+  }
+}
+
+/** 主题切换后按原源码重画流程图（Mermaid 的配色在 render 时就固化了） */
+async function refreshMermaidTheme() {
+  const diagrams = /** @type {HTMLElement[]} */ ([...document.querySelectorAll('.mermaid[data-source]')]);
+  if (diagrams.length === 0) return;
+  try {
+    const mermaid = await getMermaidApi();
+    let index = 0;
+    for (const diagram of diagrams) {
+      const source = diagram.dataset.source || '';
+      if (!source) continue;
+      try {
+        const { svg, bindFunctions } = await mermaid.render(`mermaid-theme-${++index}`, source);
+        diagram.innerHTML = svg;
+        if (bindFunctions) bindFunctions(diagram);
+      } catch (err) {
+        console.warn('[mermaid] theme re-render failed:', err);
+      }
+    }
+  } catch (err) {
+    console.warn('[mermaid] theme switch failed:', err);
   }
 }
 
@@ -531,6 +580,15 @@ function initSearch() {
   // Prefetch as soon as the user focuses the search box
   input.addEventListener('focus', () => { loadIndex().catch(() => {}); }, { once: true });
 
+  // 搜索结果支持 ↑↓ + Enter（文章页 Ctrl+K 跳过来时也会用上）
+  initResultKeyboardNav(input, resultsEl);
+
+  // 从文章页按 Ctrl+K 跳过来：/archive.html?search=1 → 直接把光标放进搜索框
+  // （读不到参数就算了，不影响其它入口）
+  if (new URLSearchParams(window.location.search).get('search') === '1') {
+    requestAnimationFrame(() => input.focus());
+  }
+
   function escapeHtml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
@@ -641,6 +699,9 @@ function initSearch() {
       if (html) {
         readmeEl.innerHTML = html;
         initMermaid();
+        // README 是异步塞进来的：代码块复制按钮和标题锚点要在这之后再补一遍
+        initCodeCopy();
+        initHeadingAnchors();
       } else {
         readmeEl.style.display = 'none';
       }
@@ -830,6 +891,12 @@ function initSearch() {
       }
     });
   });
+
+  // 窄屏先把分类树收起：195 条目录默认全展开，会把文章列表挤到几屏之后。
+  // 放在 initPathFromUrl 之前 —— 深链接(?path=…)该展开的还得展开。
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    getTreeFolderDetails().forEach((details) => { details.open = false; });
+  }
 
   // Init from URL on load
   function initPathFromUrl() {
@@ -1110,57 +1177,64 @@ function initBackToTop(isHome3D) {
   });
 }
 
-// ====== Season theme switcher ======
-const SEASON_THEMES = [
-  { id: '', icon: '🌌', label: '默认', color: '#0a0a0f' },
-  { id: 'spring', icon: '🌸', label: '春', color: '#0d1310' },
-  { id: 'summer', icon: '☀️', label: '夏', color: '#081220' },
-  { id: 'autumn', icon: '🍂', label: '秋', color: '#14100a' },
-  { id: 'winter', icon: '❄️', label: '冬', color: '#0a0e17' },
+// ====== Theme switcher（默认 / 极简白） ======
+const THEMES = [
+  { id: '', icon: '🌙', label: 'dark', color: '#0a0a0f' },
+  { id: 'light', icon: '☀️', label: 'light', color: '#f6f7f9' },
 ];
 
-function initSeasonSwitcher() {
-  const KEY = 'site-season';
-  const validIds = SEASON_THEMES.map((t) => t.id);
+function initThemeSwitcher() {
+  const KEY = 'site-theme';
+  const LEGACY_KEY = 'site-season';
+  const validIds = THEMES.map((t) => t.id);
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'season-btn';
-  btn.setAttribute('aria-label', '切换季节皮肤');
+  btn.className = 'theme-btn';
+  btn.setAttribute('aria-label', '切换主题');
   btn.setAttribute('aria-haspopup', 'true');
   btn.setAttribute('aria-expanded', 'false');
 
   const menu = document.createElement('div');
-  menu.className = 'season-menu';
+  menu.className = 'theme-menu';
   menu.setAttribute('role', 'menu');
-  SEASON_THEMES.forEach((theme) => {
+  THEMES.forEach((theme) => {
     const item = document.createElement('button');
     item.type = 'button';
-    item.dataset.season = theme.id;
+    item.dataset.theme = theme.id;
     item.innerHTML = `<span aria-hidden="true">${theme.icon}</span><span>${theme.label}</span>`;
     item.addEventListener('click', () => {
-      applySeason(theme.id);
+      applyTheme(theme.id);
       closeMenu();
     });
     menu.appendChild(item);
   });
 
-  function applySeason(/** @type {string} */ id) {
-    if (id) {
-      document.documentElement.setAttribute('data-season', id);
+  function applyTheme(/** @type {string} */ id) {
+    const next = id === 'light' ? 'light' : '';
+    if (next) {
+      document.documentElement.setAttribute('data-theme', next);
     } else {
-      document.documentElement.removeAttribute('data-season');
+      document.documentElement.removeAttribute('data-theme');
     }
+    // 老版本存的是季节；迁移后把旧属性/旧 key 清掉，避免两份状态并存
+    document.documentElement.removeAttribute('data-season');
     try {
-      localStorage.setItem(KEY, id);
+      localStorage.setItem(KEY, next);
+      localStorage.removeItem(LEGACY_KEY);
     } catch (e) { /* storage unavailable — ignore */ }
-    const theme = SEASON_THEMES.find((t) => t.id === id) || SEASON_THEMES[0];
+
+    const theme = THEMES.find((t) => t.id === next) || THEMES[0];
     btn.textContent = theme.icon;
+    btn.title = `当前：${theme.label}（点击切换）`;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', theme.color);
     menu.querySelectorAll('button').forEach((b) => {
-      b.classList.toggle('is-active', b.dataset.season === id);
+      b.classList.toggle('is-active', b.dataset.theme === next);
     });
+
+    // 3D 房间 / Mermaid 等需要跟着换色的模块监听这个事件
+    window.dispatchEvent(new CustomEvent('site:theme-change', { detail: { theme: next } }));
   }
 
   function openMenu() {
@@ -1193,8 +1267,12 @@ function initSeasonSwitcher() {
   let saved = '';
   try {
     saved = localStorage.getItem(KEY) || '';
+    if (!saved) {
+      // 兼容旧版季节皮肤：只把 light 迁过来，春夏秋冬统一回默认
+      saved = localStorage.getItem(LEGACY_KEY) === 'light' ? 'light' : '';
+    }
   } catch (e) { /* storage unavailable — ignore */ }
-  applySeason(validIds.includes(saved) ? saved : '');
+  applyTheme(validIds.includes(saved) ? saved : '');
 }
 
 // ====== Post font-size control ======
@@ -1239,6 +1317,85 @@ function initFontSizeControl() {
   apply();
 }
 
+// ====== 搜索快捷键 & 结果键盘操作 ======
+
+/**
+ * Ctrl/Cmd + K 唤起搜索：
+ *   - 归档页 / 404 页：直接聚焦页面上的搜索框
+ *   - 首页 3D 房间：打开房间顶部的搜索面板
+ *   - 文章页：打开右侧「搜索」浮层（搜全站文章）
+ */
+function initSearchShortcut() {
+  document.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return;
+    if (e.key.toLowerCase() !== 'k') return;
+    // 聊天窗 / 搜索浮层里按 Ctrl+K 别把另一层盖上来
+    if (e.target instanceof Element && e.target.closest('#room-chat-modal, .site-modal')) return;
+    e.preventDefault();
+
+    const searchInput = document.getElementById('search-input');
+    if (searchInput instanceof HTMLInputElement) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      searchInput.focus();
+      searchInput.select();
+      return;
+    }
+    if (document.body.dataset.page === 'home-3d') {
+      window.dispatchEvent(new CustomEvent('room:open-search'));
+      return;
+    }
+    // 文章页：打开新的全站搜索浮层（不再跳归档）
+    if (document.body.dataset.page === 'post') {
+      window.dispatchEvent(new CustomEvent('site:open-search'));
+      return;
+    }
+    window.location.href = '/archive.html?search=1';
+  });
+}
+
+/**
+ * 搜索结果支持 ↑↓ 选择 + Enter 打开（鼠标党不受影响）。
+ * @param {HTMLInputElement} input
+ * @param {HTMLElement | null} results
+ */
+function initResultKeyboardNav(input, results) {
+  if (!results) return;
+  let active = -1;
+
+  /** @returns {HTMLElement[]} */
+  const items = () => /** @type {any} */ ([...results.querySelectorAll('.post-item')]);
+
+  function highlight(next) {
+    const list = items();
+    if (list.length === 0) return;
+    active = Math.min(Math.max(next, 0), list.length - 1);
+    list.forEach((el, i) => el.classList.toggle('is-active', i === active));
+    list[active].scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (items().length === 0) return;
+      e.preventDefault();
+      highlight(e.key === 'ArrowDown' ? active + 1 : active - 1);
+      return;
+    }
+    if (e.key === 'Enter' && active >= 0) {
+      const link = items()[active]?.querySelector('a');
+      if (link) {
+        e.preventDefault();
+        window.location.href = link.href;
+      }
+    }
+  });
+
+  // 重新搜索后旧高亮已经没意义，索引归零
+  input.addEventListener('input', () => {
+    active = -1;
+    items().forEach((el) => el.classList.remove('is-active'));
+  });
+}
+
 // Init
 const isHome3D = initHomeRoomIfNeeded();
 if (!isHome3D) {
@@ -1248,11 +1405,17 @@ initHomeSearchModal();
 // 聊天窗骨架两种页面都有：首页 3D 房间（点小人 / 头顶气泡）和文章页（右下角入口 + 划词）
 initChatModal();
 initPageChatEntry();
+initPostQuickNav();
 initTextSelectionAsk();
 initSearch();
+initSearchShortcut();
+initCodeCopy();
+initImageLightbox();
+initHeadingAnchors();
 initPostToc();
 initWeChatShare();
 initMermaid();
+window.addEventListener('site:theme-change', () => { refreshMermaidTheme(); });
 initFontSizeControl();
-initSeasonSwitcher();
+initThemeSwitcher();
 initBackToTop(isHome3D);

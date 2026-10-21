@@ -909,16 +909,18 @@ function createZhenfengTowerArtTexture() {
 }
 
 function addWindow(parent) {
+  const frameMat = makeMaterial(0x4a5db8);
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(0.62, 0.88, 0.06),
-    makeMaterial(0x4a5db8)
+    frameMat
   );
   frame.position.set(-3.45, 1.85, -1.1);
   frame.rotation.y = Math.PI / 2;
 
+  const panelMat = makeMaterial(0xb8d7ff, 0x5aa0ff);
   const panel1 = new THREE.Mesh(
     new THREE.BoxGeometry(0.26, 0.78, 0.02),
-    makeMaterial(0xb8d7ff, 0x5aa0ff)
+    panelMat
   );
   panel1.position.set(-3.42, 1.85, -1.24);
   panel1.rotation.y = Math.PI / 2;
@@ -927,6 +929,7 @@ function addWindow(parent) {
   panel2.position.z = -0.95;
 
   parent.add(frame, panel1, panel2);
+  return { frameMat, panelMat };
 }
 
 function addPlants(parent) {
@@ -1053,6 +1056,104 @@ function createFloorPerspectiveGuide() {
   return group;
 }
 
+/** 极简白主题下的白天背景：蓝天 + 白云（canvas 贴图，直接当 scene.background） */
+function createDaySkyTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  sky.addColorStop(0, '#3f8ee8');
+  sky.addColorStop(0.55, '#8ecbff');
+  sky.addColorStop(1, '#eaf6ff');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const puff = (x, y, r, alpha) => {
+    const g = ctx.createRadialGradient(x, y, r * 0.15, x, y, r);
+    g.addColorStop(0, `rgba(255,255,255,${alpha})`);
+    g.addColorStop(0.65, `rgba(255,255,255,${alpha * 0.6})`);
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  for (const [x, y, r] of [
+    [170, 130, 72],
+    [240, 118, 54],
+    [110, 120, 46],
+    [720, 105, 82],
+    [800, 120, 58],
+    [650, 125, 44],
+    [420, 235, 64],
+    [485, 220, 46],
+    [360, 228, 38],
+    [900, 300, 56],
+    [960, 288, 40],
+  ]) {
+    puff(x, y, r, 0.9);
+    puff(x + r * 0.55, y + 10, r * 0.62, 0.8);
+    puff(x - r * 0.5, y + 12, r * 0.55, 0.75);
+  }
+
+  // 靠近地平线压一层白雾，云才不会像贴纸
+  const haze = ctx.createLinearGradient(0, canvas.height * 0.68, 0, canvas.height);
+  haze.addColorStop(0, 'rgba(255,255,255,0)');
+  haze.addColorStop(1, 'rgba(255,255,255,0.6)');
+  ctx.fillStyle = haze;
+  ctx.fillRect(0, canvas.height * 0.68, canvas.width, canvas.height * 0.32);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+/** 极简白主题下窗户玻璃上的蓝天白云（竖向窄条） */
+function createWindowSkyTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  sky.addColorStop(0, '#3d8fe9');
+  sky.addColorStop(0.6, '#7fc0ff');
+  sky.addColorStop(1, '#dff1ff');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const puff = (x, y, r) => {
+    const g = ctx.createRadialGradient(x, y, r * 0.15, x, y, r);
+    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.65, 'rgba(255,255,255,0.55)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  for (const [x, y, r] of [
+    [80, 130, 52],
+    [125, 150, 40],
+    [55, 160, 34],
+    [180, 300, 46],
+    [215, 315, 34],
+    [150, 320, 30],
+  ]) {
+    puff(x, y, r);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 export function initHome3DRoom() {
   const mount = document.getElementById('room-canvas');
   const cardTitle = document.getElementById('room-card-title');
@@ -1154,50 +1255,38 @@ export function initHome3DRoom() {
     floorMap.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
   }
 
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(14, 9),
-    new THREE.MeshStandardMaterial({
-      color: 0x5665ab,
-      map: floorMap || null,
-      roughness: 0.93,
-      metalness: 0.02,
-    })
-  );
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: 0x5665ab,
+    map: floorMap || null,
+    roughness: 0.93,
+    metalness: 0.02,
+  });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 9), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = 0;
   floor.receiveShadow = true;
 
-  const rug = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.5, 2.6),
-    new THREE.MeshStandardMaterial({ color: 0x6b45a6, roughness: 0.9, metalness: 0 })
-  );
+  const rugMat = new THREE.MeshStandardMaterial({ color: 0x6b45a6, roughness: 0.9, metalness: 0 });
+  const rug = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 2.6), rugMat);
   rug.rotation.x = -Math.PI / 2;
   rug.position.set(0, 0.01, 1.2);
 
-  const backWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(14, 6),
-    new THREE.MeshStandardMaterial({ color: 0x2f3470, roughness: 0.9 })
-  );
+  const backWallMat = new THREE.MeshStandardMaterial({ color: 0x2f3470, roughness: 0.9 });
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 6), backWallMat);
   backWall.position.set(0, 3, -3.5);
 
-  const leftWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(9, 6),
-    new THREE.MeshStandardMaterial({ color: 0x2d3272, roughness: 0.9 })
-  );
+  const leftWallMat = new THREE.MeshStandardMaterial({ color: 0x2d3272, roughness: 0.9 });
+  const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(9, 6), leftWallMat);
   leftWall.rotation.y = Math.PI / 2;
   leftWall.position.set(-3.5, 3, 0.8);
 
-  const rightWall = new THREE.Mesh(
-    new THREE.PlaneGeometry(9, 6),
-    new THREE.MeshStandardMaterial({ color: 0x1e2460, roughness: 0.9 })
-  );
+  const rightWallMat = new THREE.MeshStandardMaterial({ color: 0x1e2460, roughness: 0.9 });
+  const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(9, 6), rightWallMat);
   rightWall.rotation.y = -Math.PI / 2;
   rightWall.position.set(3.5, 3, 0.8);
 
-  const ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(14, 9),
-    new THREE.MeshStandardMaterial({ color: 0x262d63, roughness: 1 })
-  );
+  const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x262d63, roughness: 1 });
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(14, 9), ceilingMat);
   ceiling.rotation.x = Math.PI / 2;
   ceiling.position.set(0, 5.95, 0.8);
 
@@ -1221,8 +1310,48 @@ export function initHome3DRoom() {
   room.add(shelfWrap);
 
   const picMeta = addPicture(room);
-  addWindow(room);
+  const windowMeta = addWindow(room);
   addPlants(room);
+
+  const daySkyTexture = createDaySkyTexture();
+  const windowSkyTexture = createWindowSkyTexture();
+
+  /** @param {boolean} light */
+  function applyRoomTheme(light) {
+    scene.background = light && daySkyTexture ? daySkyTexture : new THREE.Color(0x070e3f);
+    scene.fog = light ? new THREE.Fog(0xdcecff, 10, 28) : new THREE.Fog(0x070e3f, 8, 20);
+
+    hemiLight.color.set(light ? 0xbfe3ff : 0x6f88ff);
+    hemiLight.groundColor.set(light ? 0xa9b6c7 : 0x27315f);
+    hemiLight.intensity = light ? 1.15 : 0.75;
+    ambient.color.set(light ? 0xffffff : 0x41528f);
+    ambient.intensity = light ? 0.6 : 0.45;
+    dirLight.color.set(light ? 0xfff1d6 : 0xdbe8ff);
+    dirLight.intensity = light ? 2.1 : 1.3;
+
+    floorMat.color.set(light ? 0xd8c6a8 : 0x5665ab);
+    floorMat.map = light ? null : floorMap || null;
+    floorMat.needsUpdate = true;
+    rugMat.color.set(light ? 0xc9b9ea : 0x6b45a6);
+    backWallMat.color.set(light ? 0xedf3fb : 0x2f3470);
+    leftWallMat.color.set(light ? 0xe8f0fa : 0x2d3272);
+    rightWallMat.color.set(light ? 0xe2ebf7 : 0x1e2460);
+    ceilingMat.color.set(light ? 0xf7fafe : 0x262d63);
+
+    // 窗户：白天换成蓝天白云，夜里保持原来的蓝色玻璃
+    windowMeta.frameMat.color.set(light ? 0xf2f6fb : 0x4a5db8);
+    windowMeta.panelMat.color.set(light ? 0xffffff : 0xb8d7ff);
+    windowMeta.panelMat.emissive.set(light ? 0xffffff : 0x5aa0ff);
+    windowMeta.panelMat.emissiveMap = light ? windowSkyTexture : null;
+    windowMeta.panelMat.map = light ? windowSkyTexture : null;
+    windowMeta.panelMat.emissiveIntensity = light ? 0.85 : 1;
+    windowMeta.panelMat.needsUpdate = true;
+  }
+
+  applyRoomTheme(document.documentElement.dataset.theme === 'light');
+  window.addEventListener('site:theme-change', (event) => {
+    applyRoomTheme(/** @type {any} */ (event).detail?.theme === 'light');
+  });
 
   const charWrap = new THREE.Group();
   // Start position: standing outside the room front, will walk in
@@ -1474,6 +1603,12 @@ export function initHome3DRoom() {
   scene.add(room);
 
   const stars = addStars(scene);
+  // 白天的房间里不该有星星
+  const syncStars = () => {
+    stars.visible = document.documentElement.dataset.theme !== 'light';
+  };
+  syncStars();
+  window.addEventListener('site:theme-change', syncStars);
 
   const anchors = {
     about: new THREE.Object3D(),
@@ -1541,6 +1676,31 @@ export function initHome3DRoom() {
   hotspotWrap.appendChild(chatBadge);
   const charHeadAnchor = new THREE.Vector3();
 
+  /** 按钮半宽/半高缓存：offsetWidth 会强制回流，别放进逐帧循环 */
+  const hotspotHalf = new Map();
+
+  function halfSize(el) {
+    let half = hotspotHalf.get(el);
+    if (!half) {
+      half = { w: el.offsetWidth / 2, h: el.offsetHeight / 2 };
+      hotspotHalf.set(el, half);
+    }
+    return half;
+  }
+
+  /** 投影点贴边时按钮会被切掉一半（窄屏上 Skills/Contact 就飞到屏幕外），夹回可视区 */
+  function clampX(el, x, width) {
+    const margin = 6;
+    const half = halfSize(el).w;
+    return Math.min(Math.max(x, half + margin), Math.max(half + margin, width - half - margin));
+  }
+
+  function clampY(el, y, height) {
+    const margin = 6;
+    const half = halfSize(el).h;
+    return Math.min(Math.max(y, half + margin), Math.max(half + margin, height - half - margin));
+  }
+
   function updateHotspots() {
     const rect = mount.getBoundingClientRect();
     const width = rect.width;
@@ -1564,7 +1724,7 @@ export function initHome3DRoom() {
 
       button.style.opacity = '1';
       button.style.pointerEvents = 'auto';
-      button.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      button.style.transform = `translate(${clampX(button, x, width)}px, ${clampY(button, y, height)}px) translate(-50%, -50%)`;
     }
 
     // 小人头顶的「聊聊」气泡：入场镜头飞完之后才显示，跟着小人一起动
@@ -1580,8 +1740,8 @@ export function initHome3DRoom() {
         chatBadge.style.opacity = '0';
         chatBadge.style.pointerEvents = 'none';
       } else {
-        const bx = (charHeadAnchor.x * 0.5 + 0.5) * width;
-        const by = (-charHeadAnchor.y * 0.5 + 0.5) * height;
+        const bx = clampX(chatBadge, (charHeadAnchor.x * 0.5 + 0.5) * width, width);
+        const by = clampY(chatBadge, (-charHeadAnchor.y * 0.5 + 0.5) * height, height);
         chatBadge.style.opacity = '1';
         chatBadge.style.pointerEvents = 'auto';
         chatBadge.style.transform = `translate(${bx}px, ${by}px) translate(-50%, -100%)`;
@@ -1592,6 +1752,8 @@ export function initHome3DRoom() {
   function onResize() {
     const w = mount.clientWidth;
     const h = mount.clientHeight;
+    // 按钮尺寸可能随断点/缩放变化，缓存作废，下一帧重新量
+    hotspotHalf.clear();
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);

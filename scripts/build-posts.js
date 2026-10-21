@@ -13,6 +13,7 @@ import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import hljs from 'highlight.js';
 import { buildImageIndex } from './images.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -195,7 +196,26 @@ function collectHeadings(tokens, slugCounts, headings = []) {
 const renderer = new marked.Renderer();
 renderer.heading = function heading({ tokens, depth, _headingId }) {
   const text = this.parser.parseInline(tokens);
-  return `<h${depth} id="${_headingId}">${text}</h${depth}>`;
+  // 标题右侧挂一个锚点：hover 才显形，点一下就把「本页#这一节」复制走（复制逻辑在 main.js）
+  const anchor = `<a class="heading-anchor" href="#${_headingId}" data-anchor="${_headingId}" aria-label="复制本节链接" title="复制本节链接">#</a>`;
+  return `<h${depth} id="${_headingId}">${text}${anchor}</h${depth}>`;
+};
+
+// 代码块语法高亮：构建期用 highlight.js 着色，运行时只靠 CSS 换深浅配色。
+// 未知语言（包括 mermaid）保持纯文本，别让自动识别把图表源码染得乱七八糟。
+renderer.code = function code({ text, lang }) {
+  const language = String(lang || '').trim().split(/\s+/)[0].toLowerCase();
+  const known = Boolean(language && language !== 'mermaid' && hljs.getLanguage(language));
+  let highlighted = attrEscape(text);
+  if (known) {
+    try {
+      highlighted = hljs.highlight(text, { language, ignoreIllegals: true }).value;
+    } catch {
+      highlighted = attrEscape(text);
+    }
+  }
+  const cls = language ? ` class="language-${language} hljs"` : ' class="hljs"';
+  return `<pre><code${cls}>${highlighted}</code></pre>`;
 };
 
 // 正文配图：构建期已把 PNG/JPEG 转成同目录 WebP（见 scripts/images.js）。
@@ -328,6 +348,17 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
 posts.sort((a, b) => (b.sortDate > a.sortDate ? 1 : -1));
 
 // ====== Generate search index (with category support) ======
+/** 去掉 HTML 标签后还会残留 &quot; 这类实体，搜索结果里会原样显示成 &quot;，顺手解码掉 */
+function decodeEntities(text) {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&');
+}
+
 const searchIndex = posts.map(p => ({
   slug: p.slug,
   title: p.title,
@@ -339,7 +370,15 @@ const searchIndex = posts.map(p => ({
   // Strip HTML tags for plain-text search content.
   // Truncate to 1200 chars: snippets only need ±120 chars around a match,
   // and full text here was the main reason the index grew past 1MB.
-  content: p.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1200),
+  content: decodeEntities(
+    p.html
+      // 标题右侧的锚点 <a class="heading-anchor">#</a> 只是 UI，别让 # 混进搜索结果摘要
+      .replace(/<a\b[^>]*class="heading-anchor"[^>]*>[^<]*<\/a>/g, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 1200)
+  ),
 }));
 fs.writeFileSync(
   path.join(ROOT, 'public', 'search-index.json'),
@@ -419,7 +458,7 @@ function buildPostsTree(baseDir) {
         try {
           const raw = fs.readFileSync(fullPath, 'utf-8');
           const { content } = matter(raw);
-          readmeHtml = rewriteReadmeLinks(marked.parse(content), relPath);
+          readmeHtml = rewriteReadmeLinks(marked.parse(content, { renderer }), relPath);
         } catch (_) { /* ignore */ }
       }
     }
@@ -531,6 +570,30 @@ fs.writeFileSync(
   'utf-8'
 );
 
+// ====== Generate lightweight nav tree for post pages ======
+// 归档页把整棵树内联在 archive.html 里；文章页不重复塞 200KB，点「目录」时按需拉这份 JSON。
+// 只保留导航需要的字段（标题/日期/URL/数量），不带 README。
+function navNode(node) {
+  return {
+    name: node.name,
+    path: toUrlPath(node.path),
+    totalCount: node.totalCount,
+    children: node.children.map(navNode),
+    posts: node.posts.map((p) => ({
+      title: p.title,
+      date: p.date,
+      url: p.relativeDir
+        ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
+        : `/posts-html/${p.slug}.html`,
+    })),
+  };
+}
+fs.writeFileSync(
+  path.join(ROOT, 'public', 'posts-tree.json'),
+  JSON.stringify(navNode(postsTree)),
+  'utf-8'
+);
+
 // ====== Shared HTML fragments ======
 const criticalCss = `
   <style>
@@ -544,6 +607,7 @@ const siteDesc = 'HTTP200专注分享最新AI技术、大模型应用、人工�
 
 const headExtra = `
   <link rel="manifest" href="/manifest.json">
+  <link rel="alternate" type="application/rss+xml" title="http200.cn" href="/feed.xml">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -557,7 +621,7 @@ const headExtra = `
       });
     }
   </script>
-  <script>try{var s=localStorage.getItem('site-season');if(s)document.documentElement.setAttribute('data-season',s);}catch(e){}</script>${criticalCss}`;
+  <script>try{var t=localStorage.getItem('site-theme');var s=localStorage.getItem('site-season');if(t==='light'||(!t&&s==='light'))document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>${criticalCss}`;
 
 // 聊天窗骨架：首页 3D 房间、文章页、归档页共用一份，逻辑在 src/room-chat.js（节点 id 对不上会直接报错）。
 // 打开方式：首页点小人 / 头顶「聊聊」气泡；文章页、归档页用右下角常驻入口（文章页还有正文划词气泡）。
@@ -570,6 +634,7 @@ const chatModalHtml = `
             <h2 id="room-chat-title">和房间主人聊聊</h2>
             <p id="room-chat-status">TommyHu · 在线</p>
           </div>
+          <button type="button" class="room-chat-icon-btn room-chat-reset" id="room-chat-reset" aria-label="开始新对话" title="开始新对话">↺</button>
           <button type="button" class="room-chat-icon-btn" id="room-chat-voice" aria-pressed="false" aria-label="朗读回复" title="朗读回复">🔇</button>
           <button type="button" class="room-chat-icon-btn room-chat-close" id="room-chat-close" aria-label="关闭聊天">×</button>
         </header>
@@ -626,7 +691,7 @@ function buildJsonLd({ type, title, description, url, datePublished = '', dateMo
 const navHtml = '<a href="/">首页</a><a href="/archive.html">归档</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a>';
 
 // ====== Generate post pages ======
-for (const post of posts) {
+for (const [postIndex, post] of posts.entries()) {
   // Build category breadcrumb HTML
   let categoryHtml = '';
   if (post.category) {
@@ -663,6 +728,30 @@ for (const post of posts) {
     ? `/posts-html/${toUrlPath(post.relativeDir)}/${post.slug}.html`
     : `/posts-html/${post.slug}.html`;
 
+  /** 任意文章页的站内地址（上一篇/下一篇/相关文章共用） */
+  const hrefOf = (p) =>
+    p.relativeDir ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html` : `/posts-html/${p.slug}.html`;
+
+  // 上一篇 / 下一篇：沿用归档顺序（日期倒序），"上一篇"= 更新的一篇
+  const prevPost = postIndex > 0 ? posts[postIndex - 1] : null;
+  const nextPost = postIndex < posts.length - 1 ? posts[postIndex + 1] : null;
+
+  // 相关文章：同二级分类最相关，其次同大类，再按共同标签加分；同分时新的在前
+  const related = posts
+    .filter((p) => p !== post)
+    .map((p) => {
+      let score = 0;
+      if (post.subcategory && p.subcategory === post.subcategory) score += 3;
+      else if (post.category && p.category === post.category) score += 1;
+      const sharedTags = (p.tags || []).filter((tag) => (post.tags || []).includes(tag)).length;
+      score += Math.min(sharedTags, 2);
+      return { p, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || (b.p.sortDate > a.p.sortDate ? 1 : -1))
+    .slice(0, 3)
+    .map((item) => item.p);
+
   const ogMeta = buildOgMeta({
     title: `${post.title} - http200.cn`,
     description: post.summary,
@@ -693,13 +782,14 @@ for (const post of posts) {
   <script>try{var s=parseFloat(localStorage.getItem('post-font-scale'));if(s>=0.8&&s<=1.6)document.documentElement.style.setProperty('--post-font-scale',s);}catch(e){}</script>
 </head>
 <body data-page="post">
+  <a class="skip-link" href="#main">跳到正文</a>
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav>${navHtml}</nav>
   </header>
-  <main class="container container-post">
+  <main id="main" class="container container-post">
     <div class="post-layout${post.tocHeadings.length ? '' : ' no-toc'}">
       <div class="post-main">
         <article>
@@ -717,6 +807,15 @@ for (const post of posts) {
           </div>
           <div class="post-content">${post.html}</div>
         </article>
+        ${related.length ? `<section class="related-posts">
+          <h2 class="related-title">相关文章</h2>
+          <ul class="related-list">
+            ${related.map((p) => `<li>
+              <a href="${hrefOf(p)}">${attrEscape(p.title)}</a>
+              ${p.category ? `<span class="related-meta">${attrEscape(p.category)}${p.subcategory ? ` › ${attrEscape(p.subcategory)}` : ''}</span>` : ''}
+            </li>`).join('')}
+          </ul>
+        </section>` : ''}
         <section class="comments-section">
           <h2 class="comments-title">评论</h2>
           <div id="comments-widget"><p class="comments-loading">评论加载中…</p></div>
@@ -767,9 +866,23 @@ for (const post of posts) {
       </div>
       ${tocHtml}
     </div>
+    ${prevPost || nextPost ? `<nav class="post-pager" aria-label="上一篇 / 下一篇">
+      ${prevPost
+        ? `<a class="post-pager-item" href="${hrefOf(prevPost)}">
+        <span class="post-pager-label">← 上一篇</span>
+        <strong class="post-pager-title">${attrEscape(prevPost.title)}</strong>
+      </a>`
+        : ''}
+      ${nextPost
+        ? `<a class="post-pager-item is-next" href="${hrefOf(nextPost)}">
+        <span class="post-pager-label">下一篇 →</span>
+        <strong class="post-pager-title">${attrEscape(nextPost.title)}</strong>
+      </a>`
+        : ''}
+    </nav>` : ''}
     <a href="/archive.html" class="back-link">← 返回归档</a>
   </main>
-  <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  <footer class="site-footer">© http200.cn | Powered by TommyHu · <a href="/feed.xml" class="rss-link">RSS</a></footer>
   ${chatModalHtml}
   </div>
   <script type="module" src="/src/main.js"></script>
@@ -946,16 +1059,18 @@ const archiveHtml = `<!DOCTYPE html>
   ${keywordsMeta}${buildOgMeta({ title: '归档 - HTTP200', description: siteDesc, url: '/archive.html' })}${buildJsonLd({ type: 'CollectionPage', title: '归档 - HTTP200', description: siteDesc, url: '/archive.html' })}${headExtra}
 </head>
 <body data-page="archive">
+  <a class="skip-link" href="#main">跳到正文</a>
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav>${navHtml}</nav>
   </header>
-  <main class="container container-archive">
+  <main id="main" class="container container-archive">
     <h2 style="margin-bottom:24px;font-weight:700;color:var(--heading,#fff);">文章归档</h2>
     <div class="search-box">
       <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+      <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
     </div>
     <div class="archive-layout">
       <aside class="archive-sidebar">
@@ -973,7 +1088,7 @@ const archiveHtml = `<!DOCTYPE html>
       </div>
     </div>
   </main>
-  <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  <footer class="site-footer">© http200.cn | Powered by TommyHu · <a href="/feed.xml" class="rss-link">RSS</a></footer>
   ${chatModalHtml}
   </div>
   <script>
@@ -984,6 +1099,57 @@ const archiveHtml = `<!DOCTYPE html>
 </html>`;
 
 fs.writeFileSync(path.join(ROOT, 'archive.html'), archiveHtml, 'utf-8');
+
+// ====== Generate 404.html ======
+// GitHub Pages 在找不到页面时用根目录的 404.html。默认那张白页没有任何出口，
+// 这里给一个「搜索 + 最近文章」的版本，顺带让聊天、皮肤、回到顶部都还能用。
+const notFoundHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>页面走丢了 - HTTP200</title>
+  <meta name="robots" content="noindex">
+  ${headExtra}
+</head>
+<body data-page="404">
+  <a class="skip-link" href="#main">跳到正文</a>
+  <canvas id="bg-canvas"></canvas>
+  <div class="page-wrap">
+  <header class="site-header">
+    <div class="logo"><a href="/">http200.cn</a></div>
+    <nav>${navHtml}</nav>
+  </header>
+  <main id="main" class="container container-404">
+    <p class="notfound-code" aria-hidden="true">404</p>
+    <h1 class="notfound-title">这个地址不存在</h1>
+    <p class="notfound-text">可能是链接过期了，或者文章被挪到了别的目录。搜一下试试，或者直接翻最近更新。</p>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+      <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
+    </div>
+    <div id="search-results" style="display:none;"></div>
+    <div id="post-list-wrap">
+      <h2 class="notfound-subtitle">最近更新</h2>
+      <ul class="notfound-list">
+        ${recentPosts.slice(0, 8).map((p) => {
+          const href = p.relativeDir
+            ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
+            : `/posts-html/${p.slug}.html`;
+          return `<li><a href="${href}">${attrEscape(p.title)}</a><span class="notfound-date">${p.date}</span></li>`;
+        }).join('')}
+      </ul>
+      <a class="back-link" href="/archive.html">← 全部文章</a>
+    </div>
+  </main>
+  <footer class="site-footer">© http200.cn | Powered by TommyHu · <a href="/feed.xml" class="rss-link">RSS</a></footer>
+  ${chatModalHtml}
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>`;
+
+fs.writeFileSync(path.join(ROOT, '404.html'), notFoundHtml, 'utf-8');
 
 // ====== Generate sitemap.xml ======
 const SITE_URL = 'https://http200.cn';
@@ -1020,6 +1186,42 @@ ${sitemapEntries.map(e => `  <url>
 </urlset>`;
 
 fs.writeFileSync(path.join(ROOT, 'public', 'sitemap.xml'), sitemapXml, 'utf-8');
+
+// ====== Generate feed.xml（RSS 2.0）======
+// 只放最近的 30 篇：全文在站内，订阅端只需要"知道更新了"。
+// 编辑器/阅读器都认根目录下的 /feed.xml，headExtra 里也挂了 <link rel="alternate">。
+const FEED_LIMIT = 30;
+const feedItems = posts.slice(0, FEED_LIMIT).map((p) => {
+  const path = p.relativeDir
+    ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
+    : `/posts-html/${p.slug}.html`;
+  const url = `${SITE_URL}${path}`;
+  const pubDate = (p.sortDate instanceof Date ? p.sortDate : new Date()).toUTCString();
+  return `    <item>
+      <title>${attrEscape(p.title)}</title>
+      <link>${url}</link>
+      <guid isPermaLink="true">${url}</guid>
+      <pubDate>${pubDate}</pubDate>
+      ${p.category ? `<category>${attrEscape(p.category)}</category>` : ''}
+      <description>${attrEscape(p.summary)}</description>
+    </item>`;
+}).join('\n');
+
+const feedXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>http200.cn</title>
+    <link>${SITE_URL}/</link>
+    <description>${attrEscape(siteDesc)}</description>
+    <language>zh-CN</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
+${feedItems}
+  </channel>
+</rss>
+`;
+
+fs.writeFileSync(path.join(ROOT, 'public', 'feed.xml'), feedXml, 'utf-8');
 
 // ====== Generate robots.txt ======
 const robotsTxt = `User-agent: *

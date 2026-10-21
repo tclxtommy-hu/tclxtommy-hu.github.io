@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>页面走丢了 - HTTP200</title>
+  <meta name="robots" content="noindex">
+  
+  <link rel="manifest" href="/manifest.json">
+  <link rel="alternate" type="application/rss+xml" title="http200.cn" href="/feed.xml">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script>try{var t=localStorage.getItem('site-theme');var s=localStorage.getItem('site-season');if(t==='light'||(!t&&s==='light'))document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+  <style>
+    body { background: #0a0a0f; color: #e0e0e6; margin: 0; }
+    .page-wrap { opacity: 0; animation: fadeIn .3s ease .05s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+  </style>
+</head>
+<body data-page="404">
+  <a class="skip-link" href="#main">跳到正文</a>
+  <canvas id="bg-canvas"></canvas>
+  <div class="page-wrap">
+  <header class="site-header">
+    <div class="logo"><a href="/">http200.cn</a></div>
+    <nav><a href="/">首页</a><a href="/archive.html">归档</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
+  </header>
+  <main id="main" class="container container-404">
+    <p class="notfound-code" aria-hidden="true">404</p>
+    <h1 class="notfound-title">这个地址不存在</h1>
+    <p class="notfound-text">可能是链接过期了，或者文章被挪到了别的目录。搜一下试试，或者直接翻最近更新。</p>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+      <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
+    </div>
+    <div id="search-results" style="display:none;"></div>
+    <div id="post-list-wrap">
+      <h2 class="notfound-subtitle">最近更新</h2>
+      <ul class="notfound-list">
+        <li><a href="/posts-html/AI/AI实践/codex配置.html">codex配置</a><span class="notfound-date">2026/10/20</span></li><li><a href="/posts-html/AI/AI实践/copilot配置.html">copilot配置</a><span class="notfound-date">2026/10/20</span></li><li><a href="/posts-html/AI/Harness/上下文压缩机制对比.html">上下文压缩机制对比：PI / OpenClaw / Codex / WorkBuddy</a><span class="notfound-date">2026/10/10</span></li><li><a href="/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html">02-Computer-Use</a><span class="notfound-date">2026/10/14</span></li><li><a href="/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html">02-上下文工程</a><span class="notfound-date">2026/10/14</span></li><li><a href="/posts-html/AI/AI实践/读《理解深度学习Understanding Deep Learning》.html">读《理解深度学习Understanding Deep Learning》</a><span class="notfound-date">2026/10/07</span></li><li><a href="/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html">01-A2A协议深挖</a><span class="notfound-date">2026/10/07</span></li><li><a href="/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html">01-模型选型指南</a><span class="notfound-date">2026/09/30</span></li>
+      </ul>
+      <a class="back-link" href="/archive.html">← 全部文章</a>
+    </div>
+  </main>
+  <footer class="site-footer">© http200.cn | Powered by TommyHu · <a href="/feed.xml" class="rss-link">RSS</a></footer>
+  
+    <div class="room-chat-modal" id="room-chat-modal" hidden>
+      <div class="room-chat-panel" role="dialog" aria-modal="true" aria-labelledby="room-chat-title">
+        <header class="room-chat-header">
+          <span class="room-chat-avatar" aria-hidden="true">🧑</span>
+          <div class="room-chat-heading">
+            <h2 id="room-chat-title">和房间主人聊聊</h2>
+            <p id="room-chat-status">TommyHu · 在线</p>
+          </div>
+          <button type="button" class="room-chat-icon-btn room-chat-reset" id="room-chat-reset" aria-label="开始新对话" title="开始新对话">↺</button>
+          <button type="button" class="room-chat-icon-btn" id="room-chat-voice" aria-pressed="false" aria-label="朗读回复" title="朗读回复">🔇</button>
+          <button type="button" class="room-chat-icon-btn room-chat-close" id="room-chat-close" aria-label="关闭聊天">×</button>
+        </header>
+        <div class="room-chat-log" id="room-chat-log" role="log" aria-live="polite"></div>
+        <!-- 文章页划词进来的引用卡片：发送时会拼成「引用自《标题》(链接)：> 选段」，模型才知道这段出自哪篇 -->
+        <div class="room-chat-quote" id="room-chat-quote" hidden></div>
+        <form class="room-chat-form" id="room-chat-form">
+          <button type="button" class="room-chat-icon-btn room-chat-mic" id="room-chat-mic" aria-pressed="false" aria-label="语音输入" title="语音输入">🎤</button>
+          <textarea id="room-chat-input" rows="1" placeholder="输入问题，Enter 发送 · Shift+Enter 换行" autocomplete="off"></textarea>
+          <button type="submit" class="room-chat-send" id="room-chat-send">发送</button>
+        </form>
+        <p class="room-chat-hint" id="room-chat-hint">语音输入与朗读都调用浏览器系统接口（Web Speech API），不依赖第三方服务</p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

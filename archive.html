@@ -20,6 +20,7 @@
   <meta name="twitter:image" content="https://http200.cn/icons/icon-512.png">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"归档 - HTTP200","description":"HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。","url":"https://http200.cn/archive.html","publisher":{"@type":"Organization","name":"http200.cn","logo":{"@type":"ImageObject","url":"https://http200.cn/icons/icon-512.png"}}}</script>
   <link rel="manifest" href="/manifest.json">
+  <link rel="alternate" type="application/rss+xml" title="http200.cn" href="/feed.xml">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,7 +34,7 @@
       });
     }
   </script>
-  <script>try{var s=localStorage.getItem('site-season');if(s)document.documentElement.setAttribute('data-season',s);}catch(e){}</script>
+  <script>try{var t=localStorage.getItem('site-theme');var s=localStorage.getItem('site-season');if(t==='light'||(!t&&s==='light'))document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
   <style>
     body { background: #0a0a0f; color: #e0e0e6; margin: 0; }
     .page-wrap { opacity: 0; animation: fadeIn .3s ease .05s forwards; }
@@ -41,16 +42,18 @@
   </style>
 </head>
 <body data-page="archive">
+  <a class="skip-link" href="#main">跳到正文</a>
   <canvas id="bg-canvas"></canvas>
   <div class="page-wrap">
   <header class="site-header">
     <div class="logo"><a href="/">http200.cn</a></div>
     <nav><a href="/">首页</a><a href="/archive.html">归档</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a></nav>
   </header>
-  <main class="container container-archive">
+  <main id="main" class="container container-archive">
     <h2 style="margin-bottom:24px;font-weight:700;color:var(--heading,#fff);">文章归档</h2>
     <div class="search-box">
       <input type="text" id="search-input" placeholder="搜索文章标题、内容或标签…" autocomplete="off">
+      <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
     </div>
     <div class="archive-layout">
       <aside class="archive-sidebar">
@@ -2254,7 +2257,7 @@
       </div>
     </div>
   </main>
-  <footer class="site-footer">© http200.cn | Powered by TommyHu</footer>
+  <footer class="site-footer">© http200.cn | Powered by TommyHu · <a href="/feed.xml" class="rss-link">RSS</a></footer>
   
     <div class="room-chat-modal" id="room-chat-modal" hidden>
       <div class="room-chat-panel" role="dialog" aria-modal="true" aria-labelledby="room-chat-title">
@@ -2264,6 +2267,7 @@
             <h2 id="room-chat-title">和房间主人聊聊</h2>
             <p id="room-chat-status">TommyHu · 在线</p>
           </div>
+          <button type="button" class="room-chat-icon-btn room-chat-reset" id="room-chat-reset" aria-label="开始新对话" title="开始新对话">↺</button>
           <button type="button" class="room-chat-icon-btn" id="room-chat-voice" aria-pressed="false" aria-label="朗读回复" title="朗读回复">🔇</button>
           <button type="button" class="room-chat-icon-btn room-chat-close" id="room-chat-close" aria-label="关闭聊天">×</button>
         </header>

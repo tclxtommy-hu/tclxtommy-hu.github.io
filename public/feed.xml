@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>http200.cn</title>
+    <link>https://http200.cn/</link>
+    <description>HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Oct 2026 06:51:08 GMT</lastBuildDate>
+    <atom:link href="https://http200.cn/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>copilot配置</title>
+      <link>https://http200.cn/posts-html/AI/AI实践/copilot配置.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/copilot配置.html</guid>
+      <pubDate>Tue, 20 Oct 2026 06:51:22 GMT</pubDate>
+      <category>AI</category>
+      <description>配置copilot搭配的vscode插件 &gt; CMB: Copilot Model Bridge &gt; weisiren.cmb-copilot-model-bridge 配置copilot搭配的vscode插件 &gt; ctrl+shift+p 打开命令面板，输入 Copilot Model Brid</description>
+    </item>
+    <item>
+      <title>codex配置</title>
+      <link>https://http200.cn/posts-html/AI/AI实践/codex配置.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/codex配置.html</guid>
+      <pubDate>Tue, 20 Oct 2026 06:51:22 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; .codex目录 config.toml toml 顶层主模型 model = &quot;deepseek-v4.1-flash&quot; 代码评审模型（很多人漏掉这个，这里经常是terra） review_model = &quot;deepseek-v4.1-flash&quot; inline 内联补全模型 inline_m</description>
+    </item>
+    <item>
+      <title>02-上下文工程</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html</guid>
+      <pubDate>Wed, 14 Oct 2026 13:37:36 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-10 21:06 &gt; 一句话定义：系统化设计送给 LLM /ˌel el ˈem/ （ Large Language Model /lɑːdʒ ˈlæŋɡwɪdʒ ˈmɒdl/ ，大语言模型）的上下文——选材、检索、压缩、记忆，让模型在正确信息下推理。 &gt; 关联阅读</description>
+    </item>
+    <item>
+      <title>02-Computer-Use</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</guid>
+      <pubDate>Wed, 14 Oct 2026 13:37:36 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-08 21:51 &gt; 状态：✅ 已补齐（2026-10-08） &gt; 一句话定义：让 Agent 通过截图理解界面并执行点击/输入等动作，操作浏览器或桌面。 大纲 1. 为什么需要：API 到不了的地方(一为什么需要api-到不了的地方) 2. 感知-规划-动作环(二</description>
+    </item>
+    <item>
+      <title>上下文压缩机制对比：PI / OpenClaw / Codex / WorkBuddy</title>
+      <link>https://http200.cn/posts-html/AI/Harness/上下文压缩机制对比.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Harness/上下文压缩机制对比.html</guid>
+      <pubDate>Sat, 10 Oct 2026 00:00:00 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-10 21:43 &gt; 一句话定义：上下文压缩是 harness /ˈhɑːnɪs/ （运行外壳）的&quot;内存管理&quot;——进上下文之前瘦身、组装时裁剪、超窗时摘要续命；四家实现细节不同，骨架高度一致。 &gt; 关联阅读：压缩方法论与预算分配见 ../AI知识库/09-RAG与上</description>
+    </item>
+    <item>
+      <title>01-A2A协议深挖</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html</guid>
+      <pubDate>Wed, 07 Oct 2026 14:28:18 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-07 21:33 &gt; 一句话定义： A2A /ˌeɪ tuː ˈeɪ/ （ Agent-to-Agent /ˈeɪdʒənt tuː ˈeɪdʒənt/ ，Agent 间互操作协议）是让不同厂商、不同框架的 Agent 互相发现能力、委派任务、交换结果的标准——MC</description>
+    </item>
+    <item>
+      <title>读《理解深度学习Understanding Deep Learning》</title>
+      <link>https://http200.cn/posts-html/AI/AI实践/读《理解深度学习Understanding Deep Learning》.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/读《理解深度学习Understanding Deep Learning》.html</guid>
+      <pubDate>Wed, 07 Oct 2026 14:28:18 GMT</pubDate>
+      <category>AI</category>
+      <description></description>
+    </item>
+    <item>
+      <title>06-LLM 核心性能指标全景手册</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
+    </item>
+    <item>
+      <title>05-产品指标与AB</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/05-产品指标与AB.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/05-产品指标与AB.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
+    </item>
+    <item>
+      <title>04-在线与离线评测</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/04-在线与离线评测.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/04-在线与离线评测.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
+    </item>
+    <item>
+      <title>03-红队测试</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/03-红队测试.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/03-红队测试.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
+    </item>
+    <item>
+      <title>02-护栏产品化</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/02-护栏产品化.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/02-护栏产品化.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
+    </item>
+    <item>
+      <title>01-Prompt-Injection深挖</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/01-Prompt-Injection深挖.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/01-Prompt-Injection深挖.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
+    </item>
+    <item>
+      <title>08-多租户与隔离</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/08-多租户与隔离.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/08-多租户与隔离.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>07-Prompt版本管理</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/07-Prompt版本管理.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/07-Prompt版本管理.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>06-限流重试与幂等</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/06-限流重试与幂等.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/06-限流重试与幂等.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>05-降级与Fallback</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/05-降级与Fallback.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/05-降级与Fallback.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>04-LLM网关与路由</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/04-LLM网关与路由.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/04-LLM网关与路由.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>03-延迟成本质量三角</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/03-延迟成本质量三角.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/03-延迟成本质量三角.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>02-Token成本估算</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/02-Token成本估算.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/02-Token成本估算.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>01-模型选型指南</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</guid>
+      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>04-向量模型Embedding</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</guid>
+      <pubDate>Wed, 30 Sep 2026 06:41:15 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 一句话定义：把文本 / 图片 / 视频编码成固定维度浮点向量的模型，只负责&quot;算相似度&quot;、不负责&quot;写答案&quot;，是 RAG、语义搜索与推荐系统的检索底座。</description>
+    </item>
+    <item>
+      <title>03-输出解析与修复</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.html</guid>
+      <pubDate>Wed, 30 Sep 2026 06:41:15 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
+    </item>
+    <item>
+      <title>读《深入理解 AI Agent：设计原理与工程实践》</title>
+      <link>https://http200.cn/posts-html/AI/AI实践/读《深入理解 AI Agent：设计原理与工程实践》.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/读《深入理解 AI Agent：设计原理与工程实践》.html</guid>
+      <pubDate>Sat, 19 Sep 2026 13:37:06 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 项目地址：https://github.com/bojieli/ai-agent-book 引言 第一，选择对 Agent 能力上限提出足够高要求的真实业务，并持续获取真实反馈。 第二，建立系统的评估（Evaluation）机制。 好的设计原则本就应该穿越模型的迭代周期 Agent = LLM</description>
+    </item>
+    <item>
+      <title>02-上下文工程</title>
+      <link>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/02-上下文工程.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/02-上下文工程.html</guid>
+      <pubDate>Sat, 19 Sep 2026 00:57:27 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 一句话定义：上下文工程是&quot;为每一次 LLM 调用，动态构造最优输入上下文&quot;的学科——比提示词更系统，是 Agent 可靠性的核心杠杆。 1. 为什么从&quot;提示工程&quot;升级到&quot;上下文工程&quot; - 单轮对话：写好 system + user 即可（提示工程）。 - 多步 Agent：每一步要注入工具结果、</description>
+    </item>
+    <item>
+      <title>02-Agent.md与Memory.md规范</title>
+      <link>https://http200.cn/posts-html/AI/Agent开发知识/12-补充概念/02-Agent.md与Memory.md规范.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Agent开发知识/12-补充概念/02-Agent.md与Memory.md规范.html</guid>
+      <pubDate>Sat, 19 Sep 2026 00:57:27 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 一句话定义：Agent.md 是描述 Agent 身份/能力/边界的配置文件；Memory.md 是 Agent 持久化记忆的 Markdown 存储——两者都是用 Markdown 组织 Agent 元信息的轻量实践。 &gt; &gt; 缩写与术语：英文术语与缩写首次出现附音标/全拼，汇总见 §8。 -</description>
+    </item>
+    <item>
+      <title>02-工具设计原则</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/02-工具设计原则.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/02-工具设计原则.html</guid>
+      <pubDate>Sun, 13 Sep 2026 02:22:23 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：✅ 已补齐（2026-09-13） &gt; 一句话定义：工具是 Agent 的手；粒度、命名、参数 schema、错误信息、幂等 决定模型能不能用对。 你为什么要学这个 工具调用是 Agent 能力的核心，但很多工程师只关注「工具能不能跑」，忽略「模型会不会用」。好工具让模型用对 90% 的情</description>
+    </item>
+    <item>
+      <title>01-人在环上HITL</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/01-人在环上HITL.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/01-人在环上HITL.html</guid>
+      <pubDate>Sun, 13 Sep 2026 02:22:23 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：✅ 已补齐（2026-09-13） &gt; 一句话定义：把 人的审批、澄清、接管 设计成流程中的一等节点，而不是出事故后的补丁。 大纲 1. 何时必须 HITL：风险分级(一何时必须-hitl风险分级) 2. 交互形态：确认卡/改写/接管(二交互形态确认卡改写接管) 3. 超时与升级策略(三超</description>
+    </item>
+    <item>
+      <title>04-流式输出工程</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/04-流式输出工程.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/04-流式输出工程.html</guid>
+      <pubDate>Sun, 13 Sep 2026 02:22:23 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-09-11 22:09 &gt; 状态：✅ 正文已补 &gt; 一句话定义：把模型生成以 流式（SSE 等） 推到前端，优化首字延迟与体验；并处理工具调用、取消、断线。 你为什么要学这个 非流式「转圈 10 秒」会毁掉对话产品；但流式与工具调用、结构化输出、计费统计纠缠在一起：中途要</description>
+    </item>
+    <item>
+      <title>06-引用与可溯源</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/06-引用与可溯源.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/06-引用与可溯源.html</guid>
+      <pubDate>Sat, 12 Sep 2026 14:40:27 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：✅ 已补齐（2026-09-12） &gt; 一句话定义：让回答 带出处 （citation），并尽量保证陈述可被检索片段支撑（groundedness）；支撑不足则拒答或降级。 大纲 1. 引用 UX：从角标到原文(一引用-ux从角标到原文) 2. 强制引用 vs 软提示(二强制引用-vs-软</description>
+    </item>
+  </channel>
+</rss>

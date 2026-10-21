@@ -23,6 +23,8 @@ function getHtmlInputs() {
   const inputs = {
     main: path.resolve(__dirname, 'index.html'),
     archive: path.resolve(__dirname, 'archive.html'),
+    // GitHub Pages 的 404 页：和 index/archive 一样由 build-posts.js 生成
+    notFound: path.resolve(__dirname, '404.html'),
   };
 
   const postsHtmlDir = path.resolve(__dirname, 'posts-html');
