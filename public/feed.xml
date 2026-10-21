@@ -5,8 +5,16 @@
     <link>https://http200.cn/</link>
     <description>HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 21 Oct 2026 06:51:08 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 21 Oct 2026 07:52:24 GMT</lastBuildDate>
     <atom:link href="https://http200.cn/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>06-WorkFlow工具深挖索引</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.html</guid>
+      <pubDate>Wed, 21 Oct 2026 07:52:09 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-21 15:17</description>
+    </item>
     <item>
       <title>copilot配置</title>
       <link>https://http200.cn/posts-html/AI/AI实践/copilot配置.html</link>
@@ -238,14 +246,6 @@
       <pubDate>Sun, 13 Sep 2026 02:22:23 GMT</pubDate>
       <category>AI</category>
       <description>&gt; 最后修改时间：2026-09-11 22:09 &gt; 状态：✅ 正文已补 &gt; 一句话定义：把模型生成以 流式（SSE 等） 推到前端，优化首字延迟与体验；并处理工具调用、取消、断线。 你为什么要学这个 非流式「转圈 10 秒」会毁掉对话产品；但流式与工具调用、结构化输出、计费统计纠缠在一起：中途要</description>
-    </item>
-    <item>
-      <title>06-引用与可溯源</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/06-引用与可溯源.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/06-引用与可溯源.html</guid>
-      <pubDate>Sat, 12 Sep 2026 14:40:27 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 状态：✅ 已补齐（2026-09-12） &gt; 一句话定义：让回答 带出处 （citation），并尽量保证陈述可被检索片段支撑（groundedness）；支撑不足则拒答或降级。 大纲 1. 引用 UX：从角标到原文(一引用-ux从角标到原文) 2. 强制引用 vs 软提示(二强制引用-vs-软</description>
     </item>
   </channel>
 </rss>
