@@ -1,8 +1,10 @@
 # LLM API 接口与调用实例
 
+> 最后修改时间：2026-10-21 16:14
+
 ## 定义
 
-LLM API 是大语言模型厂商对外提供的** HTTP/SDK 编程接口**，让开发者把模型能力集成到自己的应用中。当前主流厂商普遍采用"OpenAI 兼容"的 REST 风格（`/v1/chat/completions`），并以官方 SDK（Python/Node.js）封装鉴权、流式、工具调用等能力，降低集成门槛。
+LLM API 是大语言模型厂商对外提供的 **HTTP/SDK 编程接口** ，让开发者把模型能力集成到自己的应用中。当前主流厂商普遍采用"OpenAI 兼容"的 REST 风格（`/v1/chat/completions`），并以官方 SDK（Python/Node.js）封装鉴权、流式、工具调用等能力，降低集成门槛。
 
 本篇聚焦**当前主流厂商的 API 形态与最小可运行调用实例**，覆盖 OpenAI、Anthropic、Google Gemini、以及 OpenAI 兼容的国产/开源模型（DeepSeek、通义、Kimi 等），并给出 Node.js 与 Python 双语言示例。
 
@@ -52,6 +54,253 @@ flowchart TD
     J -- 否 --> L[输出最终结果]
 ```
 
+## 上下文协议与入参全景
+
+调用 LLM API 只有两件核心事： **把上下文拼对** （messages / contents 的结构约定）， **把参数传对** （请求体里几十个字段各自管什么）。这一节给出三家协议的对照、角色与消息形态、以及分组的完整入参表。
+
+### 0.1 三家协议对照：同一件事的三种说法
+
+| 维度 | OpenAI Chat Completions | Anthropic Messages | Gemini generateContent |
+|------|--------------------------|--------------------|------------------------|
+| 端点 | `POST /v1/chat/completions` | `POST /v1/messages` | `POST /v1beta/models/{model}:generateContent` |
+| 对话历史载体 | `messages` 数组 | `messages` 数组 | `contents` 数组 |
+| 系统提示 | 消息之一：`{"role":"system"}` | 独立顶层参数 `system` | 顶层 `systemInstruction` |
+| 角色取值 | `system` / `developer` / `user` / `assistant` / `tool` | 只有 `user` / `assistant` | 只有 `user` / `model` |
+| 内容载体 | `content`：字符串或多模态数组 | `content`：内容块数组（text / image / tool_use / tool_result / thinking） | `parts`：text / inlineData / functionCall / functionResponse |
+| 工具结果回传 | 独立消息：`role:"tool"` + `tool_call_id` | user 内容块里的 `tool_result` | `functionResponse` part |
+| 必填参数 | `model` + `messages` | `model` + `messages` + `max_tokens` | `contents`（模型名在 URL 里） |
+| 多轮上下文 | 自己拼 messages | 自己拼 messages | 自己拼 contents（SDK 里有 Chat Session 帮你拼） |
+
+最重要的一条认知： **上下文协议是无状态的——API 不帮你记对话，每一轮都要把完整历史重发一遍** 。唯一的例外是 OpenAI Responses API 的 `previous_response_id`（服务端替你续历史）。这就是为什么长对话的 token 账单会滚雪球，也是各家推出 Prompt Caching / Context Caching 的原因。
+
+### 0.2 角色与消息形态（以 OpenAI 口径为准）
+
+| 角色 | 谁写 | 用途 | 注意 |
+|------|------|------|------|
+| `system` | 开发者 | 人设、规则、输出约束 | o 系列 / GPT-5 官方建议改用 `developer` |
+| `developer` | 开发者 | 同 system，但优先级高于用户输入 | 仅新模型支持 |
+| `user` | 终端用户 | 用户输入 | 可以是多模态数组 |
+| `assistant` | 模型 | 历史回复 | 多轮时必须原样回传；带 `tool_calls` 时 `content` 可为 `null` |
+| `tool` | 开发者 | 工具执行结果 | 必须带 `tool_call_id` 与上一条 `tool_calls` 对齐 |
+| `function` | — | 旧版函数调用的结果消息 | 已废弃，别再新建 |
+
+消息内容有三种形态：
+
+1. **纯文本** ：`content: "字符串"`；
+2. **多模态数组** ：`content: [{type:"text"}, {type:"image_url"}, {type:"input_audio"}]`；
+3. **工具调用链** ：assistant 消息带 `tool_calls` → 开发者执行 → `tool` 消息回传结果。
+
+完整一轮「带工具调用的上下文」长这样（可直接当模板用）：
+
+```json
+{
+  "messages": [
+    { "role": "system", "content": "你是售后工单分类器，只能调用工具或输出 JSON。" },
+    { "role": "user", "content": "冰箱买了 12 天不制冷，要求退货" },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "call_1",
+          "type": "function",
+          "function": { "name": "query_order", "arguments": "{\"keyword\":\"冰箱\"}" }
+        }
+      ]
+    },
+    { "role": "tool", "tool_call_id": "call_1", "content": "{\"orderNo\":\"SN20261018009321\",\"days\":12}" },
+    { "role": "assistant", "content": "已超 7 天无理由期，但属质量问题，可走特殊退货通道。" }
+  ]
+}
+```
+
+三个易错点：assistant 的 `tool_calls` 消息 **必须原样回传** （少一条下一轮就报 400）；`tool` 消息的 `tool_call_id` 要和 `tool_calls[].id` 一一对应；历史每条都要重发，所以 **历史裁剪要在应用层做，而不是指望 API** 。
+
+### 0.3 Chat Completions 入参全景表
+
+按「必填 / 高频 / 进阶 / 场景专用」四组列出，这张表覆盖了 OpenAI 兼容端点（DeepSeek / 通义 / Kimi / GLM / vLLM）的绝大多数字段。
+
+**必填（只有 2 个）**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `model` | string | 模型 ID（如 `gpt-4o`）；生产建议锁定日期版本（如 `gpt-4o-2024-11-20`）防静默升级 |
+| `messages` | array | 见 0.2；内容支持文本与 image_url / input_audio |
+
+**采样与生成长度（高频）**
+
+| 参数 | 类型 / 取值 | 作用 | 注意 |
+|------|-------------|------|------|
+| `temperature` | number 0–2，默认 1 | 越高越随机 | 分类 / 抽取 / 结构化输出建议 0–0.3 |
+| `top_p` | number 0–1，默认 1 | 核采样截断 | 官方建议与 temperature 二选一调，不要同时调 |
+| `max_completion_tokens` | integer | 限制输出 token 数 | 旧名 `max_tokens` 已废弃，o 系列 / GPT-5 只认新名 |
+| `n` | integer 1–128，默认 1 | 一次生成几条候选 | 按候选数计费；评测 / 多样化场景用 |
+| `stop` | string 或 array（≤4 个） | 命中即停止生成 | 返回文本不含停止词本身 |
+| `seed` | integer | 尽力复现 | 同 seed + 同参数不保证逐字一致（服务端有波动） |
+
+**结构化输出与工具（高频）**
+
+| 参数 | 类型 / 取值 | 作用 | 注意 |
+|------|-------------|------|------|
+| `response_format` | `{"type":"text"\|"json_object"\|"json_schema"}` | JSON 模式 / 强 Schema | `json_schema` 需带 `name` + `schema`，`strict:true` 才严格；**仍要代码侧校验** |
+| `tools` | array | 声明函数：`{type:"function", function:{name, description, parameters, strict}}` | `description` 写清「何时该用」，直接决定调用率 |
+| `tool_choice` | `"none"` / `"auto"` / `"required"` / `{"type":"function","function":{"name":"…"}}` | 控制 是否 / 必须 / 调哪个 工具 | 固定流程用 `required` 或点名指定 |
+| `parallel_tool_calls` | boolean，默认 true | 允许一次返回多个工具调用 | 要「一次只调一个」时显式设 false |
+| `functions` / `function_call` | — | 旧版函数调用参数 | 已被 `tools` / `tool_choice` 取代，不要再用 |
+
+**输出分布与概率（进阶）**
+
+| 参数 | 类型 / 取值 | 作用 | 注意 |
+|------|-------------|------|------|
+| `presence_penalty` | number −2–2，默认 0 | 越高越倾向引入新话题 | 事实类任务保持 0 |
+| `frequency_penalty` | number −2–2，默认 0 | 按出现次数惩罚重复 | 开太高会伤专有名词和数字 |
+| `logit_bias` | map(token_id, −100–100) | 手动抬高 / 压低特定 token | −100 等效禁用；token id 需先用 tokenizer 转换 |
+| `logprobs` + `top_logprobs` | boolean + integer 0–20 | 返回 top-N 概率分布 | 用于置信度路由、评测与蒸馏数据 |
+
+**流式与服务（进阶）**
+
+| 参数 | 类型 / 取值 | 作用 | 注意 |
+|------|-------------|------|------|
+| `stream` | boolean | SSE 流式返回 | 逐块收 `delta`，以 `[DONE]` 结束 |
+| `stream_options` | `{"include_usage": true}` | 流式最后一帧附带 usage | 成本统计必开，否则流式拿不到 token 数 |
+| `service_tier` | `auto` / `default` / `flex` / `priority` | 延迟与价格档位 | `flex` 更便宜但可能排队，批处理场景用 |
+| `store` | boolean | 保存会话供评测 / 蒸馏 | 合规敏感场景记得关闭 |
+| `metadata` | map（≤16 个键值对） | 给请求打业务标签 | 归因 / 检索用 |
+| `user` | string | 终端用户标识 | 滥用检测用，别传真实手机号 |
+
+**推理与多模态（o 系列 / GPT-5 / audio 专用）**
+
+| 参数 | 适用模型 | 作用 |
+|------|----------|------|
+| `reasoning_effort` | o 系列、GPT-5 | `minimal` / `low` / `medium` / `high`，控制思考预算；省钱省延迟就降档 |
+| `verbosity` | GPT-5 | `low` / `medium` / `high`，控制回答详略 |
+| `modalities` + `audio` | gpt-4o-audio | 请求音频输出并指定 voice / format |
+| `web_search_options` | 搜索型模型 | 联网搜索与上下文档位 |
+
+### 0.4 全参数请求模板（Node.js + TS）
+
+把上面的参数固化成一个类型 + 一个最小请求函数，业务代码按需传字段：
+
+```typescript
+interface ChatCompletionRequest {
+  model: string;
+  messages: {
+    role: "system" | "developer" | "user" | "assistant" | "tool";
+    content:
+      | string
+      | { type: "text"; text: string }[]
+      | { type: "image_url"; image_url: { url: string } }[]
+      | null;
+    tool_calls?: {
+      id: string;
+      type: "function";
+      function: { name: string; arguments: string };
+    }[];
+    tool_call_id?: string;
+  }[];
+  temperature?: number;
+  top_p?: number;
+  max_completion_tokens?: number;
+  n?: number;
+  stop?: string | string[];
+  stream?: boolean;
+  stream_options?: { include_usage: boolean };
+  response_format?: { type: "text" | "json_object" | "json_schema" };
+  tools?: {
+    type: "function";
+    function: { name: string; description: string; parameters: object; strict?: boolean };
+  }[];
+  tool_choice?: "none" | "auto" | "required" | { type: "function"; function: { name: string } };
+  parallel_tool_calls?: boolean;
+  seed?: number;
+  reasoning_effort?: "minimal" | "low" | "medium" | "high";
+}
+
+export async function chat(body: ChatCompletionRequest): Promise<unknown> {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`openai ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+```
+
+### 0.5 Anthropic 与 Gemini 的入参差异
+
+Anthropic `/v1/messages` 参数（节选，注意必填项和 OpenAI 不同）：
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `model` | ✅ | 如 `claude-sonnet-4-5` |
+| `messages` | ✅ | 只允许 `user` / `assistant` 两种角色；system 不放这里 |
+| `max_tokens` | ✅ | **与 OpenAI 最大的差异：必填**，输出上限 |
+| `system` | ❌ | 顶层字符串或块数组；可加 `cache_control` 做提示缓存 |
+| `temperature` | ❌ | 取值 0–1（不是 0–2） |
+| `top_p` / `top_k` | ❌ | `top_k` 是 OpenAI Chat Completions 没有的参数 |
+| `stop_sequences` | ❌ | 最多 4 个 |
+| `stream` | ❌ | SSE，但事件类型更细（message_start / content_block_delta / message_delta…） |
+| `tools` / `tool_choice` | ❌ | `tool_choice` 取值 `auto` / `any` / `tool`（`any` = 必须调工具） |
+| `thinking` | ❌ | `{type:"enabled", budget_tokens}` 显式思考预算 |
+| `metadata` | ❌ | 只有 `user_id` 一个字段 |
+| `mcp_servers` | ❌ | 直接在请求里挂 MCP Server（beta 能力） |
+
+Gemini `generateContent` 参数（节选）：
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `contents` | ✅ | `[{role:"user"\|"model", parts:[…]}]`；函数结果用 `functionResponse` part 回传 |
+| `systemInstruction` | ❌ | 独立的系统提示，等价 OpenAI 的 system 消息 |
+| `generationConfig` | ❌ | `temperature` / `topP` / `topK` / `maxOutputTokens` / `stopSequences`；`topK` 是特色 |
+| `generationConfig.responseMimeType` + `responseSchema` | ❌ | `application/json` + Schema，等价 `response_format` |
+| `generationConfig.thinkingConfig.thinkingBudget` | ❌ | 2.5 系列的思考预算，设 0 可关闭 |
+| `tools` | ❌ | `functionDeclarations` / `googleSearch` / `codeExecution`（内置工具） |
+| `toolConfig.functionCallingConfig.mode` | ❌ | `AUTO` / `ANY` / `NONE` |
+| `safetySettings` | ❌ | 按类别调整安全阈值 |
+
+### 0.6 同一需求的参数三家对照
+
+| 需求 | OpenAI | Anthropic | Gemini |
+|------|--------|-----------|--------|
+| 限制输出长度 | `max_completion_tokens` | `max_tokens`（必填） | `generationConfig.maxOutputTokens` |
+| 系统提示 | `role:"system"` 消息 | 顶层 `system` | `systemInstruction` |
+| 强制 JSON | `response_format` | 工具点名（`tool_choice:{type:"tool"}`）或预填 assistant `{` | `responseMimeType:"application/json"` + `responseSchema` |
+| 必须调工具 | `tool_choice:"required"` | `tool_choice:{type:"any"}` | `toolConfig…mode:"ANY"` |
+| 控制思考量 | `reasoning_effort` | `thinking.budget_tokens` | `thinkingConfig.thinkingBudget` |
+| 停止词 | `stop` | `stop_sequences` | `stopSequences` |
+| 流式 | `stream:true`（以 `[DONE]` 结束） | `stream:true`（结构化事件流） | `:streamGenerateContent` |
+
+一句话： **参数名各异但意图一一对应；写适配层时按这张表映射，别让业务代码感知厂商差异** 。
+
+### 0.7 上下文怎么变成一次请求
+
+拼装顺序（多轮 + 工具场景）：
+
+```text
+system/developer → 历史轮（user / assistant / tool 交替，按时间顺序） → 当前 user 输入
+```
+
+发送前做一次预算闸门（Node.js + TS）：
+
+```typescript
+interface UsageLike {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+// 估算上下文 + 预留输出，超限就裁最旧的历史轮（永远保留 system）
+export function fitsBudget(estimatedPromptTokens: number, contextLimit: number, reserveForOutput: number): boolean {
+  return estimatedPromptTokens + reserveForOutput <= contextLimit;
+}
+```
+
+三条纪律： **每轮重发全部历史** （除 Responses API 的 `previous_response_id`）； **usage 字段每次记账** （prompt / completion / total 分开记，成本才算得清）； **超限先裁最旧的历史轮，永远不要裁 system** 。
+
 ## 一、OpenAI API
 
 OpenAI 目前有两套主流生成端点：
@@ -85,6 +334,8 @@ Content-Type: application/json
   "response_format": {"type": "json_schema", "json_schema": {}}
 }
 ```
+
+> 上面只列了 7 个字段； **完整入参清单见 [0.3](#03-chat-completions-入参全景表)** 。
 
 ### 1.2 Chat Completions：Python 调用实例
 
@@ -646,6 +897,22 @@ console.log(resp.choices[0].message.content);
 | Agent | Agent 循环每步调用 LLM API 决策；厂商产品如 Codex / Claude Code 是开箱即用的编程 Agent |
 | MCP | MCP Server 暴露的工具最终经 LLM API 的 tools 调用 |
 | Fine-tuning | 微调后的模型仍通过相同 API 调用 |
+
+## 本文缩写
+
+| 缩写 | 音标 | 全拼 | 中文 |
+|------|------|------|------|
+| **API** | /ˌeɪ piː ˈaɪ/ | Application Programming Interface | 应用程序接口 |
+| **CLI** | /ˌsiː el ˈaɪ/ | Command-Line Interface | 命令行界面 |
+| **IDE** | /ˌaɪ diː ˈiː/ | Integrated Development Environment | 集成开发环境 |
+| **JSON** | /ˈdʒeɪsən/ | JavaScript Object Notation | 一种轻量数据交换格式 |
+| **LLM** | /ˌel el ˈem/ | Large Language Model | 大语言模型 |
+| **MCP** | /ˌem siː ˈpiː/ | Model Context Protocol | 模型上下文协议 |
+| **RAG** | /ræɡ/ | Retrieval-Augmented Generation | 检索增强生成 |
+| **REST** | /rest/ | Representational State Transfer | 表述性状态转移（一种 HTTP 接口风格） |
+| **SDK** | /ˌes diː ˈkeɪ/ | Software Development Kit | 软件开发工具包 |
+| **SSE** | /ˌes es ˈiː/ | Server-Sent Events | 服务器单向推送事件 |
+| **TS** | /ˌtiː ˈes/ | TypeScript | 类型化的 JavaScript 超集 |
 
 ## 参考资料
 

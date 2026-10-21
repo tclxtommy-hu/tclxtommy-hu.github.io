@@ -14,7 +14,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://http200.cn/posts-html/AI/AI编程范式/AI应用开发范式/09-llm-api.html</loc>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.html</loc>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI实践/大模型LLm没有记忆？.html</loc>
     <lastmod>2026-10-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -543,12 +555,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/ChatFlow/00-什么是ChatFlow.html</loc>
-    <lastmod>2026-07-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI编程范式/AI应用开发范式/09-llm-api.html</loc>
     <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
