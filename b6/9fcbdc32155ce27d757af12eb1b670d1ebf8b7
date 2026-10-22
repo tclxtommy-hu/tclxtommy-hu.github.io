@@ -1,0 +1,23 @@
+archive.html
+  s_767bafac3b9f72::t_a000d50d07784a 65,69,84,501,503,519,521,568
+public/feed.xml
+  s_767bafac3b9f72::t_33cc92504f3b6d 8,14
+public/sitemap.xml
+  s_767bafac3b9f72::t_9f4696fab1c81a 6,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "b69fcbdc32155ce27d757af12eb1b670d1ebf8b7",
+  "prompts": {},
+  "sessions": {
+    "s_767bafac3b9f72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1618d-84b8-7e71-bfbd-cc9907bc8124",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
