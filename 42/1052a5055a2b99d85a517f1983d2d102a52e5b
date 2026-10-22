@@ -1,0 +1,25 @@
+.github/workflows/deploy.yml
+  s_767bafac3b9f72::t_6234111d33c086 7-15,19,29-37,68-70
+package.json
+  s_767bafac3b9f72::t_cdb0e83339a82e 8,10
+scripts/build-comments.js
+  s_767bafac3b9f72::t_0b6f850f561cd8 1-219
+scripts/build-posts.js
+  s_767bafac3b9f72::t_41aa9dfb3588e5 693-709,747-749,842,844,848-855,859-865,868-870,872,874-876,878-879
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "421052a5055a2b99d85a517f1983d2d102a52e5b",
+  "prompts": {},
+  "sessions": {
+    "s_767bafac3b9f72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1618d-84b8-7e71-bfbd-cc9907bc8124",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
