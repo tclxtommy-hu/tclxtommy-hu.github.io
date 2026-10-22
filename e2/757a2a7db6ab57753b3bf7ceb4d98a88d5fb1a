@@ -1,0 +1,21 @@
+src/style.css
+  s_767bafac3b9f72::t_58e150833cad65 2058-2078
+src/text-selection.js
+  s_767bafac3b9f72::t_965d0c2b4bd984 14-18,66-83,88-92,102-103,112-114,117-120,152,170-173,206-221,247-573
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "e2757a2a7db6ab57753b3bf7ceb4d98a88d5fb1a",
+  "prompts": {},
+  "sessions": {
+    "s_767bafac3b9f72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1618d-84b8-7e71-bfbd-cc9907bc8124",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
