@@ -1,0 +1,25 @@
+posts/AI/AI工程师学习路线/07-前沿与形态/04-VLM与多模态应用.md
+  s_5a880c3afcf49d::t_00177c42866eda 358
+  s_5a880c3afcf49d::t_d0b56e4317a325 259
+  s_5a880c3afcf49d::t_d0e1b5040f5b87 261
+  s_5a880c3afcf49d::t_d84c97be3ab7e2 409
+  s_5a880c3afcf49d::t_0e4a4c7ab76fc2 55,101,125,189,236,263,317,360,384,433,478
+  s_5a880c3afcf49d::t_296cfc358b85b2 3,5-6,8-14,18-54,56-100,102-124,126-188,190-235,237-258,260,262,264-316,318-357,359,361-383,385-404,406-408,410-432,434-477,479-532,534,536-548,550,552-557
+  s_5a880c3afcf49d::t_7735d45eadf6d2 405
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "71f8733a073b6414cbc4e76baf2eca5851a4e3d6",
+  "prompts": {},
+  "sessions": {
+    "s_5a880c3afcf49d": {
+      "agent_id": {
+        "tool": "codebuddy",
+        "id": "cc4d922bbcdc40e783ef000b0de172fc",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
