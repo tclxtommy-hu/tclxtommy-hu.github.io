@@ -2046,6 +2046,12 @@ body.is-home-chat-open .theme-menu {
   color: #f7faff;
 }
 
+/* hover 时保持渐变底：.ask-sel-btn:hover 的通用背景会盖掉渐变，白字会失去对比度 */
+.ask-sel-ask:hover {
+  background: linear-gradient(120deg, rgba(76, 124, 255, 0.98), rgba(150, 78, 226, 0.96));
+  color: #fff;
+}
+
 .ask-sel-bubble.is-copied .ask-sel-copy {
   color: #7ff0b0;
 }
@@ -3207,13 +3213,18 @@ html[data-theme="light"] .ask-sel-bubble {
   box-shadow: 0 12px 30px rgba(20, 28, 45, 0.18);
 }
 
-html[data-theme="light"] .ask-sel-btn {
+/* 浅色模式下只有「复制」跟随正文色；「问 AI」是渐变底，必须保留白字 */
+html[data-theme="light"] .ask-sel-btn:not(.ask-sel-ask) {
   color: var(--text);
 }
 
-html[data-theme="light"] .ask-sel-btn:hover {
+html[data-theme="light"] .ask-sel-btn:not(.ask-sel-ask):hover {
   background: rgba(11, 99, 197, 0.1);
   color: var(--accent);
+}
+
+html[data-theme="light"] .ask-sel-bubble.is-copied .ask-sel-copy {
+  color: #0a7f4a;
 }
 
 /* 全站搜索 / 目录浮层 */
@@ -3400,6 +3411,7 @@ html[data-theme="light"] .room-chat-hint {
 }
 
 html[data-theme="light"] .room-chat-quote {
+  background: #eef3fb;
   border-color: var(--border);
   border-left-color: var(--accent);
 }
@@ -3413,8 +3425,13 @@ html[data-theme="light"] .room-chat-quote-text {
 }
 
 html[data-theme="light"] .room-chat-quote-close {
-  background: #eef1f6;
+  background: #e0e7f2;
   color: var(--text-muted);
+}
+
+html[data-theme="light"] .room-chat-quote-close:hover {
+  background: #d3dceb;
+  color: var(--text);
 }
 
 html[data-theme="light"] .room-chat-msg-quote {
