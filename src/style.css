@@ -2085,14 +2085,17 @@ body.is-home-chat-open .theme-menu {
   z-index: 120;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 9px 15px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid rgba(165, 195, 255, 0.34);
   border-radius: 999px;
   background: linear-gradient(120deg, rgba(76, 124, 255, 0.94), rgba(150, 78, 226, 0.9));
   color: #f6f9ff;
   font-family: inherit;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 600;
   box-shadow: 0 12px 28px rgba(6, 10, 31, 0.45);
   cursor: pointer;
@@ -2249,8 +2252,9 @@ body.is-home-chat-open .back-to-top {
   .post-chat-fab {
     right: 14px;
     bottom: 66px;
-    padding: 8px 13px;
-    font-size: 0.82rem;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 0.78rem;
   }
 
   .room-chat-quote {
