@@ -2056,6 +2056,27 @@ body.is-home-chat-open .theme-menu {
   color: #7ff0b0;
 }
 
+/* ====== 正文划线标注：划词工具栏的「红线 / 橙线」 ====== */
+.text-with-red-wave {
+  /* Chromium 不会给行尾空白（&nbsp;）绘制 text-decoration，
+     内容是“图标+空白”时波浪线会整体消失，因此改用背景图平铺波浪线 */
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 2Q1.5 0 3 2T6 2' fill='none' stroke='red' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: left bottom;
+}
+
+.text-with-orange-wave {
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 2Q1.5 0 3 2T6 2' fill='none' stroke='orange' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: left bottom;
+}
+
+.ask-sel-mark {
+  padding: 6px 9px;
+}
+
 /* 文章页右下角常驻入口：压在「回到顶部」（bottom: 24px，高 40px）上方 */
 .post-chat-fab {
   position: fixed;
