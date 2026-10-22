@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/build-posts.js && vite",
-    "build": "node scripts/build-posts.js && vite build",
+    "build": "node scripts/build-comments.js && node scripts/build-posts.js && vite build",
     "preview": "vite preview",
+    "comments": "node scripts/build-comments.js",
     "new": "node scripts/new-post.js",
     "typecheck": "tsc -p jsconfig.json",
     "images": "node scripts/images.js",

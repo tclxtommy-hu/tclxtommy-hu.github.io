@@ -690,6 +690,23 @@ function buildJsonLd({ type, title, description, url, datePublished = '', dateMo
 // ====== Shared nav HTML ======
 const navHtml = '<a href="/">首页</a><a href="/archive.html">归档</a><a href="https://github.com/tclxtommy-hu" target="_blank">GitHub</a>';
 
+/**
+ * 评论快照：由 scripts/build-comments.js 在构建前从 GitHub Issues 抓取。
+ * 页面只读这份静态数据，浏览器不再直连 api.github.com —— 匿名 API 每 IP 每小时
+ * 只有 60 次，国内共享出口 IP 很容易被限流，评论区就会整块不可用。
+ */
+function loadCommentsSnapshot() {
+  try {
+    const data = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'public', 'comments.json'), 'utf-8')
+    );
+    return data && typeof data.issues === 'object' && data.issues ? data.issues : {};
+  } catch {
+    return {};
+  }
+}
+const commentsByPath = loadCommentsSnapshot();
+
 // ====== Generate post pages ======
 for (const [postIndex, post] of posts.entries()) {
   // Build category breadcrumb HTML
@@ -727,6 +744,9 @@ for (const [postIndex, post] of posts.entries()) {
   const postUrl = post.relativeDir
     ? `/posts-html/${toUrlPath(post.relativeDir)}/${post.slug}.html`
     : `/posts-html/${post.slug}.html`;
+  // `<` 转成 \u003c 防止评论正文里的 </script> 提前闭合标签
+  const postComments = commentsByPath[postUrl] || null;
+  const commentsJson = JSON.stringify(postComments).replace(/</g, '\\u003c');
 
   /** 任意文章页的站内地址（上一篇/下一篇/相关文章共用） */
   const hrefOf = (p) =>
@@ -819,47 +839,44 @@ for (const [postIndex, post] of posts.entries()) {
         <section class="comments-section">
           <h2 class="comments-title">评论</h2>
           <div id="comments-widget"><p class="comments-loading">评论加载中…</p></div>
+          <script type="application/json" id="comments-data">${commentsJson}</script>
           <script>
-          (async function(){
+          (function(){
             var repo='tclxtommy-hu/tclxtommy-hu.github.io';
             var postPath='${postUrl}';
             var el=document.getElementById('comments-widget');
-            var API='https://api.github.com/repos/'+repo;
-            var HDR={Accept:'application/vnd.github.full+json'};
-            function gh(u){
-              return fetch(u,{headers:HDR}).then(function(r){
-                if(r.status===403||r.status===429){throw new Error('ratelimit');}
-                if(!r.ok){throw new Error(r.status);}
-                return r.json();
+            var data=null;
+            try{
+              var node=document.getElementById('comments-data');
+              data=JSON.parse((node&&node.textContent)||'null');
+            }catch(e){}
+            function esc(s){
+              return String(s).replace(/[&<>"']/g,function(ch){
+                return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
               });
             }
             var newUrl='https://github.com/'+repo+'/issues/new?title='+encodeURIComponent(postPath)+'&labels='+encodeURIComponent('\ud83d\udcac comment');
-            try{
-              var issues=await gh(API+'/issues?state=open&per_page=100');
-              var issue=Array.isArray(issues)&&issues.find(function(i){return i.title===postPath;});
-              var btn='<a href="'+(issue?issue.html_url:newUrl)+'" target="_blank" rel="noopener" class="comment-btn">\ud83d\udcac '+(issue?'\u53bb GitHub \u8bc4\u8bba':'\u6210\u4e3a\u7b2c\u4e00\u4e2a\u8bc4\u8bba\u8005')+'</a>';
-              if(!issue||issue.comments===0){el.innerHTML='<p class="comments-empty">\u6682\u65e0\u8bc4\u8bba</p>'+btn;return;}
-              var comments=await gh(issue.comments_url+'?per_page=100');
-              var html=comments.map(function(c){
-                var d=new Date(c.created_at).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+            var hasIssue=!!(data&&data.html_url);
+            var comments=(data&&data.comments)||[];
+            var html='';
+            if(comments.length){
+              html+='<div class="comments-list">'+comments.map(function(c){
+                var d=c.createdAt?new Date(c.createdAt):null;
+                var label=d&&!isNaN(d.getTime())?d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'}):'';
                 return '<div class="comment-item">'
                   +'<div class="comment-meta">'
-                  +'<img src="'+c.user.avatar_url+'" class="comment-avatar" alt="" loading="lazy">'
-                  +'<a href="https://github.com/'+c.user.login+'" target="_blank" rel="noopener" class="comment-user">'+c.user.login+'</a>'
-                  +'<time class="comment-time">'+d+'</time>'
+                  +(c.avatar?'<img src="'+esc(c.avatar)+'" class="comment-avatar" alt="" loading="lazy">':'')
+                  +'<a href="https://github.com/'+encodeURIComponent(c.user||'')+'" target="_blank" rel="noopener" class="comment-user">'+esc(c.user||'')+'</a>'
+                  +(label?'<time class="comment-time">'+esc(label)+'</time>':'')
                   +'</div>'
-                  +'<div class="comment-body">'+(c.body_html||c.body||'')+'</div>'
+                  +'<div class="comment-body">'+(c.bodyHtml||'')+'</div>'
                   +'</div>';
-              }).join('');
-              el.innerHTML='<div class="comments-list">'+html+'</div>'+btn;
-            }catch(e){
-              if(e.message==='ratelimit'){
-                el.innerHTML='<p class="comments-error">GitHub \u8bc4\u8bba\u8bf7\u6c42\u8fc7\u4e8e\u9891\u7e41\uff0c\u8bf7\u7a0d\u540e\u5237\u65b0\u3002'
-                  +'<a href="'+newUrl+'" target="_blank" rel="noopener" class="comment-btn" style="margin-left:12px">\ud83d\udcac \u53bb GitHub \u8bc4\u8bba</a></p>';
-              }else{
-                el.innerHTML='<p class="comments-error">\u8bc4\u8bba\u52a0\u8f7d\u5931\u8d25\uff0c<a href="https://github.com/'+repo+'/issues" target="_blank" rel="noopener">\u524d\u5f80 GitHub \u67e5\u770b</a></p>';
-              }
+              }).join('')+'</div>';
+            }else{
+              html+='<p class="comments-empty">\u6682\u65e0\u8bc4\u8bba'+(hasIssue?'':'\uff0c\u6b22\u8fce\u5728 GitHub \u4e0a\u5f00\u4e2a\u697c')+'\u3002</p>';
             }
+            html+='<a href="'+esc(hasIssue?data.html_url:newUrl)+'" target="_blank" rel="noopener" class="comment-btn">\ud83d\udcac '+(hasIssue?'\u53bb GitHub \u8bc4\u8bba':'\u6210\u4e3a\u7b2c\u4e00\u4e2a\u8bc4\u8bba\u8005')+'</a>';
+            el.innerHTML=html;
           })();
           <\/script>
         </section>

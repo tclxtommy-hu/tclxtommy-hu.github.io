@@ -4,9 +4,19 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # 评论区的数据来自 GitHub Issues：有人发/改/删评论、开/关评论帖时重新构建，
+  # 让文章页里的静态评论快照尽快跟上（读者浏览器不再直连 GitHub API）。
+  issues:
+    types: [opened, edited, deleted, closed, reopened]
+  issue_comment:
+    types: [created, edited, deleted]
+  # 兜底：每天重建一次，防止某次事件构建失败后评论一直停在旧版本
+  schedule:
+    - cron: '23 4 * * *'
 
 permissions:
   contents: read
+  issues: read
   pages: write
   id-token: write
 
@@ -16,6 +26,15 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    # issues / issue_comment 只处理「文章评论帖」（标题就是文章路径），
+    # 顺带跳过 PR 上的评论，避免无关 issue 和刷评论把部署次数打满
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      ((github.event_name == 'issues' || github.event_name == 'issue_comment') &&
+        github.event.issue.pull_request == null &&
+        startsWith(github.event.issue.title, '/posts-html/'))
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -46,6 +65,9 @@ jobs:
         run: npm run check:generated
 
       - name: Build
+        env:
+          # 构建时抓取评论快照：token 只在 CI 里用，浏览器拿不到
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build
 
       - name: Setup Pages

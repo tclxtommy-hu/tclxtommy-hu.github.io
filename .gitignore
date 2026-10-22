@@ -1,6 +1,7 @@
 # Generated
 posts-html/
 dist/
+public/comments.json
 node_modules/
 *.local
 .DS_Store
