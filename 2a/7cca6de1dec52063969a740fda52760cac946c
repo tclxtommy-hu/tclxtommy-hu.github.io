@@ -1,0 +1,29 @@
+src/style.css
+  s_380d50f4036bfe::t_8c0a082b362842 2007,2015-2019,2042-2043,2088-2105
+src/text-selection.js
+  s_e27ede085e4741::t_ebe4406109cf92 124-143,147-157,164-165,183,186,188,191-196,200-201,203-211,230-234,242-258,266-277,282-283,285-290
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "2a7cca6de1dec52063969a740fda52760cac946c",
+  "prompts": {},
+  "sessions": {
+    "s_380d50f4036bfe": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16674-90c2-7990-8c04-af759a07d232",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_e27ede085e4741": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13d31-8bae-7ae2-b320-c4f8144e2c91",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
