@@ -121,10 +121,7 @@ export function initTextSelectionAsk() {
     return true;
   }
 
-  /**
-   * 触屏（没有 hover）上把气泡放到选区下方：长按选中后，系统自带的
-   * 「复制 / 全选」菜单就浮在选区上方，我们再挤上去会互相压住。
-   */
+  /** 触屏设备（没有 hover）：工具栏贴底，避开浏览器自己绘制的选区菜单 */
   const coarsePointer = window.matchMedia?.('(hover: none), (pointer: coarse)').matches ?? false;
 
   /** 取整个选区的外接矩形；多行选区时浏览器给的 rect 可能偏差很大 */
@@ -140,20 +137,24 @@ export function initTextSelectionAsk() {
     return new DOMRect(left, top, right - left, bottom - top);
   }
 
-  /** 默认浮在选区上方；贴顶或空间不够时改放下方，别被视口裁掉 */
+  /** 桌面端浮在选区上方；贴顶或空间不够时改放下方，别被视口裁掉 */
   function place(/** @type {DOMRect} */ rect) {
     bubble.hidden = false;
+    // 手机浏览器自带的选区菜单（复制 / 全选 / 搜索 / 翻译）由系统绘制，
+    // 网页既删不掉也改不了。我们的工具栏固定到屏幕底部，和它错开，
+    // 避免两套按钮叠在一起；桌面端仍贴着选区。
+    if (coarsePointer) {
+      bubble.classList.add('ask-sel-docked');
+      bubble.style.top = '';
+      bubble.style.left = '';
+      return;
+    }
+    bubble.classList.remove('ask-sel-docked');
     const { width, height } = bubble.getBoundingClientRect();
     const gap = 10;
     const above = rect.top - height - gap;
     const below = rect.bottom + gap;
-    let top;
-    if (coarsePointer) {
-      // 手机：优先下方；下方放不下再翻到上方
-      top = below + height <= window.innerHeight - 8 || below < above ? below : above;
-    } else {
-      top = above >= 8 ? above : below;
-    }
+    let top = above >= 8 ? above : below;
     top = Math.min(Math.max(top, 8), Math.max(8, window.innerHeight - height - 8));
     const center = rect.left + rect.width / 2;
     bubble.style.top = `${Math.round(top)}px`;
