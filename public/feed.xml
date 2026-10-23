@@ -5,8 +5,24 @@
     <link>https://http200.cn/</link>
     <description>HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 22 Oct 2026 05:11:30 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 23 Oct 2026 05:36:42 GMT</lastBuildDate>
     <atom:link href="https://http200.cn/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Claude-Code使用指南</title>
+      <link>https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</guid>
+      <pubDate>Fri, 23 Oct 2026 05:36:18 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-23 13:26 &gt; 整理日期：2026-10-23 &gt; 适用版本：2026-10 官方 CLI；命令迭代很快，具体参数以 claude --help 和官方文档为准</description>
+    </item>
+    <item>
+      <title>04-VLM与多模态应用</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/04-VLM与多模态应用.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/04-VLM与多模态应用.html</guid>
+      <pubDate>Thu, 22 Oct 2026 08:05:20 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-10-22 15:57</description>
+    </item>
     <item>
       <title>09-llm-api</title>
       <link>https://http200.cn/posts-html/AI/AI编程范式/AI应用开发范式/09-llm-api.html</link>
@@ -230,22 +246,6 @@
       <pubDate>Sat, 19 Sep 2026 00:57:27 GMT</pubDate>
       <category>AI</category>
       <description>&gt; 一句话定义：上下文工程是&quot;为每一次 LLM 调用，动态构造最优输入上下文&quot;的学科——比提示词更系统，是 Agent 可靠性的核心杠杆。 1. 为什么从&quot;提示工程&quot;升级到&quot;上下文工程&quot; - 单轮对话：写好 system + user 即可（提示工程）。 - 多步 Agent：每一步要注入工具结果、</description>
-    </item>
-    <item>
-      <title>02-Agent.md与Memory.md规范</title>
-      <link>https://http200.cn/posts-html/AI/Agent开发知识/12-补充概念/02-Agent.md与Memory.md规范.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Agent开发知识/12-补充概念/02-Agent.md与Memory.md规范.html</guid>
-      <pubDate>Sat, 19 Sep 2026 00:57:27 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 一句话定义：Agent.md 是描述 Agent 身份/能力/边界的配置文件；Memory.md 是 Agent 持久化记忆的 Markdown 存储——两者都是用 Markdown 组织 Agent 元信息的轻量实践。 &gt; &gt; 缩写与术语：英文术语与缩写首次出现附音标/全拼，汇总见 §8。 -</description>
-    </item>
-    <item>
-      <title>02-工具设计原则</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/02-工具设计原则.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/02-工具设计原则.html</guid>
-      <pubDate>Sun, 13 Sep 2026 02:22:23 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 状态：✅ 已补齐（2026-09-13） &gt; 一句话定义：工具是 Agent 的手；粒度、命名、参数 schema、错误信息、幂等 决定模型能不能用对。 你为什么要学这个 工具调用是 Agent 能力的核心，但很多工程师只关注「工具能不能跑」，忽略「模型会不会用」。好工具让模型用对 90% 的情</description>
     </item>
   </channel>
 </rss>
