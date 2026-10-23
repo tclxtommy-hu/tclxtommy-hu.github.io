@@ -121,7 +121,10 @@ export function initTextSelectionAsk() {
     return true;
   }
 
-  /** 触屏设备（没有 hover）：工具栏贴底，避开浏览器自己绘制的选区菜单 */
+  /**
+   * 触屏（没有 hover）上把气泡放到选区下方：长按选中后，系统自带的
+   * 「复制 / 全选」菜单通常浮在选区上方，我们再挤上去会互相压住。
+   */
   const coarsePointer = window.matchMedia?.('(hover: none), (pointer: coarse)').matches ?? false;
 
   /** 取整个选区的外接矩形；多行选区时浏览器给的 rect 可能偏差很大 */
@@ -137,24 +140,21 @@ export function initTextSelectionAsk() {
     return new DOMRect(left, top, right - left, bottom - top);
   }
 
-  /** 桌面端浮在选区上方；贴顶或空间不够时改放下方，别被视口裁掉 */
+  /** 默认浮在选区上方；贴顶或空间不够时改放下方，别被视口裁掉 */
   function place(/** @type {DOMRect} */ rect) {
     bubble.hidden = false;
-    // 手机浏览器自带的选区菜单（复制 / 全选 / 搜索 / 翻译）由系统绘制，
-    // 网页既删不掉也改不了。我们的工具栏固定到屏幕底部，和它错开，
-    // 避免两套按钮叠在一起；桌面端仍贴着选区。
-    if (coarsePointer) {
-      bubble.classList.add('ask-sel-docked');
-      bubble.style.top = '';
-      bubble.style.left = '';
-      return;
-    }
-    bubble.classList.remove('ask-sel-docked');
     const { width, height } = bubble.getBoundingClientRect();
     const gap = 10;
     const above = rect.top - height - gap;
     const below = rect.bottom + gap;
-    let top = above >= 8 ? above : below;
+    let top;
+    if (coarsePointer) {
+      // 手机：优先放在选区下方；下方放不下就贴到屏幕顶部。
+      // 不要翻到选区上方：那里通常正是系统选区菜单的位置，两套按钮会叠在一起。
+      top = below + height <= window.innerHeight - 8 ? below : 10;
+    } else {
+      top = above >= 8 ? above : below;
+    }
     top = Math.min(Math.max(top, 8), Math.max(8, window.innerHeight - height - 8));
     const center = rect.left + rect.width / 2;
     bubble.style.top = `${Math.round(top)}px`;
@@ -291,7 +291,7 @@ export function initTextSelectionAsk() {
     pointerSelecting = false;
   });
 
-  askBtn.addEventListener('click', () => {
+  function askCurrent() {
     const text = currentText;
     if (!text) return;
     const title = document.querySelector('.post-header h1')?.textContent?.trim() || document.title;
@@ -301,9 +301,9 @@ export function initTextSelectionAsk() {
     window.dispatchEvent(
       new CustomEvent('room:open-chat', { detail: { quote: text, sourceTitle: title, sourceUrl: url } })
     );
-  });
+  }
 
-  copyBtn.addEventListener('click', async () => {
+  async function copyCurrent() {
     if (!currentText) return;
     const ok = await copyText(currentText);
     copyBtn.textContent = ok ? '已复制' : '复制失败';
@@ -314,7 +314,42 @@ export function initTextSelectionAsk() {
         bubble.classList.remove('is-copied');
       }
     }, 1200);
-  });
+  }
+
+  /**
+   * 触屏点按钮时，系统选区菜单可能先把随后的 click 吃掉（表现为「点了没反应」）。
+   * 所以在 touchend 里直接执行动作；浏览器补发的 click 用时间戳挡掉，
+   * 避免「红线」被执行两次又切换回去。
+   */
+  /** @type {Element | null} */
+  let lastTouchButton = null;
+  let lastTouchAt = 0;
+
+  /** @param {Element} button */
+  function activate(button) {
+    if (button === askBtn) askCurrent();
+    else if (button === copyBtn) copyCurrent();
+    else if (button === redBtn) applyMark('red');
+    else if (button === orangeBtn) applyMark('orange');
+  }
+
+  for (const button of [askBtn, copyBtn, redBtn, orangeBtn]) {
+    button.addEventListener('click', () => {
+      if (button === lastTouchButton && Date.now() - lastTouchAt < 800) return;
+      activate(button);
+    });
+  }
+
+  bubble.addEventListener('touchend', (e) => {
+    const target = e.target instanceof Element ? e.target.closest('button') : null;
+    if (!target || !bubble.contains(target)) return;
+    // 直接在 touchend 里执行：系统选区菜单可能吞掉随后的 click；
+    // preventDefault 同时挡掉浏览器补发的 click，避免它落到气泡下面的链接上。
+    e.preventDefault();
+    lastTouchButton = target;
+    lastTouchAt = Date.now();
+    activate(target);
+  }, { passive: false });
 
   // ====== 划线标注：只存本机 localStorage，按文章路径隔离 ======
   const MARKS_KEY = `http200:annotations:${window.location.pathname}`;
@@ -633,12 +668,6 @@ export function initTextSelectionAsk() {
     saveMarks();
     sel?.removeAllRanges();
     hide();
-  }
-
-  for (const button of [redBtn, orangeBtn]) {
-    button.addEventListener('click', () => {
-      applyMark(button.dataset.color === 'orange' ? 'orange' : 'red');
-    });
   }
 
   loadMarks();
