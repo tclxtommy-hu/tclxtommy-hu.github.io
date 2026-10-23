@@ -121,18 +121,48 @@ export function initTextSelectionAsk() {
     return true;
   }
 
-  /** 默认浮在选区上方；贴顶（或屏幕太矮）时改放下方，别被视口裁掉 */
+  /**
+   * 触屏（没有 hover）上把气泡放到选区下方：长按选中后，系统自带的
+   * 「复制 / 全选」菜单就浮在选区上方，我们再挤上去会互相压住。
+   */
+  const coarsePointer = window.matchMedia?.('(hover: none), (pointer: coarse)').matches ?? false;
+
+  /** 取整个选区的外接矩形；多行选区时浏览器给的 rect 可能偏差很大 */
+  function selectionRect(/** @type {Range} */ range) {
+    const rects = Array.from(range.getClientRects()).filter(
+      (item) => item.width > 0 && item.height > 0
+    );
+    if (rects.length === 0) return range.getBoundingClientRect();
+    const left = Math.min(...rects.map((item) => item.left));
+    const right = Math.max(...rects.map((item) => item.right));
+    const top = Math.min(...rects.map((item) => item.top));
+    const bottom = Math.max(...rects.map((item) => item.bottom));
+    return new DOMRect(left, top, right - left, bottom - top);
+  }
+
+  /** 默认浮在选区上方；贴顶或空间不够时改放下方，别被视口裁掉 */
   function place(/** @type {DOMRect} */ rect) {
     bubble.hidden = false;
     const { width, height } = bubble.getBoundingClientRect();
-    const above = rect.top - height - 10;
-    const top = above < 8 ? rect.bottom + 10 : above;
+    const gap = 10;
+    const above = rect.top - height - gap;
+    const below = rect.bottom + gap;
+    let top;
+    if (coarsePointer) {
+      // 手机：优先下方；下方放不下再翻到上方
+      top = below + height <= window.innerHeight - 8 || below < above ? below : above;
+    } else {
+      top = above >= 8 ? above : below;
+    }
+    top = Math.min(Math.max(top, 8), Math.max(8, window.innerHeight - height - 8));
     const center = rect.left + rect.width / 2;
     bubble.style.top = `${Math.round(top)}px`;
     bubble.style.left = `${Math.round(Math.min(Math.max(center, width / 2 + 8), window.innerWidth - width / 2 - 8))}px`;
   }
 
   function evaluate() {
+    // 手指正按在气泡上：浏览器可能先清掉选区再触发 click，此时不能收气泡
+    if (pressingBubble) return;
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
       hide();
@@ -150,27 +180,35 @@ export function initTextSelectionAsk() {
     }
     currentText = text.length > MAX_QUOTE_CHARS ? `${text.slice(0, MAX_QUOTE_CHARS)}…` : text;
     currentRange = range.cloneRange();
-    place(range.getBoundingClientRect());
+    place(selectionRect(range));
   }
 
-  function schedule() {
+  function schedule(delay = 120) {
     clearTimeout(timer);
-    timer = setTimeout(evaluate, 120);
+    timer = setTimeout(evaluate, delay);
   }
 
-  // 鼠标 / 触屏选完是 pointerup，键盘（Shift + 方向键）选完是 keyup
-  document.addEventListener('pointerup', schedule);
-  document.addEventListener('keyup', (e) => {
-    if (e.shiftKey || e.key === 'Shift' || e.key.startsWith('Arrow')) schedule();
-  });
-  // 选区自己消失（点别处、拖没了）就收起，不需要等下一个事件
+  // 鼠标/触屏拖动选区的过程中先不弹，等抬手再定位；手机上长按选词会被浏览器
+  // 接管手势并派发 pointercancel（没有 pointerup），所以不能只靠 pointerup 收尾。
+  let pointerSelecting = false;
+
+  // 选区变化是移动端唯一可靠的信号：长按选中、拖动原生选区手柄都只会发
+  // selectionchange。桌面端拖动时 pointerSelecting 为 true，避免气泡跟着拖拽乱跳。
   document.addEventListener('selectionchange', () => {
-    if (bubble.hidden) return;
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed) {
-      if (pressingBubble) return;
-      hide();
+      if (!pressingBubble && !bubble.hidden) hide();
+      return;
     }
+    if (pointerSelecting) return;
+    schedule();
+  });
+  /** 触屏长按后如果浏览器既不发 pointerup 也不发 pointercancel，用它兜底放开判断 */
+  /** @type {number} */
+  let selectGuardTimer = 0;
+  // 键盘（Shift + 方向键）选完也走这里
+  document.addEventListener('keyup', (e) => {
+    if (e.shiftKey || e.key === 'Shift' || e.key.startsWith('Arrow')) schedule();
   });
   // 为什么不是「一有 scroll 就收起」：滚动事件由浏览器延迟派发（无动画的页面里可能晚到几百毫秒），
   // 于是「先滚动、后划词」时，滚动事件会在气泡弹出之后才到，气泡会当场消失。
@@ -189,6 +227,11 @@ export function initTextSelectionAsk() {
     },
     { passive: true, capture: true }
   );
+  // 手机地址栏收起 / 键盘弹出只改 visualViewport，不触发 window.scroll，
+  // 不重算的话气泡会停在旧位置；选区已经没了就顺势收起。
+  window.visualViewport?.addEventListener('resize', () => {
+    if (!bubble.hidden) evaluate();
+  });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') hide();
   });
@@ -196,28 +239,55 @@ export function initTextSelectionAsk() {
     'pointerdown',
     (e) => {
       const target = e.target;
-      if (target instanceof Node && bubble.contains(target)) return;
-      hide();
+      if (target instanceof Node && bubble.contains(target)) {
+        pressingBubble = true;
+        return;
+      }
+      // 不在这里直接 hide()：手机上这根手指很可能正按在原生选区手柄上，
+      // 一按就收会让气泡再也弹不回来（后续只有 pointercancel，没有 pointerup）。
+      // 真正的收起信号是选区塌陷，交给上面的 selectionchange。
+      pointerSelecting = true;
+      // iOS 有些版本长按选词后不会再派发 pointerup/pointercancel，
+      // 只靠事件复位会让 pointerSelecting 一直为 true，气泡永远不出现。
+      if (e.pointerType === 'touch') {
+        clearTimeout(selectGuardTimer);
+        selectGuardTimer = window.setTimeout(() => {
+          pointerSelecting = false;
+          schedule(80);
+        }, 700);
+      }
     },
     true
   );
   // 点气泡按钮时别让浏览器顺手清掉选区：否则「复制」永远拿不到内容
   bubble.addEventListener('mousedown', (e) => e.preventDefault());
-  bubble.addEventListener('pointerdown', () => {
-    pressingBubble = true;
-  });
   document.addEventListener(
     'pointerup',
-    () => {
-      // 等 click 跑完再复位，避免 pointerup 与 click 之间补发的 selectionchange 把气泡收掉
-      setTimeout(() => {
-        pressingBubble = false;
-      }, 0);
+    (e) => {
+      const target = e.target;
+      if (target instanceof Node && bubble.contains(target)) {
+        // 等 click 跑完再复位，避免 pointerup 与 click 之间补发的 selectionchange 把气泡收掉
+        setTimeout(() => {
+          pressingBubble = false;
+        }, 300);
+        return;
+      }
+      clearTimeout(selectGuardTimer);
+      pointerSelecting = false;
+      schedule(160);
     },
     true
   );
   document.addEventListener('pointercancel', () => {
+    clearTimeout(selectGuardTimer);
+    pointerSelecting = false;
     pressingBubble = false;
+    schedule(200);
+  }, true);
+  // 手指拖到窗口外再松开时可能收不到 pointerup，别让 pointerSelecting 卡在 true
+  window.addEventListener('blur', () => {
+    clearTimeout(selectGuardTimer);
+    pointerSelecting = false;
   });
 
   askBtn.addEventListener('click', () => {

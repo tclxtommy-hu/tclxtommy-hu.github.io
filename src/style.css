@@ -2004,6 +2004,7 @@ body.is-home-chat-open .theme-menu {
   display: flex;
   gap: 2px;
   padding: 4px;
+  max-width: calc(100vw - 16px);
   transform: translateX(-50%);
   border: 1px solid rgba(137, 165, 237, 0.34);
   border-radius: 11px;
@@ -2011,6 +2012,11 @@ body.is-home-chat-open .theme-menu {
   box-shadow: 0 12px 30px rgba(4, 8, 26, 0.6);
   backdrop-filter: blur(6px);
   animation: ask-sel-in 0.14s ease-out;
+  /* 触屏上长按气泡里的按钮别再触发一次选字 / 双击缩放 */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ask-sel-bubble[hidden] {
@@ -2033,6 +2039,8 @@ body.is-home-chat-open .theme-menu {
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: background 0.18s ease, color 0.18s ease;
 }
 
@@ -2075,6 +2083,24 @@ body.is-home-chat-open .theme-menu {
 
 .ask-sel-mark {
   padding: 6px 9px;
+}
+
+/* 手机上没有 hover，按钮要够大才好点；四项仍能塞进 320px 宽的屏幕 */
+@media (max-width: 640px) {
+  .ask-sel-bubble {
+    gap: 0;
+    padding: 3px;
+    border-radius: 12px;
+  }
+
+  .ask-sel-btn {
+    padding: 9px 10px;
+    font-size: 0.84rem;
+  }
+
+  .ask-sel-mark {
+    padding: 9px 8px;
+  }
 }
 
 /* 文章页右下角常驻入口：压在「回到顶部」（bottom: 24px，高 40px）上方 */
