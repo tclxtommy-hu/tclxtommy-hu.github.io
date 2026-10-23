@@ -1,0 +1,51 @@
+404.html
+  s_380d50f4036bfe::t_9ee73a28244947 51
+archive.html
+  s_767bafac3b9f72::t_23847c6da5275d 63-70,108,110,291,433,435,440-441,502-519,592,601,2307
+"posts/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.md"
+  s_380d50f4036bfe::t_6fa13067900711 1-1019
+"posts/AI/Harness/成品harness/Claude Code/README.md"
+  s_380d50f4036bfe::t_6a2f9d8445aa0e 3-4,11-12
+public/feed.xml
+  s_767bafac3b9f72::t_74cc0951abb63a 8,10-25
+public/posts-tree.json
+  s_a2c3094b7eacbe::t_6c84523d7b30f9 1
+public/readmes.json
+  s_380d50f4036bfe::t_c289fe13c23d8c 1
+public/search-index.json
+  s_380d50f4036bfe::t_4810da9a19ff0c 1
+public/sitemap.xml
+  s_767bafac3b9f72::t_9c15f744a28b68 6,12,16-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "c32f1ad59fa805c3f4a11eff7271667d7dd6a253",
+  "prompts": {},
+  "sessions": {
+    "s_380d50f4036bfe": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a16674-90c2-7990-8c04-af759a07d232",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_767bafac3b9f72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1618d-84b8-7e71-bfbd-cc9907bc8124",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    },
+    "s_a2c3094b7eacbe": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a15c79-1dcf-78e0-9f12-dca420c14c23",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
