@@ -1,0 +1,19 @@
+src/text-selection.js
+  s_e27ede085e4741::t_7abb19e58413a7 124,140,143-152,157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "a69ff902cdbf531aa5140db88ba2339885230b45",
+  "prompts": {},
+  "sessions": {
+    "s_e27ede085e4741": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13d31-8bae-7ae2-b320-c4f8144e2c91",
+        "model": "unknown"
+      },
+      "human_author": "tommy.hu <tommy.hu@ly.com>"
+    }
+  }
+}
