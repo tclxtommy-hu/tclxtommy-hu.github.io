@@ -5,13 +5,53 @@
     <link>https://http200.cn/</link>
     <description>HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 23 Oct 2026 05:36:42 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 26 Oct 2026 07:19:02 GMT</lastBuildDate>
     <atom:link href="https://http200.cn/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>程序员</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</guid>
+      <pubDate>Mon, 26 Oct 2026 07:18:10 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 整理日期：2026-10-26 &gt; 状态：✅ 已补齐（2026-10-26） &gt; 上游：产品经理、设计师 &gt; 下游：测试 / 发布 &gt; 核心交付：技术方案、代码、提测单、发布单 &gt; 目标成熟度：L3 &gt; 一句话：模型负责从规格到可合并代码的整条链路，人只做代码评审与责任签字。</description>
+    </item>
+    <item>
+      <title>测试</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</guid>
+      <pubDate>Mon, 26 Oct 2026 06:50:16 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：程序员 &gt; 下游：产品经理 / 设计师 / 程序员 &gt; 核心交付：用例、缺陷单、测试报告 &gt; 目标成熟度：L3</description>
+    </item>
+    <item>
+      <title>产品经理</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</guid>
+      <pubDate>Mon, 26 Oct 2026 06:45:42 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：运营、老板、客户 &gt; 下游：设计师 / 程序员 / 测试 &gt; 核心交付：需求文档、设计需求单、验收记录 &gt; 目标成熟度：L2–L3</description>
+    </item>
+    <item>
+      <title>运营</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/运营.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/运营.html</guid>
+      <pubDate>Mon, 26 Oct 2026 06:45:34 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：用户、客服、销售、数据看板 &gt; 下游：产品经理 &gt; 核心交付：需求线索单、上线效果日报、异常升级单 &gt; 目标成熟度：L2</description>
+    </item>
+    <item>
+      <title>设计师</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/设计师.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/设计师.html</guid>
+      <pubDate>Mon, 26 Oct 2026 06:45:31 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：产品经理 &gt; 下游：程序员 / 产品经理 &gt; 核心交付：设计稿、走查清单 &gt; 目标成熟度：L1–L2</description>
+    </item>
     <item>
       <title>Claude-Code使用指南</title>
       <link>https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</link>
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</guid>
-      <pubDate>Fri, 23 Oct 2026 05:36:18 GMT</pubDate>
+      <pubDate>Fri, 23 Oct 2026 05:40:46 GMT</pubDate>
       <category>AI</category>
       <description>&gt; 最后修改时间：2026-10-23 13:26 &gt; 整理日期：2026-10-23 &gt; 适用版本：2026-10 官方 CLI；命令迭代很快，具体参数以 claude --help 和官方文档为准</description>
     </item>
@@ -206,46 +246,6 @@
       <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
       <category>AI</category>
       <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>01-模型选型指南</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>04-向量模型Embedding</title>
-      <link>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</guid>
-      <pubDate>Wed, 30 Sep 2026 06:41:15 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 一句话定义：把文本 / 图片 / 视频编码成固定维度浮点向量的模型，只负责&quot;算相似度&quot;、不负责&quot;写答案&quot;，是 RAG、语义搜索与推荐系统的检索底座。</description>
-    </item>
-    <item>
-      <title>03-输出解析与修复</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.html</guid>
-      <pubDate>Wed, 30 Sep 2026 06:41:15 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>读《深入理解 AI Agent：设计原理与工程实践》</title>
-      <link>https://http200.cn/posts-html/AI/AI实践/读《深入理解 AI Agent：设计原理与工程实践》.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/读《深入理解 AI Agent：设计原理与工程实践》.html</guid>
-      <pubDate>Sat, 19 Sep 2026 13:37:06 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 项目地址：https://github.com/bojieli/ai-agent-book 引言 第一，选择对 Agent 能力上限提出足够高要求的真实业务，并持续获取真实反馈。 第二，建立系统的评估（Evaluation）机制。 好的设计原则本就应该穿越模型的迭代周期 Agent = LLM</description>
-    </item>
-    <item>
-      <title>02-上下文工程</title>
-      <link>https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/02-上下文工程.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Agent开发知识/13-进阶与工程化/02-上下文工程.html</guid>
-      <pubDate>Sat, 19 Sep 2026 00:57:27 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 一句话定义：上下文工程是&quot;为每一次 LLM 调用，动态构造最优输入上下文&quot;的学科——比提示词更系统，是 Agent 可靠性的核心杠杆。 1. 为什么从&quot;提示工程&quot;升级到&quot;上下文工程&quot; - 单轮对话：写好 system + user 即可（提示工程）。 - 多步 Agent：每一步要注入工具结果、</description>
     </item>
   </channel>
 </rss>
