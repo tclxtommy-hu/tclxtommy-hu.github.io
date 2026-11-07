@@ -1,5 +1,7 @@
 # 什么是 LLM
 
+> 最后修改时间：2026-11-07 12:47
+
 > 一句话定义：LLM 是用海量文本自监督预训练的超大规模 Transformer 语言模型，具备通用语言理解与生成能力。
 
 ## 1. 定义
@@ -21,9 +23,10 @@ Large Language Model（大语言模型）指参数规模巨大（数十亿到万
 | 训练数据 | 语料规模与质量 |
 | 对齐方式 | RLHF/DPO 等 |
 
-## 4. 主流模型（2026 视角）
-- 闭源：GPT-4/5、Claude、Gemini、Qwen-Max。
-- 开源：Llama、Qwen、DeepSeek、Mistral、GLM。
+## 4. 主流模型（2026 下半年视角）
+- 闭源：OpenAI GPT-5 系列、Anthropic Claude（Opus / Sonnet / Haiku 5.x 家族）、Google Gemini 系列、Qwen-Max。
+- 开源 / 开放权重：DeepSeek（V3/R1 系列）、Qwen（通义千问）、Llama 4、GLM（智谱）、Kimi（月之暗面）、Mistral。
+- 趋势：旗舰模型普遍内置可开关的"推理/思考模式"（hybrid reasoning），一个模型覆盖快答与深思两档；开源权重与闭源前沿差距收窄到数月量级。
 
 ## 5. 能力边界
 - **幻觉**：会编造看似合理实则错误的内容。
