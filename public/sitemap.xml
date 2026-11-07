@@ -3,43 +3,133 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://http200.cn/</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://http200.cn/archive.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</loc>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/07-ChatFlow工具深挖索引.html</loc>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/03-Voice-Realtime.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/09-Agent运行主机与沙箱.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/05-IM-Bot与信息推送.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/02-AGI路径与未来.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/14-评估与安全/01-模型评估.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/03-MCP协议.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/06-大语言模型LLM/01-什么是LLM.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/01-AI基础概念/01-AI发展简史.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/13-多模态/03-视频生成与世界模型.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/06-Coding-Agent与AI编程.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/05-A2A与Agent互操作.html</loc>
+    <lastmod>2026-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/07-训练范式/05-GRPO与RLVR.html</loc>
+    <lastmod>2026-11-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/运营.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-10-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/设计师.html</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</loc>
+    <lastmod>2026-10-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -290,12 +380,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</loc>
-    <lastmod>2026-09-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/03-会话状态管理.html</loc>
     <lastmod>2026-09-11</lastmod>
     <changefreq>weekly</changefreq>
@@ -369,12 +453,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI实践/日志处理-JSONL-zstd.html</loc>
-    <lastmod>2026-08-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/14-评估与安全/01-模型评估.html</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -538,18 +616,6 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/AI实践/AI开发项目知识库.html</loc>
     <lastmod>2026-08-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/07-ChatFlow工具深挖索引.html</loc>
-    <lastmod>2026-08-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/03-Voice-Realtime.html</loc>
-    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -896,18 +962,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/02-AGI路径与未来.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/14-评估与安全/02-对齐与安全.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -927,12 +981,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/04-多智能体.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/03-MCP协议.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1022,12 +1070,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/06-大语言模型LLM/01-什么是LLM.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/05-Transformer与注意力/03-从Transformer到LLM.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
@@ -1107,12 +1149,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/01-AI基础概念/02-AI-ML-DL关系.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/01-AI基础概念/01-AI发展简史.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

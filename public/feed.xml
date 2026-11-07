@@ -5,47 +5,167 @@
     <link>https://http200.cn/</link>
     <description>HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 26 Oct 2026 07:19:02 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 07 Nov 2026 08:51:22 GMT</lastBuildDate>
     <atom:link href="https://http200.cn/feed.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>程序员</title>
-      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</guid>
-      <pubDate>Mon, 26 Oct 2026 07:18:10 GMT</pubDate>
+      <title>学习清单-TODO</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 整理日期：2026-10-26 &gt; 状态：✅ 已补齐（2026-10-26） &gt; 上游：产品经理、设计师 &gt; 下游：测试 / 发布 &gt; 核心交付：技术方案、代码、提测单、发布单 &gt; 目标成熟度：L3 &gt; 一句话：模型负责从规格到可合并代码的整条链路，人只做代码评审与责任签字。</description>
+      <description>&gt; 最后修改时间：2026-11-07 14:00</description>
     </item>
     <item>
-      <title>测试</title>
-      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</guid>
-      <pubDate>Mon, 26 Oct 2026 06:50:16 GMT</pubDate>
+      <title>07-ChatFlow工具深挖索引</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/07-ChatFlow工具深挖索引.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/07-ChatFlow工具深挖索引.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：程序员 &gt; 下游：产品经理 / 设计师 / 程序员 &gt; 核心交付：用例、缺陷单、测试报告 &gt; 目标成熟度：L3</description>
+      <description>&gt; 最后修改时间：2026-11-07 13:30</description>
     </item>
     <item>
-      <title>产品经理</title>
-      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</guid>
-      <pubDate>Mon, 26 Oct 2026 06:45:42 GMT</pubDate>
+      <title>03-Voice-Realtime</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/03-Voice-Realtime.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/03-Voice-Realtime.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：运营、老板、客户 &gt; 下游：设计师 / 程序员 / 测试 &gt; 核心交付：需求文档、设计需求单、验收记录 &gt; 目标成熟度：L2–L3</description>
+      <description>&gt; 最后修改时间：2026-11-07 13:30</description>
+    </item>
+    <item>
+      <title>09-Agent运行主机与沙箱</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/09-Agent运行主机与沙箱.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/09-Agent运行主机与沙箱.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 14:00</description>
+    </item>
+    <item>
+      <title>05-IM-Bot与信息推送</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/05-IM-Bot与信息推送.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/05-IM-Bot与信息推送.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 14:00</description>
+    </item>
+    <item>
+      <title>02-AGI路径与未来</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/02-AGI路径与未来.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/02-AGI路径与未来.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：探讨通向通用人工智能的可能路径、关键瓶颈与未来展望。 1. 当前共识与分歧 - LLM 已展现强通用语言能力，但是否算 AGI 雏形存争议。 - 缺口：长程规划、世界模型、持续学习、具身、自我纠错。 2. 可能路径 | 路径 | 思</description>
+    </item>
+    <item>
+      <title>01-推理模型</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：通过 test-time 计算（长思维链）显著提升复杂推理能力的模型，代表是 OpenAI o1 / DeepSeek R1。 1. 核心思想 - 传统 LLM &quot;快思考&quot;：直接输出答案。 - 推理模型&quot;慢思考&quot;：在回答前进行长链内</description>
+    </item>
+    <item>
+      <title>01-模型评估</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/14-评估与安全/01-模型评估.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/14-评估与安全/01-模型评估.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：用基准与指标量化 LLM 能力，是选型、迭代与对齐的依据。 1. 评估维度 &gt; 查得全（召回率），查得准（精准度），理解得对（多模态），看得对（权限隔离） - 知识：MMLU（已趋饱和，改用 MMLU-Pro）、GPQA（研究生级理</description>
+    </item>
+    <item>
+      <title>03-MCP协议</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/03-MCP协议.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/03-MCP协议.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：MCP 是标准化 LLM 与外部工具/数据源连接的开放协议，被类比为&quot;AI 应用的 USB-C&quot;。 1. 定义 Model Context Protocol（MCP）由 Anthropic 于 2024 年开源，标准化客户端与工具/</description>
+    </item>
+    <item>
+      <title>01-什么是LLM</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/06-大语言模型LLM/01-什么是LLM.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/06-大语言模型LLM/01-什么是LLM.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：LLM 是用海量文本自监督预训练的超大规模 Transformer 语言模型，具备通用语言理解与生成能力。 1. 定义 Large Language Model（大语言模型）指参数规模巨大（数十亿到万亿）、在海量文本上预训练的 Tr</description>
+    </item>
+    <item>
+      <title>01-AI发展简史</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/01-AI基础概念/01-AI发展简史.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/01-AI基础概念/01-AI发展简史.html</guid>
+      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：AI 经历了符号主义→连接主义复兴→深度学习→大语言模型四波浪潮，每次都由算力、数据、算法三者共振驱动。 1. 四波浪潮 | 时期 | 浪潮 | 代表 | 驱动 | |------|------|------|------| | 1</description>
+    </item>
+    <item>
+      <title>视频生成与世界模型</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/13-多模态/03-视频生成与世界模型.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/13-多模态/03-视频生成与世界模型.html</guid>
+      <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+    </item>
+    <item>
+      <title>Coding Agent 与 AI 编程</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/06-Coding-Agent与AI编程.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/06-Coding-Agent与AI编程.html</guid>
+      <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+    </item>
+    <item>
+      <title>A2A 协议与 Agent 互操作</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/05-A2A与Agent互操作.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/05-A2A与Agent互操作.html</guid>
+      <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+    </item>
+    <item>
+      <title>GRPO 与 RLVR：可验证奖励强化学习</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/07-训练范式/05-GRPO与RLVR.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/07-训练范式/05-GRPO与RLVR.html</guid>
+      <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
     </item>
     <item>
       <title>运营</title>
       <link>https://http200.cn/posts-html/AI/智能员工/软件公司/运营.html</link>
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/运营.html</guid>
-      <pubDate>Mon, 26 Oct 2026 06:45:34 GMT</pubDate>
+      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：用户、客服、销售、数据看板 &gt; 下游：产品经理 &gt; 核心交付：需求线索单、上线效果日报、异常升级单 &gt; 目标成熟度：L2</description>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：用户、客服、销售、数据看板 &gt; 下游：产品经理 &gt; 核心交付：需求线索单、上线效果日报、异常升级单 &gt; 目标成熟度：L2 1. 角色边界 负责： - 收集并聚类用户反馈、客服工单、社群与评论。 - 用数据说明影响面，形成需求线索单。 - 上线后跟踪效果，</description>
     </item>
     <item>
       <title>设计师</title>
       <link>https://http200.cn/posts-html/AI/智能员工/软件公司/设计师.html</link>
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/设计师.html</guid>
-      <pubDate>Mon, 26 Oct 2026 06:45:31 GMT</pubDate>
+      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：产品经理 &gt; 下游：程序员 / 产品经理 &gt; 核心交付：设计稿、走查清单 &gt; 目标成熟度：L1–L2</description>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：产品经理 &gt; 下游：程序员 / 产品经理 &gt; 核心交付：设计稿、走查清单 &gt; 目标成熟度：L1–L2 1. 角色边界 负责： - 把需求文档转成可实现的界面与交互。 - 维护组件映射、状态覆盖与设计规范。 - 完成视觉与交互验收。 不负责： - 接没有需</description>
+    </item>
+    <item>
+      <title>程序员</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</guid>
+      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 整理日期：2026-10-26 &gt; 状态：✅ 已补齐（2026-10-26） &gt; 上游：产品经理、设计师 &gt; 下游：测试 / 发布 &gt; 核心交付：技术方案、代码、提测单、发布单 &gt; 目标成熟度：L3 &gt; 一句话：模型负责从规格到可合并代码的整条链路，人只做代码评审与责任签字。 全链路 AI /ˌ</description>
+    </item>
+    <item>
+      <title>测试</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</guid>
+      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：程序员 &gt; 下游：产品经理 / 设计师 / 程序员 &gt; 核心交付：用例、缺陷单、测试报告 &gt; 目标成熟度：L3 1. 角色边界 负责： - 按提测单设计用例、执行测试、管理缺陷。 - 给出覆盖、通过率、遗留风险与结论。 - 守住发布前的质量门禁。 不负责</description>
+    </item>
+    <item>
+      <title>产品经理</title>
+      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</guid>
+      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：运营、老板、客户 &gt; 下游：设计师 / 程序员 / 测试 &gt; 核心交付：需求文档、设计需求单、验收记录 &gt; 目标成熟度：L2–L3 1. 角色边界 负责： - 把需求线索收敛成可开发、可验收的 PRD /ˌpiː ɑːr ˈdiː/ （ Product</description>
     </item>
     <item>
       <title>Claude-Code使用指南</title>
@@ -53,7 +173,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</guid>
       <pubDate>Fri, 23 Oct 2026 05:40:46 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-23 13:26 &gt; 整理日期：2026-10-23 &gt; 适用版本：2026-10 官方 CLI；命令迭代很快，具体参数以 claude --help 和官方文档为准</description>
+      <description>&gt; 最后修改时间：2026-10-23 13:26 &gt; 整理日期：2026-10-23 &gt; 适用版本：2026-10 官方 CLI；命令迭代很快，具体参数以 claude --help 和官方文档为准 Claude Code /klɔːd kəʊd/ 是 Anthropic /ænˈθrɒpɪk/</description>
     </item>
     <item>
       <title>04-VLM与多模态应用</title>
@@ -61,7 +181,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/04-VLM与多模态应用.html</guid>
       <pubDate>Thu, 22 Oct 2026 08:05:20 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-22 15:57</description>
+      <description>&gt; 最后修改时间：2026-10-22 15:57 &gt; 状态：✅ 已补齐（2026-10-22） &gt; 一句话定义：视觉语言模型（及更广多模态）如何进入业务：识图问答、单据理解、多模态 RAG，以及绕不开的输入工程与图中注入防御。 大纲 1. VLM 能力与局限(一vlm-能力与局限) 2. 图文输入</description>
     </item>
     <item>
       <title>09-llm-api</title>
@@ -69,7 +189,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI编程范式/AI应用开发范式/09-llm-api.html</guid>
       <pubDate>Wed, 21 Oct 2026 10:02:34 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-21 16:14</description>
+      <description>&gt; 最后修改时间：2026-10-21 16:14 定义 LLM API 是大语言模型厂商对外提供的 HTTP/SDK 编程接口 ，让开发者把模型能力集成到自己的应用中。当前主流厂商普遍采用&quot;OpenAI 兼容&quot;的 REST 风格（/v1/chat/completions），并以官方 SDK（Pyt</description>
     </item>
     <item>
       <title>06-WorkFlow工具深挖索引</title>
@@ -77,7 +197,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.html</guid>
       <pubDate>Wed, 21 Oct 2026 07:53:16 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-21 15:17</description>
+      <description>&gt; 最后修改时间：2026-10-21 15:17 &gt; 状态：✅ 已补齐（2026-10-21） &gt; 一句话定义：把 n8n /en eɪt ˈen/ 、Dify /ˈdɪfaɪ/ 、Langflow /ˈlæŋfloʊ/ 、LangGraph /ˈlæŋɡræf/ 、Temporal /ˈtemp</description>
     </item>
     <item>
       <title>大模型 LLM 没有记忆？</title>
@@ -85,7 +205,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/大模型LLm没有记忆？.html</guid>
       <pubDate>Wed, 21 Oct 2026 00:00:00 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-21 17:12</description>
+      <description>&gt; 最后修改时间：2026-10-21 17:12 &gt; 一句话结论： LLM 本身没有任何记忆 ——它是一个「输入什么就处理什么」的无状态函数；你在 ChatGPT 里感受到的「记得我」，全部来自工程手段：拼上下文、服务端托管会话、提示缓存、外部记忆库，或把知识写进权重的微调。本文把这五层拆开讲清，</description>
     </item>
     <item>
       <title>copilot配置</title>
@@ -126,126 +246,6 @@
       <pubDate>Sat, 10 Oct 2026 00:00:00 GMT</pubDate>
       <category>AI</category>
       <description>&gt; 最后修改时间：2026-10-10 21:43 &gt; 一句话定义：上下文压缩是 harness /ˈhɑːnɪs/ （运行外壳）的&quot;内存管理&quot;——进上下文之前瘦身、组装时裁剪、超窗时摘要续命；四家实现细节不同，骨架高度一致。 &gt; 关联阅读：压缩方法论与预算分配见 ../AI知识库/09-RAG与上</description>
-    </item>
-    <item>
-      <title>01-A2A协议深挖</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/01-A2A协议深挖.html</guid>
-      <pubDate>Wed, 07 Oct 2026 14:28:18 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-07 21:33 &gt; 一句话定义： A2A /ˌeɪ tuː ˈeɪ/ （ Agent-to-Agent /ˈeɪdʒənt tuː ˈeɪdʒənt/ ，Agent 间互操作协议）是让不同厂商、不同框架的 Agent 互相发现能力、委派任务、交换结果的标准——MC</description>
-    </item>
-    <item>
-      <title>读《理解深度学习Understanding Deep Learning》</title>
-      <link>https://http200.cn/posts-html/AI/AI实践/读《理解深度学习Understanding Deep Learning》.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/读《理解深度学习Understanding Deep Learning》.html</guid>
-      <pubDate>Wed, 07 Oct 2026 14:28:18 GMT</pubDate>
-      <category>AI</category>
-      <description></description>
-    </item>
-    <item>
-      <title>06-LLM 核心性能指标全景手册</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/06-LLM 核心性能指标全景手册.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
-    </item>
-    <item>
-      <title>05-产品指标与AB</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/05-产品指标与AB.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/05-产品指标与AB.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
-    </item>
-    <item>
-      <title>04-在线与离线评测</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/04-在线与离线评测.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/04-在线与离线评测.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
-    </item>
-    <item>
-      <title>03-红队测试</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/03-红队测试.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/03-红队测试.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
-    </item>
-    <item>
-      <title>02-护栏产品化</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/02-护栏产品化.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/02-护栏产品化.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
-    </item>
-    <item>
-      <title>01-Prompt-Injection深挖</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/01-Prompt-Injection深挖.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/06-安全与评测/01-Prompt-Injection深挖.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 15:43</description>
-    </item>
-    <item>
-      <title>08-多租户与隔离</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/08-多租户与隔离.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/08-多租户与隔离.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>07-Prompt版本管理</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/07-Prompt版本管理.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/07-Prompt版本管理.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>06-限流重试与幂等</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/06-限流重试与幂等.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/06-限流重试与幂等.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>05-降级与Fallback</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/05-降级与Fallback.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/05-降级与Fallback.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>04-LLM网关与路由</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/04-LLM网关与路由.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/04-LLM网关与路由.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>03-延迟成本质量三角</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/03-延迟成本质量三角.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/03-延迟成本质量三角.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
-    </item>
-    <item>
-      <title>02-Token成本估算</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/02-Token成本估算.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/02-Token成本估算.html</guid>
-      <pubDate>Wed, 30 Sep 2026 08:05:03 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-09-30 14:22</description>
     </item>
   </channel>
 </rss>
