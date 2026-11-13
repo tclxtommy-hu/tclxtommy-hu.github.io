@@ -1,6 +1,10 @@
 # vLLM
 
+> 最后修改时间：2026-11-13 13:44
+
 > 一句话定义： **vLLM** /ˌviː el el ˈem/ 是面向高吞吐生产场景的开源大语言模型推理与服务引擎；用 **PagedAttention** /peɪdʒd əˈtenʃn/ 管显存、用连续批处理吃满显卡，并默认提供 OpenAI 兼容接口，便于私有化替换云端模型调用。
+
+> 📌 2026 年末版本注记：自 v0.8 起 **V1 引擎成为默认**（V0 已在 2025 年后的版本中移除），**前缀缓存（prefix caching）默认开启**；生产侧新主线是 **PD 分离部署**（disaggregated prefill/decode）、多模态与推理模型（thinking）负载优化、以及对 NVIDIA / AMD / TPU / 国产加速卡的广泛适配。安装命令与参数以官方当前版本为准，本文机制部分（PagedAttention、连续批处理）依然是理解 V1 的地基。
 
 相关篇目：
 
@@ -179,7 +183,7 @@ uv pip install vllm --torch-backend=auto
 # 使用官方镜像启动：把 GPU 交给容器，映射 8000 端口，并加载指定模型（首次会下载权重）
 docker run --gpus all -p 8000:8000 \
   vllm/vllm-openai \
-  --model Qwen/Qwen2.5-1.5B-Instruct
+  --model Qwen/Qwen3-1.7B
 ```
 
 > 命令与镜像标签随版本会变，以 [官方 Quickstart](https://docs.vllm.ai/en/latest/getting_started/quickstart.html) 为准。
@@ -192,7 +196,7 @@ docker run --gpus all -p 8000:8000 \
 
 ```bash
 # 启动 OpenAI 兼容服务；模型名为 Hugging Face 仓库 ID，首次自动下载权重
-vllm serve Qwen/Qwen2.5-1.5B-Instruct
+vllm serve Qwen/Qwen3-1.7B
 ```
 
 显存紧张可先用更小模型（如上面的 1.5B）验证通路，再换 7B 等。
@@ -203,14 +207,14 @@ vllm serve Qwen/Qwen2.5-1.5B-Instruct
 # 让 vLLM 从 ModelScope 拉模型，而不是默认 Hugging Face
 export VLLM_USE_MODELSCOPE=True
 # 启动服务并加载模型（需在 ModelScope 侧可解析该 ID）
-vllm serve Qwen/Qwen2.5-1.5B-Instruct
+vllm serve Qwen/Qwen3-1.7B
 ```
 
 **方式 B：先下载到本地目录，再指定路径**
 
 ```bash
 # 用 Hugging Face CLI 下载模型文件到本地目录
-huggingface-cli download Qwen/Qwen2.5-7B-Instruct \
+huggingface-cli download Qwen/Qwen3-8B \
   --local-dir ./models/qwen2.5-7b
 # 用本地路径启动服务，不再依赖在线下载
 vllm serve ./models/qwen2.5-7b
@@ -221,7 +225,7 @@ vllm serve ./models/qwen2.5-7b
 ```python
 from vllm import LLM, SamplingParams  # LLM：离线引擎入口；SamplingParams：采样参数
 
-llm = LLM(model="Qwen/Qwen2.5-1.5B-Instruct")  # 加载模型（无缓存则下载）；权重进 GPU
+llm = LLM(model="Qwen/Qwen3-1.7B")  # 加载模型（无缓存则下载）；权重进 GPU
 params = SamplingParams(temperature=0.7, max_tokens=64)  # 温度与最大生成长度
 outputs = llm.generate(["你好，用一句话介绍 vLLM。"], params)  # 把提示送入引擎并生成
 print(outputs[0].outputs[0].text)  # 打印第一条结果的文本
@@ -238,7 +242,7 @@ print(outputs[0].outputs[0].text)  # 打印第一条结果的文本
 # --max-model-len：单序列最大长度（过大挤占 KV 池）
 # --gpu-memory-utilization：预留显存比例（过高易 OOM）
 python -m vllm.entrypoints.openai.api_server \
-  --model Qwen/Qwen2.5-7B-Instruct \
+  --model Qwen/Qwen3-8B \
   --host 0.0.0.0 \
   --port 8000 \
   --max-model-len 8192 \
@@ -270,7 +274,7 @@ client = OpenAI(
 )
 
 resp = client.chat.completions.create(
-    model="Qwen/Qwen2.5-7B-Instruct",  # 必须与启动时的模型名 / 路径一致
+    model="Qwen/Qwen3-8B",  # 必须与启动时的模型名 / 路径一致
     messages=[
         {"role": "system", "content": "你是简洁的技术助手。"},  # 系统提示
         {"role": "user", "content": "用三句话解释 PagedAttention。"},  # 用户问题

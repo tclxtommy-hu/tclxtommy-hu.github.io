@@ -1,8 +1,8 @@
 # Computer Use / GUI Agent
 
-> 最后修改时间：2026-10-08 21:51
+> 最后修改时间：2026-11-13 13:44
 
-> 状态：✅ 已补齐（2026-10-08）  
+> 状态：✅ 已补齐（2026-10-08，2026-11-13 更新模型与格局引用）  
 > 一句话定义：让 Agent 通过截图理解界面并执行点击/输入等动作，操作浏览器或桌面。
 
 ## 大纲
@@ -197,7 +197,7 @@ async function runTask(page: Page, task: string, approve: Appraiser, maxSteps = 
     if (recent.length > 2) doneSteps.push(recent.shift()!.title);                  // 溢出即压缩为文本
 
     const resp = await client.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.1",
       messages: buildMessages(task, doneSteps, recent),
       response_format: { type: "json_object" },
     });
@@ -378,8 +378,8 @@ await page.route("**/*", (route) => {
 
 | 基准 | 环境 | 规模 | 测什么 | 原始论文报告 |
 |------|------|------|--------|--------------|
-| **WebArena** | 4 个自托管真实网站（电商 / 论坛 / GitLab / CMS） | 812 个任务 | 端到端网页任务 | GPT-4 时代基线 14.4%，人类 78.2%（Zhou 等，2023） |
-| **OSWorld** | 真实 Ubuntu / Windows / macOS 虚拟机 | 369 个跨应用任务 | 桌面多应用操作 | 当时最强模型 12.2%，人类 72.4%（Xie 等，2024） |
+| **WebArena** | 4 个自托管真实网站（电商 / 论坛 / GitLab / CMS） | 812 个任务 | 端到端网页任务 | GPT-4 时代基线 14.4%，人类 78.2%（Zhou 等，2023）；2026 年专用 GUI 模型已超 50% |
+| **OSWorld** | 真实 Ubuntu / Windows / macOS 虚拟机 | 369 个跨应用任务 | 桌面多应用操作 | 首发时最强模型 12.2%，人类 72.4%（Xie 等，2024）；2026 年头部 Agent（Claude Computer Use、OpenAI Operator 系、Gemini 2.5 Computer Use）已升至 50%+ |
 | **WebVoyager** | 真实线上网站（非自托管） | 多站点任务集 | 端到端 + 多模态 | 见论文（He 等，2024） |
 | **Mind2Web** | 离线轨迹 | 2,000+ 任务，跨 137 个站点 | 动作预测（不真跑） | 见论文（Deng 等，2023） |
 | **AndroidWorld** | Android 模拟器 | 116 个任务 | 移动端操作 | 见论文（Rawles 等，2024） |
@@ -460,7 +460,7 @@ function summarize(runs: TaskRun[]) {
 
 | 周 | 动作 | 产出 | 用到的工具 |
 |----|------|------|------------|
-| W1 | 选 1 个无 API 的平台，固化 20 条黄金任务；用 Playwright 抽 a11y 元素列表 + SoM 标注截图，跑通闭环 | 成功率约 60% 的 Demo | Playwright + gpt-4o（视觉） |
+| W1 | 选 1 个无 API 的平台，固化 20 条黄金任务；用 Playwright 抽 a11y 元素列表 + SoM 标注截图，跑通闭环 | 成功率约 60% 的 Demo | Playwright + 通用视觉模型（GPT-5 系 / Claude / Qwen3-VL） |
 | W2 | 纯坐标换成元素编号定位；接默认拒绝闸门 + 出站白名单；坏例按「定位失败 / 规划错 / 断言错」三类归因 | 成功率 88%，无越权动作 | Playwright + 自写闸门 |
 | W3 | 引入 API 优先、UI 兜底通道选择；对稳定步骤做 **录制回放** （能回放的不推理） | 平均步数 22 → 11，单任务成本降一半 | Playwright trace / codegen |
 | W4 | 灰度：每天 50 个 SKU 交给 Agent，人工只审不可逆动作；补"不得重复创建"断言后重跑 | v1.1 上线，成功率 84%，接管率 12% | 黄金任务集 + 指标看板 |
@@ -471,7 +471,7 @@ function summarize(runs: TaskRun[]) {
 |------|------|------|
 | 浏览器驱动 | Playwright、Puppeteer | Playwright 的 `locator` 自带滚动到可见 + 可点等待 |
 | 现成 Agent | browser-use、Stagehand | 起步快，但动作空间与闸门要自己收紧 |
-| 视觉模型 | Claude Computer Use、gpt-4o、Qwen-VL 等 | 便宜模型做定位，贵的做规划，可分层 |
+| 视觉模型 | Claude Computer Use、OpenAI computer-use 系、Gemini 2.5 Computer Use、Qwen3-VL 等 | 便宜模型做定位，贵的做规划，可分层 |
 | 隔离 | Docker / Firecracker、独立 browser context、云 VM | 桌面 Agent 必须 VM |
 | 评测 | 自建黄金任务集 + Playwright 断言 | 断言查库/查接口，不看截图 |
 | 可观测 | Playwright trace + 每步截图存档 | 失败回放是排查定位问题的唯一手段 |

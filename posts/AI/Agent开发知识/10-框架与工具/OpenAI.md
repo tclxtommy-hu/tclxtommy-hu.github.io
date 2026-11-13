@@ -1,5 +1,7 @@
 # OpenAI API 协议详解
 
+> 最后修改时间：2026-11-13 13:44
+
 > 一句话定义：OpenAI API 协议已成为大模型服务的事实标准，几乎所有主流 LLM 服务商都提供与其兼容的接口。
 
 ---
@@ -36,6 +38,17 @@ POST https://api.openai.com/v1/chat/completions
 | Files | `/v1/files` | 文件管理 |
 | Audio | `/v1/audio/transcriptions` | 语音转文字 |
 
+### 2.3 Responses API（OpenAI 的新方向）
+
+2025 年起 OpenAI 推出 **Responses API** （`/v1/responses`），把对话、工具调用、推理过程（reasoning items）、内置工具（web search、file search、computer use）统一到一个端点，是 OpenAI 官方推荐的**新接入方式**。
+
+但要分清两件事：
+
+- **对接 OpenAI 官方服务**：新项目优先用 Responses API，能拿到推理摘要、内置工具、状态ful 会话（`store` + `previous_response_id`）等新能力；
+- **做跨厂商兼容**：**Chat Completions 仍是行业事实标准**——国产厂商、vLLM、Ollama 等几乎都只保证兼容 Chat Completions，Responses API 的第三方兼容生态还不成熟。
+
+本文其余部分仍以 Chat Completions 为讲解主线（因为兼容性最好），两者消息/工具调用的概念完全相通。
+
 ---
 
 ## 3. 消息结构（Messages）
@@ -66,7 +79,7 @@ POST https://api.openai.com/v1/chat/completions
 
 ```json
 {
-  "model": "gpt-4o",
+  "model": "gpt-5.1",
   "messages": [...],
   "temperature": 0.7,
   "max_tokens": 4096,
@@ -218,24 +231,24 @@ OpenAI 支持通过 `response_format` 让模型按指定 JSON Schema 输出，�
 
 | 服务商 | 模型 | Base URL | 备注 |
 |--------|------|----------|------|
-| DeepSeek | deepseek-chat / deepseek-reasoner | `https://api.deepseek.com/v1` | 完全兼容 |
-| 通义千问（阿里） | qwen-turbo / qwen-plus / qwen-max | `https://dashscope.aliyuncs.com/compatible-mode/v1` | 兼容模式 |
-| 智谱（GLM） | glm-4 / glm-4-flash | `https://open.bigmodel.cn/api/paas/v4` | 完全兼容 |
-| 月之暗面（Moonshot） | moonshot-v1-8k/32k/128k | `https://api.moonshot.cn/v1` | 完全兼容 |
-| 百川（Baichuan） | baichuan4 / baichuan3-turbo | `https://api.baichuan-ai.com/v1` | 完全兼容 |
-| MiniMax | abab6.5s / abab7 | `https://api.minimax.chat/v1` | 完全兼容 |
-| 零一万物（Yi） | yi-large / yi-medium | `https://api.lingyiwanwu.com/v1` | 完全兼容 |
+| DeepSeek | deepseek-chat（V3.2）/ deepseek-reasoner | `https://api.deepseek.com/v1` | 完全兼容 |
+| 通义千问（阿里） | qwen3-max / qwen-plus / qwen-turbo（均为 Qwen3 代） | `https://dashscope.aliyuncs.com/compatible-mode/v1` | 兼容模式 |
+| 字节豆包 | doubao-seed-1-6 系列 | `https://ark.cn-beijing.volces.com/api/v3` | 完全兼容（火山方舟） |
+| 智谱（GLM） | glm-4.6 / glm-4.5-air | `https://open.bigmodel.cn/api/paas/v4` | 完全兼容 |
+| 月之暗面（Moonshot） | kimi-k2 系列 / moonshot-v1-8k/32k/128k | `https://api.moonshot.cn/v1` | 完全兼容 |
+| MiniMax | MiniMax-M2 | `https://api.minimax.chat/v1` | 完全兼容 |
+| 百川（Baichuan） | baichuan4 | `https://api.baichuan-ai.com/v1` | 完全兼容，活跃度下降 |
 | 讯飞星火 | spark-xxx | 兼容层需要适配 | 部分兼容 |
 
 ### 8.2 国际模型
 
 | 服务商 | 模型 | Base URL | 备注 |
 |--------|------|----------|------|
-| OpenAI | gpt-4o / gpt-4-turbo / o1 / o3 等 | `https://api.openai.com/v1` | 原创协议 |
-| Anthropic | Claude 系列 | 需用 Anthropic Messages API | **不兼容 OpenAI 协议** |
-| Google | Gemini 系列 | 原生用 Gemini API，但可通过兼容层 | 第三方适配 |
+| OpenAI | GPT-5.1 / GPT-5 / gpt-5-mini / gpt-5-nano | `https://api.openai.com/v1` | 原创协议（另见 Responses API） |
+| Anthropic | Claude Opus 4.5 / Sonnet 4.5 / Haiku 4.5 | 原生用 Messages API | 不兼容，需网关转换（LiteLLM 等） |
+| Google | Gemini 3 / 2.5 系列 | `https://generativelanguage.googleapis.com/v1beta/openai/` | **官方兼容端点** |
 | Mistral | mistral-large / mixtral | `https://api.mistral.ai/v1` | 完全兼容 |
-| Groq | llama-3 / mixtral（推理加速） | `https://api.groq.com/openai/v1` | 完全兼容 |
+| Groq | Llama 4 / Qwen3 等（推理加速） | `https://api.groq.com/openai/v1` | 完全兼容 |
 | Together AI | 多种开源模型 | `https://api.together.xyz/v1` | 完全兼容 |
 | Fireworks | 多种开源模型 | `https://api.fireworks.ai/inference/v1` | 完全兼容 |
 | Perplexity | 搜索增强模型 | `https://api.perplexity.ai` | 基本兼容 |
@@ -276,7 +289,77 @@ OpenAI 支持通过 `response_format` 让模型按指定 JSON Schema 输出，�
 
 ## 10. 代码示例
 
-### Python（OpenAI SDK）
+### TypeScript（OpenAI SDK，主示例）
+
+```typescript
+import OpenAI from "openai";
+
+// 只需改 baseURL 和 apiKey 就能切换模型
+const client = new OpenAI({
+  baseURL: "https://api.deepseek.com/v1", // 换成任意兼容服务
+  apiKey: process.env.DEEPSEEK_API_KEY,
+});
+
+interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+const messages: ChatMessage[] = [
+  { role: "system", content: "你是一个 helpful assistant" },
+  { role: "user", content: "什么是 Agent？" },
+];
+
+const response = await client.chat.completions.create({
+  model: "deepseek-chat",
+  messages,
+  temperature: 0.7,
+});
+
+console.log(response.choices[0].message.content);
+```
+
+### TypeScript（带工具调用 + 流式）
+
+```typescript
+const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
+  {
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "获取天气",
+      parameters: {
+        type: "object",
+        properties: { city: { type: "string", description: "城市名" } },
+        required: ["city"],
+      },
+    },
+  },
+];
+
+const resp = await client.chat.completions.create({
+  model: "deepseek-chat",
+  messages: [{ role: "user", content: "北京天气怎么样？" }],
+  tools,
+  tool_choice: "auto",
+});
+
+for (const tc of resp.choices[0].message.tool_calls ?? []) {
+  console.log(`调用工具: ${tc.function.name}, 参数: ${tc.function.arguments}`);
+}
+
+// 流式
+const stream = await client.chat.completions.create({
+  model: "deepseek-chat",
+  messages: [{ role: "user", content: "讲一个笑话" }],
+  stream: true,
+});
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? "");
+}
+```
+
+### Python（补充示例）
 
 ```python
 from openai import OpenAI
@@ -300,7 +383,7 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-### Python（流式调用）
+### Python（流式调用，补充）
 
 ```python
 stream = client.chat.completions.create(
@@ -314,7 +397,7 @@ for chunk in stream:
         print(chunk.choices[0].delta.content, end="")
 ```
 
-### Python（带工具调用）
+### Python（带工具调用，补充）
 
 ```python
 tools = [{

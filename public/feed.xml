@@ -5,15 +5,119 @@
     <link>https://http200.cn/</link>
     <description>HTTP200专注分享最新AI技术、大模型应用、人工智能实战教程，同时提供网络技术、IT运维、服务器、软件开发等IT领域干货与技术经验。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sat, 07 Nov 2026 08:51:22 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 13 Nov 2026 07:45:04 GMT</lastBuildDate>
     <atom:link href="https://http200.cn/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>04-vLLM</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/04-vLLM.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/04-vLLM.html</guid>
+      <pubDate>Fri, 13 Nov 2026 06:02:18 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 一句话定义： vLLM /ˌviː el el ˈem/ 是面向高吞吐生产场景的开源大语言模型推理与服务引擎；用 PagedAttention /peɪdʒd əˈtenʃn/ 管显存、用连续批处理吃满显卡，并默认提供 OpenAI 兼容接口，</description>
+    </item>
+    <item>
+      <title>02-Computer-Use</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</guid>
+      <pubDate>Fri, 13 Nov 2026 06:01:29 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 状态：✅ 已补齐（2026-10-08，2026-11-13 更新模型与格局引用） &gt; 一句话定义：让 Agent 通过截图理解界面并执行点击/输入等动作，操作浏览器或桌面。 大纲 1. 为什么需要：API 到不了的地方(一为什么需要api-到</description>
+    </item>
+    <item>
+      <title>01-推理模型</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</guid>
+      <pubDate>Fri, 13 Nov 2026 06:00:35 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 一句话定义：通过 test-time 计算（长思维链）显著提升复杂推理能力的模型形态，代表从 OpenAI o1 / DeepSeek R1 演进为各家旗舰内置的 reasoning / thinking 档位。 1. 核心思想 - 传统 LL</description>
+    </item>
+    <item>
+      <title>03-推理框架</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/03-推理框架.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/03-推理框架.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:59:50 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 一句话定义：推理框架是大语言模型的宿主与运行时——负责加载模型权重、调度硬件算力、管理显存与并发，并把「一次生成」包装成可调用的服务接口。它对接的是 模型 + 硬件 ，不是业务编排。 相关篇目： - 优化技术细节 → 01-推理优化.md(01</description>
+    </item>
+    <item>
+      <title>mcp-comprehensive-guide</title>
+      <link>https://http200.cn/posts-html/AI/AI实践/mcp-comprehensive-guide.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/mcp-comprehensive-guide.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:58:17 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 更新日期：2026-04-14 &gt; 作者：刀哥的小助理 🦞🔪 一、MCP 简介 MCP（Model Context Protocol）是一个开放的标准化协议，旨在让 AI 模型能够与外部工具、服务和资源进行安全、高效的交互。它为 LLM 提</description>
+    </item>
+    <item>
+      <title>01-主流框架对比</title>
+      <link>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:57:05 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 一句话定义：对比 LangChain/LangGraph、AutoGen、CrewAI、LlamaIndex 等主流 Agent 框架的特点与选型。 &gt; 📌 2026 年末格局变化（相对本文初稿）： &gt; &gt; 1. LangChain / La</description>
+    </item>
+    <item>
+      <title>01-主流工具全景</title>
+      <link>https://http200.cn/posts-html/AI/WorkFlow/01-主流工具全景.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/WorkFlow/01-主流工具全景.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:54:07 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 一句话定义：盘点当前主流 AI / 自动化工作流工具的定位、特点与选型建议。 1. 工具地图 mermaid flowchart TB subgraph 通用自动化 n8n Make Zapier Activepieces end subgra</description>
+    </item>
+    <item>
+      <title>01-主流工具全景</title>
+      <link>https://http200.cn/posts-html/AI/ChatFlow/01-主流工具全景.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/ChatFlow/01-主流工具全景.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:53:41 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 一句话定义：盘点当前主流对话流 / 机器人搭建工具的定位、特点与选型建议。 1. 工具地图 mermaid flowchart TB subgraph AI应用平台 DifyCDify Chatflow FastGPT MaxKB end su</description>
+    </item>
+    <item>
+      <title>04-向量模型Embedding</title>
+      <link>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:52:35 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44</description>
+    </item>
+    <item>
+      <title>02-Embedding选型</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/02-Embedding选型.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/02-Embedding选型.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:52:07 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 状态：✅ 已补齐（2026-09-12，2026-11-13 更新候选模型格局） &gt; 一句话定义：选对嵌入模型（维度、多语言、领域、延迟与价格），否则后面检索怎么调都像噪声。 大纲 1. 选型的五个维度(一选型的五个维度) 2. 相似度度量与归</description>
+    </item>
+    <item>
+      <title>Ollama命令</title>
+      <link>https://http200.cn/posts-html/AI/AI实践/Ollama命令.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/Ollama命令.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:51:18 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44 &gt; 整理时间：2026-02-28 13:47（2026-11-13 更新模型推荐至 2026 年末主流） &gt; 适用版本：Ollama 最新版 --- 📚 目录 1. 安装与启动(1-安装与启动) 2. 模型管理(2-模型管理) 3. 运行对话(</description>
+    </item>
+    <item>
+      <title>OpenAI</title>
+      <link>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/OpenAI.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/OpenAI.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:49:46 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44</description>
+    </item>
+    <item>
+      <title>01-模型选型指南</title>
+      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</link>
+      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</guid>
+      <pubDate>Fri, 13 Nov 2026 05:48:06 GMT</pubDate>
+      <category>AI</category>
+      <description>&gt; 最后修改时间：2026-11-13 13:44</description>
+    </item>
     <item>
       <title>学习清单-TODO</title>
       <link>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</link>
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</guid>
       <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 14:00</description>
+      <description>&gt; 最后修改时间：2026-11-07 14:00 &gt; 用法：按顺序学；先读「已有主干」，再打开占位文看大纲，正文可稍后自己补。 &gt; 总图：README.md(README.md) &gt; 勾选：- → - x（学完或正文补齐均可勾） --- A. 已有主干（直接学，不建新文） A1 理论 - AI 知</description>
     </item>
     <item>
       <title>07-ChatFlow工具深挖索引</title>
@@ -21,7 +125,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/07-ChatFlow工具深挖索引.html</guid>
       <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 13:30</description>
+      <description>&gt; 最后修改时间：2026-11-07 13:30 &gt; 状态：✅ 已补齐（2026-11-07） &gt; 一句话定义：把 Dify Chatflow /ˈdɪfaɪ tʃæt fləʊ/ 、Coze（扣子） /kəʊz/ 、FastGPT /fɑːst ˈdʒiː piː ˈtiː/ 等会话型编排工具拆</description>
     </item>
     <item>
       <title>03-Voice-Realtime</title>
@@ -29,7 +133,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/03-Voice-Realtime.html</guid>
       <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 13:30</description>
+      <description>&gt; 最后修改时间：2026-11-07 13:30 &gt; 状态：✅ 已补齐（2026-11-07） &gt; 一句话定义：语音进、语音出的低延迟对话 Agent；核心工程题是级联 vs 端到端选型、打断（barge-in）处理、端到端延迟预算与工具循环瘦身。 大纲 1. 级联管道 vs 端到端 Realti</description>
     </item>
     <item>
       <title>09-Agent运行主机与沙箱</title>
@@ -37,7 +141,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/09-Agent运行主机与沙箱.html</guid>
       <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 14:00</description>
+      <description>&gt; 最后修改时间：2026-11-07 14:00 &gt; 状态：✅ 已补齐（2026-11-07） &gt; 一句话定义：Agent 需要 专用执行环境 （主机 / 虚拟机 / 沙箱）来收口爆炸半径、匹配突发资源画像并支持分钟级重置；本篇讲工程师怎么选型、怎么调度、怎么算成本、怎么画安全边界。 大纲 1.</description>
     </item>
     <item>
       <title>05-IM-Bot与信息推送</title>
@@ -45,7 +149,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/02-应用形态/05-IM-Bot与信息推送.html</guid>
       <pubDate>Sat, 07 Nov 2026 08:42:51 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 14:00</description>
+      <description>&gt; 最后修改时间：2026-11-07 14:00 &gt; 状态：✅ 已补齐（2026-11-07） &gt; 一句话定义： IM Bot（即时通讯机器人） 在渠道侧只有三种形态——命令、对话、推送；本篇讲渠道接入差异与「AI 资讯聚合 → 摘要 → 去重 → 推送 → 反馈回流」这条管道的通用工程模式。 大</description>
     </item>
     <item>
       <title>02-AGI路径与未来</title>
@@ -54,14 +158,6 @@
       <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
       <category>AI</category>
       <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：探讨通向通用人工智能的可能路径、关键瓶颈与未来展望。 1. 当前共识与分歧 - LLM 已展现强通用语言能力，但是否算 AGI 雏形存争议。 - 缺口：长程规划、世界模型、持续学习、具身、自我纠错。 2. 可能路径 | 路径 | 思</description>
-    </item>
-    <item>
-      <title>01-推理模型</title>
-      <link>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</guid>
-      <pubDate>Sat, 07 Nov 2026 08:42:50 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：通过 test-time 计算（长思维链）显著提升复杂推理能力的模型，代表是 OpenAI o1 / DeepSeek R1。 1. 核心思想 - 传统 LLM &quot;快思考&quot;：直接输出答案。 - 推理模型&quot;慢思考&quot;：在回答前进行长链内</description>
     </item>
     <item>
       <title>01-模型评估</title>
@@ -101,7 +197,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/13-多模态/03-视频生成与世界模型.html</guid>
       <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：视频生成模型把扩散/自回归生成从静态图像扩展到时空维度，生成连续、连贯的运动画面；世界模型 （ World Model /wɜːld ˈmɒdl/ ）更进一步——不只生成&quot;看起来对&quot;的像素，而是学习物理世界的因果与动态规律，让环境可</description>
     </item>
     <item>
       <title>Coding Agent 与 AI 编程</title>
@@ -109,7 +205,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/06-Coding-Agent与AI编程.html</guid>
       <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：Coding Agent /ˈkəʊdɪŋ ˈeɪdʒənt/ （编程智能体）是能自主读写代码、运行命令、执行测试并迭代自纠的 Agent，是 2025–2026 年第一个大规模落地的 Agent 品类，代表产品是 Claude C</description>
     </item>
     <item>
       <title>A2A 协议与 Agent 互操作</title>
@@ -117,7 +213,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/12-Agent与工具/05-A2A与Agent互操作.html</guid>
       <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：A2A /ˌeɪ tuː ˈeɪ/ （ Agent-to-Agent Protocol /ˈeɪdʒənt tə ˈeɪdʒənt ˈprəʊtəkɒl/ ，智能体间通信协议）是 Google 于 2025 年 4 月发起、后捐赠给</description>
     </item>
     <item>
       <title>GRPO 与 RLVR：可验证奖励强化学习</title>
@@ -125,7 +221,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/07-训练范式/05-GRPO与RLVR.html</guid>
       <pubDate>Sat, 07 Nov 2026 00:00:00 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 最后修改时间：2026-11-07 12:47</description>
+      <description>&gt; 最后修改时间：2026-11-07 12:47 &gt; 一句话定义：GRPO /ˌdʒiː ɑːr piː ˈəʊ/ （ Group Relative Policy Optimization /ɡruːp ˈrelətɪv ˈpɒləsi ˌɒptɪmaɪˈzeɪʃən/ ，组相对策略优化）是一种不</description>
     </item>
     <item>
       <title>运营</title>
@@ -133,7 +229,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/运营.html</guid>
       <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：用户、客服、销售、数据看板 &gt; 下游：产品经理 &gt; 核心交付：需求线索单、上线效果日报、异常升级单 &gt; 目标成熟度：L2 1. 角色边界 负责： - 收集并聚类用户反馈、客服工单、社群与评论。 - 用数据说明影响面，形成需求线索单。 - 上线后跟踪效果，</description>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：用户、客服、销售、数据看板 &gt; 下游：产品经理 &gt; 核心交付：需求线索单、上线效果日报、异常升级单 &gt; 目标成熟度：L2</description>
     </item>
     <item>
       <title>设计师</title>
@@ -141,7 +237,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/设计师.html</guid>
       <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：产品经理 &gt; 下游：程序员 / 产品经理 &gt; 核心交付：设计稿、走查清单 &gt; 目标成熟度：L1–L2 1. 角色边界 负责： - 把需求文档转成可实现的界面与交互。 - 维护组件映射、状态覆盖与设计规范。 - 完成视觉与交互验收。 不负责： - 接没有需</description>
+      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：产品经理 &gt; 下游：程序员 / 产品经理 &gt; 核心交付：设计稿、走查清单 &gt; 目标成熟度：L1–L2</description>
     </item>
     <item>
       <title>程序员</title>
@@ -149,103 +245,7 @@
       <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/程序员.html</guid>
       <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
       <category>AI</category>
-      <description>&gt; 整理日期：2026-10-26 &gt; 状态：✅ 已补齐（2026-10-26） &gt; 上游：产品经理、设计师 &gt; 下游：测试 / 发布 &gt; 核心交付：技术方案、代码、提测单、发布单 &gt; 目标成熟度：L3 &gt; 一句话：模型负责从规格到可合并代码的整条链路，人只做代码评审与责任签字。 全链路 AI /ˌ</description>
-    </item>
-    <item>
-      <title>测试</title>
-      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/测试.html</guid>
-      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：程序员 &gt; 下游：产品经理 / 设计师 / 程序员 &gt; 核心交付：用例、缺陷单、测试报告 &gt; 目标成熟度：L3 1. 角色边界 负责： - 按提测单设计用例、执行测试、管理缺陷。 - 给出覆盖、通过率、遗留风险与结论。 - 守住发布前的质量门禁。 不负责</description>
-    </item>
-    <item>
-      <title>产品经理</title>
-      <link>https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/智能员工/软件公司/产品经理.html</guid>
-      <pubDate>Fri, 30 Oct 2026 04:46:21 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 状态：⬜ 待写（骨架已初始化） &gt; 上游：运营、老板、客户 &gt; 下游：设计师 / 程序员 / 测试 &gt; 核心交付：需求文档、设计需求单、验收记录 &gt; 目标成熟度：L2–L3 1. 角色边界 负责： - 把需求线索收敛成可开发、可验收的 PRD /ˌpiː ɑːr ˈdiː/ （ Product</description>
-    </item>
-    <item>
-      <title>Claude-Code使用指南</title>
-      <link>https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Harness/成品harness/Claude Code/Claude-Code使用指南.html</guid>
-      <pubDate>Fri, 23 Oct 2026 05:40:46 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-23 13:26 &gt; 整理日期：2026-10-23 &gt; 适用版本：2026-10 官方 CLI；命令迭代很快，具体参数以 claude --help 和官方文档为准 Claude Code /klɔːd kəʊd/ 是 Anthropic /ænˈθrɒpɪk/</description>
-    </item>
-    <item>
-      <title>04-VLM与多模态应用</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/04-VLM与多模态应用.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/04-VLM与多模态应用.html</guid>
-      <pubDate>Thu, 22 Oct 2026 08:05:20 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-22 15:57 &gt; 状态：✅ 已补齐（2026-10-22） &gt; 一句话定义：视觉语言模型（及更广多模态）如何进入业务：识图问答、单据理解、多模态 RAG，以及绕不开的输入工程与图中注入防御。 大纲 1. VLM 能力与局限(一vlm-能力与局限) 2. 图文输入</description>
-    </item>
-    <item>
-      <title>09-llm-api</title>
-      <link>https://http200.cn/posts-html/AI/AI编程范式/AI应用开发范式/09-llm-api.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI编程范式/AI应用开发范式/09-llm-api.html</guid>
-      <pubDate>Wed, 21 Oct 2026 10:02:34 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-21 16:14 定义 LLM API 是大语言模型厂商对外提供的 HTTP/SDK 编程接口 ，让开发者把模型能力集成到自己的应用中。当前主流厂商普遍采用&quot;OpenAI 兼容&quot;的 REST 风格（/v1/chat/completions），并以官方 SDK（Pyt</description>
-    </item>
-    <item>
-      <title>06-WorkFlow工具深挖索引</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/06-WorkFlow工具深挖索引.html</guid>
-      <pubDate>Wed, 21 Oct 2026 07:53:16 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-21 15:17 &gt; 状态：✅ 已补齐（2026-10-21） &gt; 一句话定义：把 n8n /en eɪt ˈen/ 、Dify /ˈdɪfaɪ/ 、Langflow /ˈlæŋfloʊ/ 、LangGraph /ˈlæŋɡræf/ 、Temporal /ˈtemp</description>
-    </item>
-    <item>
-      <title>大模型 LLM 没有记忆？</title>
-      <link>https://http200.cn/posts-html/AI/AI实践/大模型LLm没有记忆？.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/大模型LLm没有记忆？.html</guid>
-      <pubDate>Wed, 21 Oct 2026 00:00:00 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-21 17:12 &gt; 一句话结论： LLM 本身没有任何记忆 ——它是一个「输入什么就处理什么」的无状态函数；你在 ChatGPT 里感受到的「记得我」，全部来自工程手段：拼上下文、服务端托管会话、提示缓存、外部记忆库，或把知识写进权重的微调。本文把这五层拆开讲清，</description>
-    </item>
-    <item>
-      <title>copilot配置</title>
-      <link>https://http200.cn/posts-html/AI/AI实践/copilot配置.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/copilot配置.html</guid>
-      <pubDate>Tue, 20 Oct 2026 06:51:22 GMT</pubDate>
-      <category>AI</category>
-      <description>配置copilot搭配的vscode插件 &gt; CMB: Copilot Model Bridge &gt; weisiren.cmb-copilot-model-bridge 配置copilot搭配的vscode插件 &gt; ctrl+shift+p 打开命令面板，输入 Copilot Model Brid</description>
-    </item>
-    <item>
-      <title>codex配置</title>
-      <link>https://http200.cn/posts-html/AI/AI实践/codex配置.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI实践/codex配置.html</guid>
-      <pubDate>Tue, 20 Oct 2026 06:51:22 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; .codex目录 config.toml toml 顶层主模型 model = &quot;deepseek-v4.1-flash&quot; 代码评审模型（很多人漏掉这个，这里经常是terra） review_model = &quot;deepseek-v4.1-flash&quot; inline 内联补全模型 inline_m</description>
-    </item>
-    <item>
-      <title>02-上下文工程</title>
-      <link>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/02-上下文工程.html</guid>
-      <pubDate>Wed, 14 Oct 2026 13:37:36 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-10 21:06 &gt; 一句话定义：系统化设计送给 LLM /ˌel el ˈem/ （ Large Language Model /lɑːdʒ ˈlæŋɡwɪdʒ ˈmɒdl/ ，大语言模型）的上下文——选材、检索、压缩、记忆，让模型在正确信息下推理。 &gt; 关联阅读</description>
-    </item>
-    <item>
-      <title>02-Computer-Use</title>
-      <link>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</guid>
-      <pubDate>Wed, 14 Oct 2026 13:37:36 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-08 21:51 &gt; 状态：✅ 已补齐（2026-10-08） &gt; 一句话定义：让 Agent 通过截图理解界面并执行点击/输入等动作，操作浏览器或桌面。 大纲 1. 为什么需要：API 到不了的地方(一为什么需要api-到不了的地方) 2. 感知-规划-动作环(二</description>
-    </item>
-    <item>
-      <title>上下文压缩机制对比：PI / OpenClaw / Codex / WorkBuddy</title>
-      <link>https://http200.cn/posts-html/AI/Harness/上下文压缩机制对比.html</link>
-      <guid isPermaLink="true">https://http200.cn/posts-html/AI/Harness/上下文压缩机制对比.html</guid>
-      <pubDate>Sat, 10 Oct 2026 00:00:00 GMT</pubDate>
-      <category>AI</category>
-      <description>&gt; 最后修改时间：2026-10-10 21:43 &gt; 一句话定义：上下文压缩是 harness /ˈhɑːnɪs/ （运行外壳）的&quot;内存管理&quot;——进上下文之前瘦身、组装时裁剪、超窗时摘要续命；四家实现细节不同，骨架高度一致。 &gt; 关联阅读：压缩方法论与预算分配见 ../AI知识库/09-RAG与上</description>
+      <description>&gt; 整理日期：2026-10-26 &gt; 状态：✅ 已补齐（2026-10-26） &gt; 上游：产品经理、设计师 &gt; 下游：测试 / 发布 &gt; 核心交付：技术方案、代码、提测单、发布单 &gt; 目标成熟度：L3 &gt; 一句话：模型负责从规格到可合并代码的整条链路，人只做代码评审与责任签字。</description>
     </item>
   </channel>
 </rss>

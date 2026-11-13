@@ -1,11 +1,26 @@
 # MCP (Model Context Protocol) 综合指南
 
+> 最后修改时间：2026-11-13 13:44
+
 > 更新日期：2026-04-14  
 > 作者：刀哥的小助理 🦞🔪
 
 ## 一、MCP 简介
 
 MCP（Model Context Protocol）是一个开放的标准化协议，旨在让 AI 模型能够与外部工具、服务和资源进行安全、高效的交互。它为 LLM 提供了访问现实世界能力的桥梁。
+
+### 协议版本时间线
+
+MCP 规范按日期版本演进，写代码前建议先确认目标客户端支持的版本：
+
+| 版本 | 关键变化 |
+|------|----------|
+| 2024-11-05 | 首个公开版：tools / resources / prompts、stdio + HTTP SSE 传输 |
+| 2025-03-26 | **Streamable HTTP 传输取代 HTTP+SSE**（本文 3.2 节标「衰退中」的原因）、OAuth 2.1 授权框架、JSON-RPC 批处理 |
+| 2025-06-18 | **Elicitation**（服务端可向用户反问收集输入）、**工具结构化输出**（`structuredContent` + outputSchema）、资源链接、OAuth Resource Server 角色明确化 |
+| 2025-11-25 | **Tasks**（实验性，长时任务的异步执行与状态轮询）、Extensions 扩展机制、采样与 elicitation 的 URL 模式细化 |
+
+生态侧：官方维护 **MCP Registry**（服务器注册中心）与多语言 SDK（TS / Python / Java / Kotlin / C# / Go / Rust / Swift）；Claude、ChatGPT、Gemini、VS Code、Cursor、Codex 等主流宿主均已支持，`.mcp.json` 成为跨工具的项目级约定。
 
 ### 核心价值
 - **标准化**：统一的协议规范，避免重复造轮子

@@ -9,7 +9,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
@@ -89,6 +89,95 @@ const dirtyPostInfo = loadDirtyPostPaths();
 const dirtyPostPaths = dirtyPostInfo.dirty;
 const dirtyAddedPaths = dirtyPostInfo.added;
 const NEW_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+const REPO_URL = 'https://github.com/tclxtommy-hu/tclxtommy-hu.github.io';
+
+/**
+ * 计算单篇文章「最近一次改动」的精简 diff，供文章页「最近变更」面板使用。
+ * 只对近 7 天有修改的文章调用（与「更新」徽标同一窗口），控制构建耗时。
+ *
+ * - 本地有未提交修改：与 HEAD 对比 → 本地预览就能看到「这次改了什么」；
+ * - 已提交：取该文件最近一次提交与其父提交的对比；
+ * - 新文章（首次提交即最新提交 / 未跟踪）：返回 null，无需面板（有「新增」徽标）。
+ */
+function loadRecentChange(repoRel) {
+  const run = (args) => execFileSync('git', ['-c', 'core.quotepath=false', ...args], {
+    cwd: ROOT, encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024,
+  });
+  try {
+    let diffText;
+    let subject;
+    let hash = '';
+    let date;
+    if (dirtyPostPaths.has(repoRel) && !dirtyAddedPaths.has(repoRel)) {
+      diffText = run(['diff', 'HEAD', '--', repoRel]);
+      subject = '未提交的本地修改';
+      date = new Date();
+    } else {
+      const log = run(['log', '-2', '--format=%H%x09%s%x09%cI', '--', repoRel]).trim().split('\n');
+      if (log.length < 2) return null; // 只有一次提交：新文章
+      const parts = log[0].split('\t');
+      hash = parts[0];
+      subject = parts[1] || '';
+      date = new Date(parts[2]);
+      diffText = run(['diff', `${hash}^!`, '--', repoRel]);
+    }
+    return parseDiffSummary(diffText, { subject, hash, date, repoRel });
+  } catch {
+    return null; // 根提交无父提交、git 不可用等——静默跳过面板
+  }
+}
+
+/** 把 unified diff 解析成渲染用行序列；过滤「最后修改时间」行的噪音 */
+function parseDiffSummary(diffText, meta) {
+  if (!diffText) return null;
+  // 文件整体新增/删除（含 renamed 场景）不出面板
+  if (/^--- \/dev\/null/m.test(diffText) || /^\+\+\+ \/dev\/null/m.test(diffText)) return null;
+  const MAX_LINES = 60;
+  const out = [];
+  let adds = 0;
+  let dels = 0;
+  let inHunks = false;
+  for (const line of diffText.split(/\r?\n/)) {
+    if (line.startsWith('@@')) { inHunks = true; out.push({ t: 'h', s: line }); continue; }
+    if (!inHunks) continue; // 跳过 diff --git / index / --- / +++ 头
+    if (line.startsWith('\\')) continue; // "\ No newline at end of file"
+    if (line.startsWith('+')) {
+      if (line.startsWith('+> 最后修改时间')) continue; // 每次编辑都会动的元信息行，过滤降噪
+      adds++; out.push({ t: 'a', s: line });
+    } else if (line.startsWith('-')) {
+      if (line.startsWith('-> 最后修改时间')) continue;
+      dels++; out.push({ t: 'd', s: line });
+    } else {
+      out.push({ t: 'c', s: line }); // 上下文行
+    }
+  }
+  if (!adds && !dels) return null; // 只改了时间戳行等无实质差异
+  let truncated = false;
+  let view = out;
+  if (view.length > MAX_LINES) { view = view.slice(0, MAX_LINES); truncated = true; }
+  return { ...meta, adds, dels, lines: view, truncated };
+}
+
+/** 渲染文章页「最近变更」折叠面板 */
+function renderChangePanel(change) {
+  const dateLabel = change.date instanceof Date && !Number.isNaN(change.date.getTime())
+    ? new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(change.date)
+    : '';
+  const body = change.lines.map((l) => {
+    const cls = l.t === 'a' ? 'diff-add' : l.t === 'd' ? 'diff-del' : l.t === 'h' ? 'diff-hunk' : 'diff-ctx';
+    return `<span class="${cls}">${attrEscape(l.s)}</span>`;
+  }).join('\n');
+  const commitLink = change.hash
+    ? `<a href="${REPO_URL}/commit/${change.hash}" target="_blank" rel="noreferrer">查看完整提交</a> · `
+    : '';
+  const historyUrl = `${REPO_URL}/commits/main/${change.repoRel.split('/').map(encodeURIComponent).join('/')}`;
+  return `<details class="post-changes">
+  <summary class="post-changes-toggle">📝 最近变更 <span class="diff-stat"><span class="diff-add">+${change.adds}</span> <span class="diff-del">−${change.dels}</span></span><span class="post-changes-meta">${attrEscape(change.subject)} · ${dateLabel}</span></summary>
+  <pre class="post-diff">${body}${change.truncated ? '\n<span class="diff-hunk">… 改动较多，已截断，完整内容见下方提交链接</span>' : ''}</pre>
+  <div class="post-changes-links">${commitLink}<a href="${historyUrl}" target="_blank" rel="noreferrer">本文全部历史</a></div>
+</details>`;
+}
 
 function formatMtime(d) {
   const parts = new Intl.DateTimeFormat('zh-CN', {
@@ -295,6 +384,10 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
     firstAdded instanceof Date && !Number.isNaN(firstAdded.getTime())
     && (Date.now() - firstAdded.getTime()) < NEW_WINDOW_MS
   );
+  // 近 7 天内有修改（且不是新建）→ 归档列表打「更新」徽标，让批量更新在界面上可感知
+  const isUpdated = !isNew && (Date.now() - lastModified.getTime()) < NEW_WINDOW_MS;
+  // 「最近变更」面板数据：与徽标同窗口，解析最近一次改动的 diff（新文章为 null）
+  const change = isUpdated ? loadRecentChange(repoRel) : null;
   let dateStr;
   let sortDate;
 
@@ -332,6 +425,13 @@ const posts = mdFiles.map(({ fullPath, relativeDir }) => {
     sortDate,
     lastModified,
     isNew,
+    isUpdated,
+    change,
+    // 文章页头部「更新于」标签：仅当最后一次提交晚于首次入库（真正改过）才显示，
+    // 避免建站初期批量导入提交把所有老文都标成「更新于同一天」
+    updatedDate: (firstAdded instanceof Date && !Number.isNaN(firstAdded.getTime())
+      && lastModified.getTime() - firstAdded.getTime() > 24 * 60 * 60 * 1000)
+      ? formatDate(lastModified) : '',
     tags: data.tags || [],
     category,
     subcategory,
@@ -785,7 +885,7 @@ for (const [postIndex, post] of posts.entries()) {
     description: post.summary,
     url: postUrl,
     datePublished: post.sortDate ? post.sortDate.toISOString().split('T')[0] : '',
-    dateModified: post.sortDate ? post.sortDate.toISOString().split('T')[0] : '',
+    dateModified: post.lastModified ? post.lastModified.toISOString().split('T')[0] : '',
   });
 
   const postHtml = `<!DOCTYPE html>
@@ -796,6 +896,7 @@ for (const [postIndex, post] of posts.entries()) {
   <title>${post.title} - http200.cn</title>
   <meta name="description" content="${attrEscape(post.summary)}">
   <meta property="article:published_time" content="${post.sortDate ? post.sortDate.toISOString() : ''}">
+  <meta property="article:modified_time" content="${post.lastModified ? post.lastModified.toISOString() : ''}">
   ${post.tags.length ? `<meta property="article:tag" content="${post.tags.join(',')}">` : ''}
   ${post.category ? `<meta property="article:section" content="${post.category}">` : ''}
   ${keywordsMeta}${ogMeta}${jsonLd}${headExtra}
@@ -816,7 +917,7 @@ for (const [postIndex, post] of posts.entries()) {
           <div class="post-header">
             <h1>${post.title}</h1>
             <div class="post-header-meta">
-              <div class="post-meta">${post.date}${categoryHtml}${tagsHtml}</div>
+              <div class="post-meta">${post.date}${post.updatedDate ? `<span class="post-updated" title="本文最后一次内容修改"> · 更新于 ${post.updatedDate}</span>` : ''}${categoryHtml}${tagsHtml}</div>
               <div class="font-size-control" role="group" aria-label="字号调节">
                 <span class="font-size-label">字号</span>
                 <button type="button" class="font-size-btn" data-action="decrease" aria-label="减小字号">A&minus;</button>
@@ -825,6 +926,7 @@ for (const [postIndex, post] of posts.entries()) {
               </div>
             </div>
           </div>
+          ${post.change ? renderChangePanel(post.change) : ''}
           <div class="post-content">${post.html}</div>
         </article>
         ${related.length ? `<section class="related-posts">
@@ -1020,7 +1122,7 @@ fs.writeFileSync(path.join(ROOT, 'index.html'), indexHtml, 'utf-8');
 
 // ====== Generate archive.html ======
 // Recent posts by git last-commit time (fs mtime is unreliable after CI checkout)
-const RECENT_LIMIT = 10;
+const RECENT_LIMIT = 20;
 const recentPosts = [...posts]
   .sort((a, b) => (b.lastModified > a.lastModified ? 1 : -1))
   .slice(0, RECENT_LIMIT);
@@ -1035,7 +1137,7 @@ const archiveListHtml = posts.length === 0
     const pathKey = toUrlPath(p.relativeDir || '');
     const isRecent = recentKeySet.has(`${pathKey}\0${p.slug}`);
     const mtimeLabel = formatMtime(p.lastModified);
-    const newBadge = p.isNew ? '<span class="archive-badge-new">新增</span>' : '';
+    const newBadge = p.isNew ? '<span class="archive-badge-new">新增</span>' : (p.isUpdated ? '<span class="archive-badge-updated">更新</span>' : '');
     return `
     <li class="archive-item" data-path="${pathKey}" data-slug="${attrEscape(p.slug)}" data-mtime="${p.lastModified.toISOString()}" data-recent="${isRecent ? '1' : '0'}">
       <a class="archive-item-link" href="${postUrl}">
@@ -1057,7 +1159,7 @@ ${recentPosts.map(p => {
     const postUrl = p.relativeDir
       ? `/posts-html/${toUrlPath(p.relativeDir)}/${p.slug}.html`
       : `/posts-html/${p.slug}.html`;
-    const newBadge = p.isNew ? '<span class="archive-badge-new">新增</span>' : '';
+    const newBadge = p.isNew ? '<span class="archive-badge-new">新增</span>' : (p.isUpdated ? '<span class="archive-badge-updated">更新</span>' : '');
     return `          <a href="${postUrl}" class="archive-recent-item" title="${attrEscape(p.title)}">
             <span class="archive-recent-title">📄 ${attrEscape(p.title)}${newBadge}</span>
             <span class="archive-recent-date">${formatMtime(p.lastModified)}</span>

@@ -3,15 +3,93 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://http200.cn/</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://http200.cn/archive.html</loc>
-    <lastmod>2026-11-07</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/04-vLLM.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/03-推理框架.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI实践/mcp-comprehensive-guide.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/WorkFlow/01-主流工具全景.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/ChatFlow/01-主流工具全景.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/02-Embedding选型.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI实践/Ollama命令.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/OpenAI.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/学习清单-TODO.html</loc>
@@ -45,12 +123,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/02-AGI路径与未来.html</loc>
-    <lastmod>2026-11-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/15-前沿与趋势/01-推理模型.html</loc>
     <lastmod>2026-11-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -182,12 +254,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/07-前沿与形态/02-Computer-Use.html</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/Harness/上下文压缩机制对比.html</loc>
     <lastmod>2026-10-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -284,18 +350,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/05-工程与生产/01-模型选型指南.html</loc>
-    <lastmod>2026-09-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/09-RAG与上下文/04-向量模型Embedding.html</loc>
-    <lastmod>2026-09-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/04-Agent与编排/03-输出解析与修复.html</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>weekly</changefreq>
@@ -362,12 +416,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/02-Embedding选型.html</loc>
-    <lastmod>2026-09-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/AI工程师学习路线/03-检索与知识/01-Chunking策略.html</loc>
     <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
@@ -406,12 +454,6 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/AI实践/客服Chatbot发展路线图-2026-09-01.html</loc>
     <lastmod>2026-09-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/03-推理框架.html</loc>
-    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -518,12 +560,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/01-主流框架对比.html</loc>
-    <lastmod>2026-08-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/Agent开发知识/08-评估与调试/01-评估与调试.html</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -544,12 +580,6 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/Harness/harness框架/AgentScope/得物知识问答：复合检索AGENT的系统设计实践.html</loc>
     <lastmod>2026-08-12</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI知识库/11-推理与部署/04-vLLM.html</loc>
-    <lastmod>2026-08-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -638,19 +668,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://http200.cn/posts-html/AI/WorkFlow/01-主流工具全景.html</loc>
-    <lastmod>2026-07-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://http200.cn/posts-html/AI/WorkFlow/00-什么是WorkFlow.html</loc>
-    <lastmod>2026-07-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/ChatFlow/01-主流工具全景.html</loc>
     <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -784,12 +802,6 @@
   <url>
     <loc>https://http200.cn/posts-html/AI/AI编程范式/AI辅助编程范式/07-openspec.html</loc>
     <lastmod>2026-07-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/Agent开发知识/10-框架与工具/OpenAI.html</loc>
-    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1173,18 +1185,6 @@
   </url>
   <url>
     <loc>https://http200.cn/posts-html/AI/AI实践/ollama镜像.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI实践/Ollama命令.html</loc>
-    <lastmod>2026-06-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://http200.cn/posts-html/AI/AI实践/mcp-comprehensive-guide.html</loc>
     <lastmod>2026-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

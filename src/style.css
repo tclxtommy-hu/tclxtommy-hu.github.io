@@ -730,6 +730,12 @@ body.is-mermaid-zoomed {
   font-size: 0.6rem;
   vertical-align: middle;
 }
+.archive-recent-title .archive-badge-updated {
+  margin-left: 4px;
+  padding: 0 4px;
+  font-size: 0.6rem;
+  vertical-align: middle;
+}
 .archive-recent-date {
   flex-shrink: 0;
   font-size: 0.7rem;
@@ -755,9 +761,112 @@ body.is-mermaid-zoomed {
   background: linear-gradient(90deg, var(--accent), var(--accent3));
   vertical-align: middle;
 }
+.archive-badge-updated {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: #7fe0b2;
+  border: 1px solid #3fbf7f;
+  background: transparent;
+  vertical-align: middle;
+}
 .archive-list.is-recent-view .archive-date {
   min-width: 138px;
   font-variant-numeric: tabular-nums;
+}
+
+/* ===== 文章页「最近变更」面板 ===== */
+.post-changes {
+  margin: 0 0 20px;
+  border: 1px solid rgba(127, 224, 178, 0.35);
+  border-radius: 8px;
+  background: rgba(127, 224, 178, 0.05);
+  overflow: hidden;
+}
+.post-changes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-muted);
+}
+.post-changes-toggle:hover {
+  color: var(--accent);
+}
+.post-changes-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.diff-stat {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.diff-stat .diff-add { color: #4fd18b; }
+.diff-stat .diff-del { color: #f0788a; }
+.post-diff {
+  margin: 0;
+  padding: 10px 12px;
+  max-height: 360px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border-top: 1px solid rgba(127, 224, 178, 0.2);
+}
+.post-diff span {
+  display: block;
+}
+.post-diff .diff-add {
+  color: #7fe0b2;
+  background: rgba(63, 191, 127, 0.1);
+}
+.post-diff .diff-del {
+  color: #f0a0ae;
+  background: rgba(240, 120, 138, 0.1);
+  text-decoration: none;
+}
+.post-diff .diff-hunk {
+  color: #82aaff;
+  opacity: 0.8;
+}
+.post-diff .diff-ctx {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+.post-changes-links {
+  padding: 6px 12px 10px;
+  font-size: 0.75rem;
+  border-top: 1px solid rgba(127, 224, 178, 0.2);
+}
+
+html[data-theme="light"] .post-changes {
+  border-color: rgba(46, 167, 106, 0.45);
+  background: rgba(46, 167, 106, 0.06);
+}
+html[data-theme="light"] .post-diff .diff-add {
+  color: #14663c;
+  background: rgba(46, 167, 106, 0.14);
+}
+html[data-theme="light"] .post-diff .diff-del {
+  color: #a33040;
+  background: rgba(200, 60, 80, 0.12);
+}
+html[data-theme="light"] .post-diff .diff-hunk {
+  color: #2f5fd0;
 }
 .archive-tree {
   font-size: 0.88rem;
@@ -3246,6 +3355,12 @@ html[data-theme="light"] .comment-btn:hover {
 html[data-theme="light"] .archive-badge-new {
   color: #fff;
   background: linear-gradient(90deg, #2f7ee0, #c04f8c);
+}
+
+/* 「更新」角标浅色主题：深绿描边 + 深绿字，保持可读 */
+html[data-theme="light"] .archive-badge-updated {
+  color: #1d7a4c;
+  border-color: #2ea76a;
 }
 
 html[data-theme="light"] .skip-link {

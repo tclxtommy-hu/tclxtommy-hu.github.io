@@ -1,5 +1,7 @@
 # 向量模型（Embedding Model）
 
+> 最后修改时间：2026-11-13 13:44
+
 > 一句话定义：把文本 / 图片 / 视频编码成固定维度浮点向量的模型，只负责"算相似度"、不负责"写答案"，是 RAG、语义搜索与推荐系统的检索底座。
 
 > 关联阅读：RAG 全链路见 [01-RAG检索增强生成.md](01-RAG检索增强生成.md)；向量怎么存、怎么查见 [03-向量数据库.md](03-向量数据库.md)；词级嵌入基础见 [../06-大语言模型LLM/03-Embedding与表示.md](../06-大语言模型LLM/03-Embedding与表示.md)。
@@ -17,7 +19,7 @@
 | 成本 | 中等 | 高 | 很低 |
 | 能否直接回答问题 | ✅ | ✅ | ❌ 只做匹配 |
 | 典型场景 | 日常对话、文案、摘要 | 奥数、算法、复杂方案推演 | RAG 知识库、语义搜索、推荐 |
-| 例子 | GPT-4o、普通豆包 | o1、DeepSeek R1 | BGE、text-embedding、doubao-embedding |
+| 例子 | GPT-5、普通豆包 | DeepSeek R1、Kimi K2 Thinking | BGE-M3、Qwen3-Embedding、text-embedding-3、doubao-embedding |
 
 **通俗比喻** ：
 
@@ -498,7 +500,7 @@ console.log(output.data.length); // 512 维句向量
 
 ### 9.3 当前可用模型与框架
 
-> 没有独立的"富化模型 API"一家独大：核心配方是「通用 LLM（GPT-4o / DeepSeek-V3 / Qwen 等强指令遵循模型）+ Schema 驱动的抽取 Prompt + 实体消歧」，框架决定质量、成本与更新能力。
+> 没有独立的"富化模型 API"一家独大：核心配方是「通用 LLM（GPT-5 系 / DeepSeek-V3.2 / Qwen3 等强指令遵循模型）+ Schema 驱动的抽取 Prompt + 实体消歧」，框架决定质量、成本与更新能力。
 
 | 方案 | 出品方 | 定位 | 特点 |
 |---|---|---|---|

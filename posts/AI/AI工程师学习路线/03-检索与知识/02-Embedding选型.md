@@ -1,6 +1,8 @@
 # Embedding 选型
 
-> 状态：✅ 已补齐（2026-09-12）  
+> 最后修改时间：2026-11-13 13:44
+
+> 状态：✅ 已补齐（2026-09-12，2026-11-13 更新候选模型格局）  
 > 一句话定义：选对嵌入模型（维度、多语言、领域、延迟与价格），否则后面检索怎么调都像噪声。
 
 ## 大纲
@@ -52,6 +54,19 @@
 - 选**单语优化模型**：中文效果最好，但英文技术文档块会被嵌入得语义含混，查「rate limiter 实现」召回很差；
 - 选**多语言模型**：单语峰值略低，但跨语言检索稳——英文文档块能被中文问题「rate limiter 怎么写」命中；
 - 判据一句话：**语料跨语言，模型就选多语言；语料纯单语，才用单语模型拿那 1~2 个点的峰值**。
+
+### 1.2.1 2026 年末候选模型速览
+
+> 嵌入模型迭代同样很快，下表为 2026 年末常用候选（公榜分数以 MTEB 实时榜为准）：
+
+| 类别 | 候选 | 特点 |
+|------|------|------|
+| 多语言开源（自托管首选） | **Qwen3-Embedding** 系列（0.6B/4B/8B，MTEB 多语言榜首梯队）、BGE-M3（仍稳）、GTE-multilingual | Qwen3-Embedding 支持指令微调式任务描述与 Matryoshka 截断 |
+| API 闭源 | OpenAI text-embedding-3 系列、Google **gemini-embedding-001**、Voyage voyage-3.5、Cohere embed-v4 | gemini-embedding 多语言性价比突出；Voyage 在代码/法律领域口碑好 |
+| 代码检索 | Voyage-code、jina-embeddings-v4（代码子任务）、Qwen3-Embedding 代码场景 | 代码库检索务必单列评测 |
+| 中文轻量 | BGE-small/large-zh、Qwen3-Embedding-0.6B | 边缘与低成本场景 |
+
+新趋势：**Reranker 与 Embedding 同族配套**（Qwen3-Reranker、BGE-Reranker-v2）——同厂商嵌入 + 重排联合训练，召回+精排的一致性更好，选型时优先考虑同族组合（重排见 [04 篇](./04-Rerank与混合检索.md)）。
 
 ### 1.3 维度与成本的换算
 
@@ -181,7 +196,7 @@ export function shadowReport(hits: DualHit[], tolerance = 0): {
 | 环节 | 工具 | 备注 |
 |------|------|------|
 | 公榜初筛 | MTEB 排行榜 | 只做初筛，不替代自建评测 |
-| 自托管嵌入 | sentence-transformers、BGE / GTE 系列 | 多语言开源首选，GPU 批量跑 |
+| 自托管嵌入 | sentence-transformers、Qwen3-Embedding / BGE / GTE 系列 | 多语言开源首选，GPU 批量跑 |
 | API 嵌入 | OpenAI / 智谱 / 通义协议 | 注意批接口限流与重试 |
 | 影子比对 | 自写 TS 脚本 + 定时对账 | 比对逻辑百行内，勿上重框架 |
 

@@ -1,6 +1,8 @@
-﻿# Ollama 命令参考手册
+# Ollama 命令参考手册
 
-> 整理时间：2026-02-28 13:47  
+> 最后修改时间：2026-11-13 13:44
+
+> 整理时间：2026-02-28 13:47（2026-11-13 更新模型推荐至 2026 年末主流）  
 > 适用版本：Ollama 最新版
 
 ---
@@ -56,9 +58,9 @@ OLLAMA_MODELS=/path       # 自定义模型存储路径
 
 ```bash
 ollama pull <model>                   # 下载模型
-ollama pull qwen2.5:7b                # 下载 Qwen2.5 7B
-ollama pull llama3.2:3b               # 下载 Llama 3.2 3B
-ollama pull qwen2.5-coder:7b          # 下载代码专用模型
+ollama pull qwen3:8b                # 下载 Qwen3 8B
+ollama pull gemma3:4b               # 下载 Llama 3.2 3B
+ollama pull qwen3-coder:30b          # 下载代码专用模型
 ```
 
 ### 查看模型
@@ -72,14 +74,14 @@ ollama list --running                 # 列出运行中的模型
 
 ```bash
 ollama rm <model>                     # 删除模型
-ollama rm qwen2.5:7b                  # 删除指定模型
+ollama rm qwen3:8b                  # 删除指定模型
 ```
 
 ### 复制模型
 
 ```bash
 ollama cp <source> <target>           # 复制模型
-ollama cp llama3.2 my-llama           # 复制为自定义名称
+ollama cp qwen3:8b my-qwen            # 复制为自定义名称
 ```
 
 ### 导出模型
@@ -96,8 +98,8 @@ ollama show --modelfile <model> > Modelfile  # 导出模型文件
 
 ```bash
 ollama run <model>                    # 启动交互对话
-ollama run qwen2.5:7b                 # 运行 Qwen2.5
-ollama run llama3.2:3b "你好"         # 单次问答
+ollama run qwen3:8b                 # 运行 Qwen3
+ollama run qwen3:4b "你好"            # 单次问答
 ```
 
 ### 对话命令
@@ -115,7 +117,7 @@ ollama run llama3.2:3b "你好"         # 单次问答
 ### 多轮对话示例
 
 ```bash
-ollama run qwen2.5:7b <<EOF
+ollama run qwen3:8b <<EOF
 你好
 介绍一下你自己
 写个快速排序
@@ -125,8 +127,8 @@ EOF
 ### 从管道输入
 
 ```bash
-echo "解释量子纠缠" | ollama run qwen2.5:7b
-cat file.txt | ollama run qwen2.5:7b "总结这篇文章"
+echo "解释量子纠缠" | ollama run qwen3:8b
+cat file.txt | ollama run qwen3:8b "总结这篇文章"
 ```
 
 ---
@@ -155,7 +157,7 @@ curl http://localhost:11434/api/tags
 **基础对话：**
 ```bash
 curl http://localhost:11434/api/generate -d '{
-  "model": "qwen2.5:7b",
+  "model": "qwen3:8b",
   "prompt": "你好",
   "stream": false
 }'
@@ -164,7 +166,7 @@ curl http://localhost:11434/api/generate -d '{
 **对话格式（推荐）：**
 ```bash
 curl http://localhost:11434/api/chat -d '{
-  "model": "qwen2.5:7b",
+  "model": "qwen3:8b",
   "messages": [{"role": "user", "content": "你好"}],
   "stream": false
 }'
@@ -173,7 +175,7 @@ curl http://localhost:11434/api/chat -d '{
 **多轮对话：**
 ```bash
 curl http://localhost:11434/api/chat -d '{
-  "model": "qwen2.5:7b",
+  "model": "qwen3:8b",
   "messages": [
     {"role": "system", "content": "你是编程助手"},
     {"role": "user", "content": "写个快速排序"},
@@ -189,7 +191,7 @@ curl http://localhost:11434/api/chat -d '{
 curl http://localhost:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "qwen2.5:7b",
+    "model": "qwen3:8b",
     "messages": [{"role": "user", "content": "你好"}]
   }'
 ```
@@ -200,7 +202,7 @@ curl http://localhost:11434/v1/chat/completions \
 ```python
 import requests
 
-def chat(prompt, model="qwen2.5:7b"):
+def chat(prompt, model="qwen3:8b"):
     response = requests.post(
         "http://localhost:11434/api/chat",
         json={
@@ -223,13 +225,13 @@ pip install ollama
 import ollama
 
 # 简单调用
-response = ollama.chat(model='qwen2.5:7b', messages=[
+response = ollama.chat(model='qwen3:8b', messages=[
     {'role': 'user', 'content': '你好'}
 ])
 
 # 流式输出
 stream = ollama.chat(
-    model='qwen2.5:7b',
+    model='qwen3:8b',
     messages=[{'role': 'user', 'content': '写个故事'}],
     stream=True
 )
@@ -247,7 +249,7 @@ npm install ollama
 import ollama from 'ollama'
 
 const response = await ollama.chat({
-  model: 'qwen2.5:7b',
+  model: 'qwen3:8b',
   messages: [{ role: 'user', content: '你好' }]
 })
 console.log(response.message.content)
@@ -261,7 +263,7 @@ console.log(response.message.content)
 
 ```bash
 curl http://localhost:11434/api/generate -d '{
-  "model": "qwen2.5:7b",
+  "model": "qwen3:8b",
   "prompt": "写首诗",
   "stream": false,
   "options": {
@@ -278,7 +280,7 @@ curl http://localhost:11434/api/generate -d '{
 
 **Modelfile 示例：**
 ```dockerfile
-FROM qwen2.5:7b
+FROM qwen3:8b
 
 # 设置系统提示
 SYSTEM """
@@ -301,8 +303,8 @@ ollama run my-coder
 ### 查看模型信息
 
 ```bash
-ollama show qwen2.5:7b              # 显示模型信息
-ollama show --modelfile qwen2.5:7b  # 显示模型文件
+ollama show qwen3:8b              # 显示模型信息
+ollama show --modelfile qwen3:8b  # 显示模型文件
 ```
 
 ### 远程访问配置
@@ -331,38 +333,47 @@ sudo systemctl restart ollama
 
 | 模型 | 大小 | 显存 | 说明 |
 |------|------|------|------|
-| `qwen2.5:7b` | 7B | 6-8GB | 阿里开源，中文优秀 |
-| `qwen2.5:1.5b` | 1.5B | 2GB | 轻量级，低配可用 |
-| `chatglm3:6b` | 6B | 6GB | 清华开源，中文优化 |
+| `qwen3:8b` | 8B | 6-8GB | 阿里 Qwen3，中文优秀，支持 thinking 开关 |
+| `qwen3:4b` | 4B | 4GB | 轻量级，低配可用 |
+| `qwen3:1.7b` | 1.7B | 2GB | 极低配可用 |
+| `glm4:9b` | 9B | 8GB | 智谱 GLM-4，中文优化 |
 
 ### 代码生成
 
 | 模型 | 大小 | 显存 | 说明 |
 |------|------|------|------|
-| `qwen2.5-coder:7b` | 7B | 6-8GB | 代码专用 |
-| `deepseek-coder:6.7b` | 6.7B | 6GB | 深度求索 |
-| `codellama:7b` | 7B | 6GB | Meta 代码模型 |
+| `qwen3-coder:30b` | 30B | 20GB+ | 2025 年代码主力，Agentic Coding 强 |
+| `qwen2.5-coder:7b` | 7B | 6-8GB | 上一代经典，低配仍可用 |
+| `deepseek-coder-v2:16b` | 16B | 12GB | 深度求索 MoE 代码模型 |
 
 ### 通用对话
 
 | 模型 | 大小 | 显存 | 说明 |
 |------|------|------|------|
-| `llama3.2:3b` | 3B | 4GB | Meta 轻量版 |
-| `llama3.1:8b` | 8B | 8GB | Meta 主流版 |
-| `phi3:mini` | 3.8B | 4GB | 微软，性能惊喜 |
-| `mistral:7b` | 7B | 6GB | Mistral AI |
+| `gpt-oss:20b` | 20B | 16GB | OpenAI 开源权重，MXFP4 量化，可离线 |
+| `gpt-oss:120b` | 120B | 80GB+ | OpenAI 开源旗舰，需大显存或云端 |
+| `gemma3:4b` | 4B | 4GB | Google Gemma 3，多模态，轻量 |
+| `llama3.2:3b` | 3B | 4GB | Meta 轻量版，老当益壮 |
+| `phi4-mini` | 3.8B | 4GB | 微软 Phi-4-mini，小模型推理强 |
+
+### 推理模型（thinking）
+
+| 模型 | 大小 | 显存 | 说明 |
+|------|------|------|------|
+| `deepseek-r1:8b` | 8B | 8GB | R1 蒸馏版，本地体验思维链 |
+| `qwen3:8b` | 8B | 6-8GB | 混合推理，`/think` 与 `/no_think` 切换 |
 
 ### 快速测试
 
 ```bash
 # 中文测试
-ollama run qwen2.5:7b "用一句话解释量子纠缠"
+ollama run qwen3:8b "用一句话解释量子纠缠"
 
 # 代码测试
-ollama run qwen2.5-coder:7b "写个 Python 快速排序"
+ollama run qwen3-coder:30b "写个 Python 快速排序"
 
 # 逻辑测试
-ollama run llama3.2:3b "鸡兔同笼，共 35 个头，94 只脚，问各几只"
+ollama run qwen3:4b "鸡兔同笼，共 35 个头，94 只脚，问各几只"
 ```
 
 ---
@@ -392,8 +403,8 @@ netstat -ano | findstr 11434  # Windows
 ```
 
 **Q: 显存不足？**
-- 使用更小模型：`ollama pull qwen2.5:1.5b`
-- 使用量化版本：`ollama pull qwen2.5:7b-q4_K_M`
+- 使用更小模型：`ollama pull qwen3:1.7b`
+- 使用量化版本：`ollama pull qwen3:8b-q4_K_M`
 
 **Q: 下载慢？**
 - 使用镜像源或本地导入 GGUF 文件
